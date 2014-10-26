@@ -1,5 +1,5 @@
 #!/bin/sh
-DIRECTORY="../DOMTemplate";
+DIRECTORY="../domtemplate";
 if [ ! -d "$DIRECTORY" ]; then
     echo "please clone DOMTemplate from https://bitbucket.org/gunsim/domtemplate"
 else
