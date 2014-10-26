@@ -12,10 +12,10 @@
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-exec": "^0.4.6"
+    "grunt-exec": "^0.4.6",
+    "node-static": "^0.7.6"
   },
   "dependencies": {
-    "node-static": "^0.7.6",
     "requirejs": "^2.1.15"
   },
   "script": {
