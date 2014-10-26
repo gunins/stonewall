@@ -7,6 +7,7 @@ else
     npm install
     grunt
     cd "../widget"
-    npm instal ${DIRECTORY}/domtemplate*
+    npm install
+    npm install ${DIRECTORY}/domtemplate*
     grunt
 fi
