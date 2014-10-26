@@ -27,68 +27,20 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         clean: ['target'],
         exec: {
-            browserify: 'browserify -o lib/htmlparser2.js -r htmlparser2 -s htmlparser'
+            npmpack: 'npm pack dist'
         },
         requirejs: {
-            dev: {
-                options: {
-                    baseUrl: 'src',
-                    optimize: 'none',
-                    dir: "target/dev",
-                    paths: {
-                        'htmlparser2': '../lib/htmlparser2'
-                    },
-                    name: 'templating/parser',
-                    include: [
-                        'templating/utils',
-                        'templating/DOMParser',
-                        'templating/Coder',
-                        'templating/Decoder'
-                    ],
-                    shim: {
-                        templating: {
-                            deps: [
-                                'templating/utils',
-                                'templating/DOMParser',
-                                'templating/Coder',
-                                'templating/Decoder'
-                            ]
-                        }
-                    }
-                }
-            },
             prod: {
                 options: {
                     baseUrl: 'src',
                     optimize: 'uglify2',
                     removeCombined: true,
                     paths: {
-                        'htmlparser2': '../lib/htmlparser2',
-                        'watch': '../bower_components/watch/src/watch'
+                        'watch': '../bower_components/watch/src/watch',
+                        templating: '../node_modules/domtemplate/dev/templating'
                     },
                     dir: 'target/prod',
                     modules: [
-                        {
-                            name: 'templating/Decoder',
-                            exclude: [
-                                'templating/utils'
-                            ]
-                        },
-                        {
-                            name: 'coders/component/CpDecoder'
-                        },
-                        {
-                            name: 'coders/placeholders/plDecoder',
-                            exclude: [
-                                'templating/utils'
-                            ]
-                        },
-                        {
-                            name: 'coders/databind/bdDecoder',
-                            exclude: [
-                                'templating/utils'
-                            ]
-                        },
                         {
                             name: 'widget/App'
                         },
@@ -113,10 +65,10 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/basic/target",
                     paths: {
-                        coders: '../../src/coders',
+                        coders: '../../node_modules/domtemplate/dev/coders',
                         buttona: 'buttonA/buttonA',
-                        templating: '../../target/dev/templating',
-                        htmlparser2: '../../target/dev/htmlparser2',
+                        templating: '../../node_modules/domtemplate/dev/templating',
+                        htmlparser2: '../../node_modules/domtemplate/dev/htmlparser2',
                         'widget': '../../src/widget',
                         'watch': '../../bower_components/watch/src/watch',
                         'd3': '../../bower_components/d3/d3'
@@ -136,9 +88,9 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/application/target",
                     paths: {
-                        coders: '../../../src/coders',
-                        templating: '../../../target/dev/templating',
-                        htmlparser2: '../../../target/dev/htmlparser2',
+                        coders: '../../../node_modules/domtemplate/dev/coders',
+                        templating: '../../../node_modules/domtemplate/dev/templating',
+                        htmlparser2: '../../../node_modules/domtemplate/dev/htmlparser2',
                         'widget': '../../../src/widget',
                         'watch': '../../../bower_components/watch/src/watch',
                         'd3': '../../../bower_components/d3/d3'
@@ -151,16 +103,6 @@ module.exports = function (grunt) {
         concat: {
             options: {
                 separator: ';'
-            },
-            Decoder: {
-
-                src: [
-                    'target/prod/coders/component/CpDecoder.js',
-                    'target/prod/coders/placeholders/plDecoder.js',
-                    'target/prod/coders/databind/bdDecoder.js',
-                    'target/prod/templating/Decoder.js'
-                ],
-                dest: 'target/prod/Decoder.js'
             },
             Widget: {
                 src: [
@@ -177,6 +119,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
 
-    grunt.registerTask('default', ['clean', 'exec', 'requirejs', 'concat']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat']);
 
 };

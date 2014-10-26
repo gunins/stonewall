@@ -1,4 +1,4 @@
-HTML templating engine.
+Framework for creating "Rich Single Page Applications".
 =======================
 
-This is advanced templating engine which one allowing you to access DOM elements.
+This Framework based on DomTemplate library. There is Devolop and production environments.

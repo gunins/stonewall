@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: './src',
+    baseUrl: './target',
     templateCoders: [
         'coders/component/CpCoder',
         'coders/placeholders/plCoder',
@@ -12,9 +12,9 @@ require.config({
         'coders/databind/bdDecoder'
     ],
     paths: {
-        'coders': '../../../src/coders',
-        'templating': '../../../src/templating',
-        'htmlparser2': '../../../lib/htmlparser2',
+        'coders': '../../../node_modules/domtemplate/dev/coders',
+        'templating': '../../../node_modules/domtemplate/dev/templating',
+        'htmlparser2': '../../../node_modules/domtemplate/dev/htmlparser2',
         'widget': '../../../src/widget',
         'watch':'../../../bower_components/watch/src/watch',
         'd3':'../../../bower_components/d3/d3'
