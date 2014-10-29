@@ -38,9 +38,10 @@ define([
         var bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update;
         if (bind) {
-            Object.keys(bind).forEach(function (key) {
+            Object.keys(bind).forEach(function (bindItem) {
+                var key = bind[bindItem];
                 if (data[key]) {
-                    if (key === 'class') {
+                    if (bindItem === 'class') {
                         childBinder.addClass(data[key]);
                         var currClass = data[key];
                         if (update === 'true') {
@@ -51,10 +52,10 @@ define([
                             }.bind(this));
                         }
                     } else {
-                        childBinder.setAttribute(key, data[key]);
+                        childBinder.setAttribute(bindItem, data[key]);
                         if (update === 'true') {
                             watch(data, key, function () {
-                                childBinder.setAttribute(key, data[key]);
+                                childBinder.setAttribute(bindItem, data[key]);
                             }.bind(this));
                         }
                     }
@@ -230,7 +231,6 @@ define([
             this.data = (dataSet) ? dataSet : this.context.data[data.bind];
             this.children = setChildren.call(this, template.children, children);
             this.bindings = setBinders.call(this, this.children);
-            //console.log(this)
 
             if (this.data) {
                 this.applyBinders(this.data, this);
@@ -251,7 +251,10 @@ define([
         elReady: {},
         init: function () {
         },
-        applyBinders: applyBinders
+        applyBinders: applyBinders,
+        destroy:function(){
+            this.el.remove();
+        }
     });
 
     Constructor.extend = utils.fnExtend;

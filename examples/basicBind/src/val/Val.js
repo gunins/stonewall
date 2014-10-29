@@ -3,9 +3,6 @@ define(['widget/Constructor',
 ],function(Widget, template){
     return Widget.extend({
         template:template,
-        init:function(){
-            console.log(this.data.items)
-        },
         events:{
             input:[
                 {

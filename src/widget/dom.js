@@ -76,6 +76,9 @@ define([
                 }
             }
         },
+        remove:function(el){
+            el.el.remove();
+        },
         Element: Element
     }
 
@@ -122,6 +125,9 @@ define([
         on: function (event, cb, context) {
             var args = Array.prototype.slice.call(arguments, 0);
             return dom.on.apply(false, [this].concat(args));
+        },
+        remove:function(){
+            dom.remove(this);
         }
 
     });
