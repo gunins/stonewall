@@ -1,3 +1,4 @@
+/*globals console*/
 define([
     'templating/parser!./search/_search.html',
     'widget/Constructor'
@@ -7,6 +8,14 @@ define([
         init: function (data, children) {
         },
         events: {
+            form: [
+                {
+                    name: 'submit',
+                    action: function (e) {
+                        e.preventDefault();
+                    }
+                }
+            ],
             input: [
                 {
                     name: 'change',

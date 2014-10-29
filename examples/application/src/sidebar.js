@@ -6,7 +6,7 @@ define([
         template: template,
         init: function () {
         },
-        bind: {
+        elReady: {
             links: function (el, data) {
                 if(data.class==='active'){
                     this.context.eventBus.publish('setActive', data);

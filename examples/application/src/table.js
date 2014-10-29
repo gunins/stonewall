@@ -53,7 +53,7 @@ define([
                 });
             }
         },
-        bind: {
+        elReady: {
             tbody: function (el, data) {
                 el.addClass(data.class);
             }

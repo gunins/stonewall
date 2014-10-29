@@ -1,29 +1,29 @@
 <div class="container-fluid">
     <div class="row">
-        <cp-sidebar data-bind="sidebar" tp-name="sideBar"></cp-sidebar>
+        <cp-sideBar data-bind="sidebar" src="sidebar"></cp-sideBar>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <pl-page-header tp-tag="h1"></pl-page-header>
 
-            <cp-charts tp-name="charts">
+            <cp-charts src="charts">
                 <pl-content>
-                    <cp-piechart data-bind="pie1" tp-name="pie1">
+                    <cp-pie1 src="piechart" data-bind="pie1" >
                         <pl-chartheader>Custom Header 1</pl-chartheader>
-                    </cp-piechart>
-                    <cp-piechart data-bind="pie2" tp-name="pie2">
+                    </cp-pie1>
+                    <cp-pie2 src="piechart" data-bind="pie2" >
                         <pl-chartheader>Custom Header 2</pl-chartheader>
-                    </cp-piechart>
-                    <cp-piechart data-bind="pie3" tp-name="pie3">
+                    </cp-pie2>
+                    <cp-pie3 src="piechart" data-bind="pie3" >
                         <pl-chartheader>Custom Header 3</pl-chartheader>
-                    </cp-piechart>
-                    <cp-piechart data-bind="pie4" tp-name="pie4">
+                    </cp-pie3>
+                    <cp-pie4 src="piechart" data-bind="pie4" >
                         <pl-chartheader>Custom Header 4</pl-chartheader>
-                    </cp-piechart>
+                    </cp-pie4>
                 </pl-content>
             </cp-charts>
 
             <pl-sub-header tp-tag="h3">Section title</pl-sub-header>
 
-            <cp-table tp-name="table" data-bind="table">
+            <cp-table src="table" data-bind="table">
                 <pl-header>Click on
                     <bd-link tp-tag="a"></bd-link>
                 </pl-header>

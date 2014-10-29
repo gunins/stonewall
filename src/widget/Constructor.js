@@ -8,6 +8,7 @@ define([
     'watch',
     'templating/Decoder'
 ], function (utils, dom, Mediator, WatchJS, Decoder) {
+    'use strict';
     var context = {},
         watch = WatchJS.watch,
         unwatch = WatchJS.unwatch,
@@ -46,7 +47,7 @@ define([
                             watch(data, key, function () {
                                 childBinder.removeClass(currClass);
                                 childBinder.addClass(data[key]);
-                                currClass= data[key];
+                                currClass = data[key];
                             }.bind(this));
                         }
                     } else {
@@ -99,9 +100,11 @@ define([
                 }
 
             }
-            if(this.elReady[key]!==undefined){
+
+            if (this.elReady[key] !== undefined && child.el !== undefined) {
                 this.elReady[key].call(this, child);
             }
+
             var events = this.events[key];
             applyEvents.call(this, child, events)
 
@@ -126,7 +129,8 @@ define([
             bindings = bindings || {};
             var el = children[key];
             if (el.bind !== undefined) {
-                bindings[el.bind] = el
+                bindings[el.bind] = bindings[el.bind] || []
+                bindings[el.bind].push(el)
             }
         }.bind(this));
         return bindings;
@@ -138,70 +142,81 @@ define([
             parent = instance.el;
         if (obj) {
             Object.keys(obj).forEach(function (key) {
-                var binder = binders[key],
-                    events = this.events[key];
-                if (binder !== undefined) {
-                    var data = obj[key];
-                    binder.applyAttach();
+                if (binders[key] !== undefined) {
+                    binders[key].forEach(function (binder) {
+                            var events = this.events[binder.name];
+                            if (binder !== undefined) {
+                                var data = obj[key];
+                                binder.applyAttach();
 
-                    if (this.nodes[key]) {
-                        var childBinder = new dom.Element(binder);
-                        this.nodes[key].call(this, childBinder, parent, data);
-                    } else {
-                        if (!utils.isArray(data) && !utils.isObject(data)) {
-                            var childBinder = new dom.Element(binder);
-                            childBinder.add(parent);
-                            childBinder.text(data);
-                            if (childBinder.data.tplSet.update === 'true') {
-                                watch(obj, key, function () {
-                                    childBinder.text(obj[key]);
-                                }.bind(this));
-                            }
-
-                            applyEvents.call(this, childBinder, events, data);
-                        } else if (utils.isArray(data)) {
-                            binder.applyAttach();
-                            var hasParent = false
-                            data.forEach(function (item) {
-                                var childBinder = new dom.Element(binder);
-
-                                if (!hasParent) {
-                                    childBinder.add(parent);
-                                    hasParent = binder.getParent();
+                                if (this.nodes[key]) {
+                                    var childBinder = new dom.Element(binder);
+                                    this.nodes[key].call(this, childBinder, parent, data);
                                 } else {
-                                    childBinder.add(parent, hasParent);
+                                    if (!utils.isArray(data) && !utils.isObject(data)) {
+                                        var childBinder = new dom.Element(binder);
+                                        childBinder.add(parent);
+                                        childBinder.text(data);
+                                        if (this.elReady[key] !== undefined) {
+                                            this.elReady[key].call(this, childBinder, data);
+                                        }
+                                        if (childBinder.data.tplSet.update === 'true') {
+                                            watch(obj, key, function () {
+                                                childBinder.text(obj[key]);
+                                            }.bind(this));
+                                        }
+                                        applyEvents.call(this, childBinder, events, data);
+                                    } else if (utils.isArray(data)) {
+                                        binder.applyAttach();
+                                        var hasParent = false
+                                        data.forEach(function (item) {
+                                            var childBinder = new dom.Element(binder);
+
+                                            if (!hasParent) {
+                                                childBinder.add(parent);
+                                                hasParent = binder.getParent();
+                                            } else {
+                                                childBinder.add(parent, hasParent);
+                                            }
+
+                                            if (this.elReady[key]) {
+                                                this.elReady[key].call(this, childBinder, item);
+                                            }
+
+                                            applyAttribute.call(this, childBinder, item);
+
+                                            applyBinders.call(this, item, childBinder);
+
+                                            applyEvents.call(this, childBinder, events, item);
+                                        }.bind(this));
+                                        hasParent = false;
+
+                                    } else if (utils.isObject(data)) {
+                                        var childBinder = new dom.Element(binder);
+                                        childBinder.add(parent);
+                                        if (this.elReady[key]) {
+                                            this.elReady[key].call(this, childBinder, data);
+                                        }
+                                        applyEvents.call(this, childBinder, events, data);
+                                        if (binder.data.type === 'cp') {
+                                            childBinder.replace(binder, data);
+                                        }
+                                        else if (!childBinder.data.tplSet.bind) {
+                                            applyBinders.call(this, data, childBinder);
+                                        } else {
+                                            applyAttribute.call(this, childBinder, data);
+                                        }
+                                    }
                                 }
-                                if (this.bind[key]) {
-                                    this.bind[key].call(this, childBinder, item);
-                                }
-
-                                applyAttribute.call(this, childBinder, item);
-                                applyBinders.call(this, item, childBinder);
-                                applyEvents.call(this, childBinder, events, item);
-                            }.bind(this));
-                            hasParent = false;
-
-                        } else if (utils.isObject(data)) {
-                            var childBinder = new dom.Element(binder);
-                            childBinder.add(parent);
-                            if (this.bind[key]) {
-                                this.bind[key].call(this, childBinder, data);
                             }
-                            applyEvents.call(this, childBinder, events, data);
 
-                            if (!childBinder.data.tplSet.bind) {
-                                applyBinders.call(this, data, childBinder);
-                            } else {
-                                applyAttribute.call(this, childBinder, data);
-                            }
-                        }
-                    }
+                    }.bind(this));
                 }
             }.bind(this));
         }
     }
 
-    function Constructor(data, children) {
+    function Constructor(data, children, dataSet) {
         this.eventBus = new Mediator();
         this.context = context;
         if (data.appContext !== undefined) {
@@ -212,9 +227,10 @@ define([
                 template = decoder.render();
 
             this.el = template.fragment;
-            this.data = this.context.data[data.bind];
+            this.data = (dataSet) ? dataSet : this.context.data[data.bind];
             this.children = setChildren.call(this, template.children, children);
             this.bindings = setBinders.call(this, this.children);
+            //console.log(this)
 
             if (this.data) {
                 this.applyBinders(this.data, this);
@@ -232,7 +248,7 @@ define([
         nodes: {},
         events: {},
         bind: {},
-        elReady:{},
+        elReady: {},
         init: function () {
         },
         applyBinders: applyBinders

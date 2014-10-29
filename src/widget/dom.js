@@ -5,10 +5,10 @@ define([
     './utils'
 ], function (utils) {
     var dom = {
-        append: function (parent, child) {
-            child.el = child.run(parent.el, true);
+        append: function (parent, child, data) {
+            child.el = child.run(parent.el, true, false, data);
         },
-        replace: function (parent, child) {
+        replace: function (parent, child, data) {
             parent.el.innerHTML = '';
             dom.append.apply(this, arguments);
         },
@@ -89,8 +89,8 @@ define([
         append: function (child) {
             dom.append(this, child)
         },
-        replace: function (child) {
-            dom.replace(this, child);
+        replace: function (child, data) {
+            dom.replace(this, child, data);
         },
         text: function (text) {
             dom.text(this, text);

@@ -23,6 +23,15 @@ module.exports = function (grunt) {
 
         ]
     }
+    var appPaths = {
+        coders: '../../../node_modules/domtemplate/dev/coders',
+        templating: '../../../node_modules/domtemplate/dev/templating',
+        htmlparser2: '../../../node_modules/domtemplate/dev/htmlparser2',
+        'widget': '../../../src/widget',
+        'watch': '../../../bower_components/watch/src/watch',
+        'd3': '../../../bower_components/d3/d3'
+    };
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: ['target'],
@@ -54,26 +63,33 @@ module.exports = function (grunt) {
                     ]
                 }
             },
-            basic: {
+            basicBind: {
                 options: {
-                    baseUrl: 'examples/basic',
+                    baseUrl: 'examples/basicBind/src',
                     removeCombined: true,
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
                     stubModules: ['templating/parser'],
                     exclude: coders.exclude,
-                    dir: "examples/basic/target",
-                    paths: {
-                        coders: '../../node_modules/domtemplate/dev/coders',
-                        buttona: 'buttonA/buttonA',
-                        templating: '../../node_modules/domtemplate/dev/templating',
-                        htmlparser2: '../../node_modules/domtemplate/dev/htmlparser2',
-                        'widget': '../../src/widget',
-                        'watch': '../../bower_components/watch/src/watch',
-                        'd3': '../../bower_components/d3/d3'
-                    },
-                    name: 'test'
+                    dir: "examples/basicBind/target",
+                    paths: appPaths,
+                    name: 'app'
+
+                }
+            },
+            basicTable: {
+                options: {
+                    baseUrl: 'examples/basicTable/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: ['templating/parser'],
+                    exclude: coders.exclude,
+                    dir: "examples/basicTable/target",
+                    paths: appPaths,
+                    name: 'app'
 
                 }
             },
@@ -87,14 +103,7 @@ module.exports = function (grunt) {
                     stubModules: ['templating/parser'],
                     exclude: coders.exclude,
                     dir: "examples/application/target",
-                    paths: {
-                        coders: '../../../node_modules/domtemplate/dev/coders',
-                        templating: '../../../node_modules/domtemplate/dev/templating',
-                        htmlparser2: '../../../node_modules/domtemplate/dev/htmlparser2',
-                        'widget': '../../../src/widget',
-                        'watch': '../../../bower_components/watch/src/watch',
-                        'd3': '../../../bower_components/d3/d3'
-                    },
+                    paths: appPaths,
                     name: 'app'
 
                 }
@@ -106,6 +115,7 @@ module.exports = function (grunt) {
             },
             Widget: {
                 src: [
+                    'node_modules/domtemplate/prod/templating/Decoder.js',
                     'target/prod/widget/App.js',
                     'target/prod/widget/Constructor.js',
                     'target/prod/loader.js'

@@ -11,5 +11,4 @@ else
     npm install ${DIRECTORY}/domtemplate*
     bower install
     grunt
-    npm start
 fi

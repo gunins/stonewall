@@ -1,0 +1,40 @@
+<div>
+    <div class="col-xs-6 col-sm-3 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">Data Binding Example</div>
+            <div class="panel-body">
+                <cp-val data-bind="val" src="val/Val"></cp-val>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-4 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">Data Output example</div>
+            <div class="panel-body">
+                <pre>
+data: {
+    val: {
+        items: {
+            value: 'Some Value'
+        },
+        list: [
+                {
+                    test: {
+                        value: 'Test Value',
+                        badge:15
+                    }
+                },
+                {
+                    test: {
+                        value: 'Test Value1',
+                        badge:17
+                    }
+                }
+        ]
+    }
+}
+                </pre>
+            </div>
+        </div>
+    </div>
+</div>
