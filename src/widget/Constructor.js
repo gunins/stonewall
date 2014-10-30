@@ -145,13 +145,13 @@ define([
     }
 
     function applyBinders(obj, instance) {
-
         var binders = instance.bindings,
             parent = instance.el;
         if (obj) {
             Object.keys(obj).forEach(function (key) {
                 if (binders !== undefined && binders[key] !== undefined) {
-                    binders[key].forEach(function (binder) {
+
+                    var parseBinder = function (binder) {
                         var events = this.events[binder.name];
                         if (binder !== undefined) {
                             var data = obj[key];
@@ -229,7 +229,13 @@ define([
                             }
                         }
 
-                    }.bind(this));
+                    };
+
+                    if (binders[key].forEach !== undefined) {
+                        binders[key].forEach(parseBinder.bind(this));
+                    } else {
+                        parseBinder.call(this, binders[key])
+                    }
                 }
             }.bind(this));
         }
