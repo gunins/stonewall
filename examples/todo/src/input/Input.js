@@ -12,7 +12,6 @@ define([
                 {
                     name: 'change',
                     action: function (e, el) {
-
                         var val = el.val();
                         if(val.trim()!==''){
                             this.context.eventBus.publish('addRecord', val);
