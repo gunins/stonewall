@@ -11,9 +11,17 @@ define([
             delete: [
                 {
                     name: 'click',
-                    action: function (e, el) {
+                    action: function () {
                         this.data.remove = true
                         this.destroy();
+                    }
+                }
+            ],
+            completed: [
+                {
+                    name: 'click',
+                    action: function (e, el, data) {
+                        data.checked = !data.checked;
                     }
                 }
             ]

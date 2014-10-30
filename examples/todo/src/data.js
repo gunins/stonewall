@@ -11,7 +11,7 @@ define({
                         checked: false
                     }
                 },
-                show:'show'
+                show: 'show'
             },
             {
                 item: {
@@ -20,7 +20,7 @@ define({
                         checked: true
                     }
                 },
-                show:'show'
+                show: 'show'
             },
             {
                 item: {
@@ -29,8 +29,25 @@ define({
                         checked: false
                     }
                 },
-                show:'hide'
+                show: 'show'
             }
+        ]
+    },
+    selection: {
+        buttons: [
+            {
+                text: 'All',
+                class: 'active'
+            },
+            {
+                text: 'Active',
+                class: 'none'
+            },
+            {
+                text: 'Completed',
+                class: 'none'
+            },
+
         ]
     }
 });

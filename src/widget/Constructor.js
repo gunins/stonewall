@@ -40,7 +40,7 @@ define([
         if (bind) {
             Object.keys(bind).forEach(function (bindItem) {
                 var key = bind[bindItem];
-                if (data[key]) {
+                if (data[key] !== undefined) {
                     if (bindItem === 'class') {
                         childBinder.addClass(data[key]);
                         var currClass = data[key];
@@ -49,6 +49,13 @@ define([
                                 childBinder.removeClass(currClass);
                                 childBinder.addClass(data[key]);
                                 currClass = data[key];
+                            }.bind(this));
+                        }
+                    } else if (bindItem === 'checked') {
+                        childBinder.el.checked = data[key];
+                        if (update === 'true') {
+                            watch(data, key, function () {
+                                childBinder.el.checked = data[key];
                             }.bind(this));
                         }
                     } else {
@@ -143,73 +150,84 @@ define([
             parent = instance.el;
         if (obj) {
             Object.keys(obj).forEach(function (key) {
-                if (binders[key] !== undefined) {
+                if (binders !== undefined && binders[key] !== undefined) {
                     binders[key].forEach(function (binder) {
-                            var events = this.events[binder.name];
-                            if (binder !== undefined) {
-                                var data = obj[key];
-                                binder.applyAttach();
+                        var events = this.events[binder.name];
+                        if (binder !== undefined) {
+                            var data = obj[key];
+                            binder.applyAttach();
 
-                                if (this.nodes[key]) {
+                            if (this.nodes[key]) {
+                                var childBinder = new dom.Element(binder);
+                                this.nodes[key].call(this, childBinder, parent, data);
+                            } else {
+                                if (!utils.isArray(data) && !utils.isObject(data)) {
                                     var childBinder = new dom.Element(binder);
-                                    this.nodes[key].call(this, childBinder, parent, data);
-                                } else {
-                                    if (!utils.isArray(data) && !utils.isObject(data)) {
-                                        var childBinder = new dom.Element(binder);
-                                        childBinder.add(parent);
-                                        childBinder.text(data);
-                                        if (this.elReady[key] !== undefined) {
-                                            this.elReady[key].call(this, childBinder, data);
-                                        }
-                                        if (childBinder.data.tplSet.update === 'true') {
-                                            watch(obj, key, function () {
-                                                childBinder.text(obj[key]);
+                                    childBinder.add(parent);
+                                    childBinder.text(data);
+                                    if (this.elReady[key] !== undefined) {
+                                        this.elReady[key].call(this, childBinder, data);
+                                    }
+                                    if (childBinder.data.tplSet.update === 'true') {
+                                        watch(obj, key, function () {
+                                            childBinder.text(obj[key]);
+                                        }.bind(this));
+                                    }
+                                    applyEvents.call(this, childBinder, events, data);
+                                } else if (utils.isArray(data)) {
+                                    binder.applyAttach();
+
+                                    var updateChildren = function () {
+                                        var hasParent = false,
+                                            addItem = function (item) {
+                                                var childBinder = new dom.Element(binder);
+
+                                                if (!hasParent) {
+                                                    childBinder.add(parent);
+                                                    hasParent = binder.getParent();
+                                                } else {
+                                                    childBinder.add(parent, hasParent);
+                                                }
+
+                                                if (this.elReady[key]) {
+                                                    this.elReady[key].call(this, childBinder, item);
+                                                }
+
+                                                applyAttribute.call(this, childBinder, item);
+                                                applyBinders.call(this, item, childBinder);
+                                                applyEvents.call(this, childBinder, events, item);
+                                            };
+                                        data.forEach(addItem.bind(this));
+                                        var update = binder.data.tplSet.update;
+                                        if (update === 'true') {
+                                            watch(obj, key, function (prop, action, newvalue, oldvalue) {
+                                                if (oldvalue === undefined && action == 'push') {
+                                                    addItem.call(this, newvalue[0]);
+                                                }
                                             }.bind(this));
                                         }
-                                        applyEvents.call(this, childBinder, events, data);
-                                    } else if (utils.isArray(data)) {
-                                        binder.applyAttach();
-                                        var hasParent = false
-                                        data.forEach(function (item) {
-                                            var childBinder = new dom.Element(binder);
+                                    }
 
-                                            if (!hasParent) {
-                                                childBinder.add(parent);
-                                                hasParent = binder.getParent();
-                                            } else {
-                                                childBinder.add(parent, hasParent);
-                                            }
+                                    updateChildren.call(this);
 
-                                            if (this.elReady[key]) {
-                                                this.elReady[key].call(this, childBinder, item);
-                                            }
-
-                                            applyAttribute.call(this, childBinder, item);
-
-                                            applyBinders.call(this, item, childBinder);
-
-                                            applyEvents.call(this, childBinder, events, item);
-                                        }.bind(this));
-                                        hasParent = false;
-
-                                    } else if (utils.isObject(data)) {
-                                        var childBinder = new dom.Element(binder);
-                                        childBinder.add(parent);
-                                        if (this.elReady[key]) {
-                                            this.elReady[key].call(this, childBinder, data);
-                                        }
-                                        applyEvents.call(this, childBinder, events, data);
-                                        if (binder.data.type === 'cp') {
-                                            childBinder.replace(binder, data);
-                                        }
-                                        else if (!childBinder.data.tplSet.bind) {
-                                            applyBinders.call(this, data, childBinder);
-                                        } else {
-                                            applyAttribute.call(this, childBinder, data);
-                                        }
+                                } else if (utils.isObject(data)) {
+                                    var childBinder = new dom.Element(binder);
+                                    childBinder.add(parent);
+                                    if (this.elReady[key]) {
+                                        this.elReady[key].call(this, childBinder, data);
+                                    }
+                                    applyEvents.call(this, childBinder, events, data);
+                                    if (binder.data.type === 'cp') {
+                                        childBinder.replace(binder, data);
+                                    }
+                                    else if (!childBinder.data.tplSet.bind) {
+                                        applyBinders.call(this, data, childBinder);
+                                    } else {
+                                        applyAttribute.call(this, childBinder, data);
                                     }
                                 }
                             }
+                        }
 
                     }.bind(this));
                 }
@@ -252,7 +270,7 @@ define([
         init: function () {
         },
         applyBinders: applyBinders,
-        destroy:function(){
+        destroy: function () {
             this.el.remove();
         }
     });

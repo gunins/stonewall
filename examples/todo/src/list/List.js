@@ -14,7 +14,7 @@ define([
         elReady: {
             items: function (el, data) {
                 watch(data.item, 'remove', function () {
-                    el.remove();
+                     el.remove();
                     var index = this.data.items.indexOf(data);
                     this.data.items.splice(index, 1);
                 }.bind(this));
