@@ -93,6 +93,21 @@ module.exports = function (grunt) {
 
                 }
             },
+            todo: {
+                options: {
+                    baseUrl: 'examples/todo/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: ['templating/parser'],
+                    exclude: coders.exclude,
+                    dir: "examples/todo/target",
+                    paths: appPaths,
+                    name: 'app'
+
+                }
+            },
             application: {
                 options: {
                     baseUrl: 'examples/application/src',
