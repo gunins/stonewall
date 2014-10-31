@@ -66,4 +66,93 @@ For Starting app you need setup index.html file.
     </body>
     </html>
 
+Configuration for requirejs will looks like
 
+    require.config({
+        baseUrl: './src',
+        templateCoders: [
+            'coders/component/CpCoder',
+            'coders/placeholders/plCoder',
+            'coders/databind/bdCoder'
+
+        ],
+        templateDecoders: [
+            'coders/component/CpDecoder',
+            'coders/placeholders/plDecoder',
+            'coders/databind/bdDecoder'
+        ],
+        paths: {
+            'coders': '../../../node_modules/domtemplate/dev/coders',
+            'templating': '../../../node_modules/domtemplate/dev/templating',
+            'widget': '../../../src/widget',
+            'watch':'../../../bower_components/watch/src/watch',
+        }
+    });
+
+There is two significant sections `templateCoders` and `templateDecoders` these are coders/decoders for "Rich Template" engine. Ypu can also create your own coders.
+paths look more [**requirejs**](http://requirejs.org/) documentation.
+
+Now App.js file.
+
+    define([
+        'widget/App',
+        'Container',
+    ], function (App, Container) {
+
+        return App.extend({
+            AppContainer: Container
+        });
+    });
+
+Container is Your base file for app.
+
+    define([
+        'templating/parser!./_container.html',
+        'widget/Constructor'
+    ], function (template, Constructor) {
+        return Constructor.extend({
+            template: template
+        });
+    });
+
+And Last one is Template file.
+
+    <div class="container-fluid">
+        <div class="col-xs-6 col-sm-3 ">
+            <div class="panel panel-default">
+                <div class="panel-heading">Data Binding Example</div>
+                <div class="panel-body">
+                    <cp-val src="Cmp">
+                        <pl-header>Header Text</pl-header>
+                        <pl-body><p>Body Text</p><pl-body>
+                    </cp-val>
+                </div>
+            </div>
+        </div>
+    </div>
+
+This one looks like basic html file, except two tags `cp` and `pl`
+`cp` - is requirejs component where `src` is location of component.
+`pl` -  is placeholders for component (Header and Body). In placeholders you can add another components, or any html markup.
+
+Then code for Cmp
+
+    define([
+        'templating/parser!./_cmp.html',
+        'widget/Constructor'
+    ], function (template, Constructor) {
+        return Constructor.extend({
+            template: template
+        });
+    });
+
+Is almost same like another ones, except path to html is different.
+
+But code for html looks like.
+
+    <div class="container-fluid">
+        <pl-header tp-tag="h2" ></pl-header>
+        <pl-body><pl-body>
+    </div>
+
+And there is a Placeholders for header and body.
