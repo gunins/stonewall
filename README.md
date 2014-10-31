@@ -100,9 +100,18 @@ Now App.js file.
     ], function (App, Container) {
 
         return App.extend({
-            AppContainer: Container
+            AppContainer: Container,
+            setContext: function () {
+                 return {data: {
+                    cmp:{
+                        item: 'Some Item'
+                    }
+                 }}
+            }
         });
     });
+
+AppContainer is Template for App. Custom context defining for App is method `setContext` and `data` in context is shared data in app.
 
 Container is Your base file for app.
 
@@ -122,7 +131,7 @@ And Last one is Template file.
             <div class="panel panel-default">
                 <div class="panel-heading">Data Binding Example</div>
                 <div class="panel-body">
-                    <cp-val src="Cmp">
+                    <cp-val data-bind="cmp" src="Cmp">
                         <pl-header>Header Text</pl-header>
                         <pl-body><p>Body Text</p><pl-body>
                     </cp-val>
@@ -133,6 +142,7 @@ And Last one is Template file.
 
 This one looks like basic html file, except two tags `cp` and `pl`
 `cp` - is requirejs component where `src` is location of component.
+`data-bind` - attribute passing object for context
 `pl` -  is placeholders for component (Header and Body). In placeholders you can add another components, or any html markup.
 
 Then code for Cmp
@@ -153,6 +163,11 @@ But code for html looks like.
     <div class="container-fluid">
         <pl-header tp-tag="h2" ></pl-header>
         <pl-body><pl-body>
+        <bd-item></bd-item>
     </div>
+
+There is new tag.
+
+`bd` - bind the values from app Object.
 
 And there is a Placeholders for header and body.
