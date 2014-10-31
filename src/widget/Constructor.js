@@ -230,7 +230,7 @@ define([
                         }
 
                     };
-
+                    //TODO: Investigate, why not allways an Array
                     if (binders[key].forEach !== undefined) {
                         binders[key].forEach(parseBinder.bind(this));
                     } else {

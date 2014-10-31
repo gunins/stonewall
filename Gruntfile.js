@@ -135,15 +135,23 @@ module.exports = function (grunt) {
                     'target/prod/widget/Constructor.js',
                     'target/prod/loader.js'
                 ],
-                dest: 'target/prod/loader.js'
+                dest: 'dist/prod/loader.js'
+            }
+        },
+        copy: {
+            prod: {
+                files: [
+                    {expand: true, cwd: './', src: ['package.json', 'bower.json'], dest: 'dist'}
+                ]
             }
         }
     });
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
 
-    grunt.registerTask('default', ['clean', 'requirejs', 'concat']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy']);
 
 };

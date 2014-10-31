@@ -3,3 +3,4 @@ node_modules/*
 *.iml
 bower_components/*
 target
+dist
