@@ -63,6 +63,21 @@ module.exports = function (grunt) {
                     ]
                 }
             },
+            basic: {
+                options: {
+                    baseUrl: 'examples/basic/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: ['templating/parser'],
+                    exclude: coders.exclude,
+                    dir: "examples/basic/target",
+                    paths: appPaths,
+                    name: 'App'
+
+                }
+            },
             basicBind: {
                 options: {
                     baseUrl: 'examples/basicBind/src',
@@ -74,7 +89,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/basicBind/target",
                     paths: appPaths,
-                    name: 'app'
+                    name: 'App'
 
                 }
             },
@@ -89,7 +104,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/basicTable/target",
                     paths: appPaths,
-                    name: 'app'
+                    name: 'App'
 
                 }
             },
@@ -104,7 +119,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/todo/target",
                     paths: appPaths,
-                    name: 'app'
+                    name: 'App'
 
                 }
             },
@@ -119,7 +134,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/application/target",
                     paths: appPaths,
-                    name: 'app'
+                    name: 'App'
 
                 }
             }
