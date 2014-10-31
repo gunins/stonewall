@@ -11,7 +11,7 @@ define([
         setContext: function () {
             return {data: {
                 cmp:{
-                    item: 'Some Item'
+                    item: 'Binded Item From App'
                 }
             }
             }

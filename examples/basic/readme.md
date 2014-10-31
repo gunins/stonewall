@@ -68,7 +68,7 @@ paths look more [**requirejs**](http://requirejs.org/) documentation.
             setContext: function () {
                  return {data: {
                     cmp:{
-                        item: 'Some Item'
+                        item: 'Binded Item From App'
                     }
                  }
               }
@@ -97,8 +97,10 @@ AppContainer is Template for App. Custom context defining for App is method `set
                 <div class="panel-heading">Data Binding Example</div>
                 <div class="panel-body">
                     <cp-val data-bind="cmp" src="cmp/Cmp">
-                        <pl-header>Header Text</pl-header>
-                        <pl-body><p>Body Text</p></pl-body>
+                        <pl-header>Header From Parent Container</pl-header>
+                        <pl-body>
+                            <p>Body From Parent Container</p>
+                        </pl-body>
                     </cp-val>
                 </div>
             </div>
