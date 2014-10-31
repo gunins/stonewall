@@ -34,5 +34,5 @@ Code is located in dist/prod/loader.js
 
 ## How to start
 
-Live examples you can see in examples section. Start with a [***Basic***](examples/basic/)
+Live examples you can see in examples section. Start with a [***Basic***](examples/basic/?at=master)
 
