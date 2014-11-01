@@ -4,5 +4,7 @@ node_js:
   - "0.10"
 before_install:
   - npm install -g grunt-cli
+  - npm -g install bower
+  - bower install
 notifications:
   email: false
