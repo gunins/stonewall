@@ -1,6 +1,6 @@
 # "Stone Wall" is framework for creating "Rich Single Page Applications".
 
-Application framework based on "Rich Template" and requirejs.
+Application framework based on "Rich Template" and requirejs. Will be good if before start you read about [**requirejs**](http://requirejs.org/)
 
 ## Why "Stone Wall"
 

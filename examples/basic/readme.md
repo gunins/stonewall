@@ -60,7 +60,7 @@ paths look more [**requirejs**](http://requirejs.org/) documentation.
 
     define([
         'widget/App',
-        'container/Container',
+        'widget/parser!container/Container',
     ], function (App, Container) {
 
         return App.extend({
@@ -78,18 +78,8 @@ paths look more [**requirejs**](http://requirejs.org/) documentation.
 
 AppContainer is Template for App. Custom context defining for App is method `setContext` and `data` in context is shared data in app.
 
-###Container is Your base file for app.
 
-    define([
-        'templating/parser!./_container.html',
-        'widget/Constructor'
-    ], function (template, Constructor) {
-        return Constructor.extend({
-            template: template
-        });
-    });
-
-###And Last one is Template file.
+###Now Template file.
 
     <div class="container-fluid">
         <div class="col-xs-6 col-sm-3 ">
@@ -111,6 +101,19 @@ This one looks like basic html file, except two tags `cp` and `pl`
 `cp` - is requirejs component where `src` is location of component.
 `data-bind` - attribute passing object for context
 `pl` -  is placeholders for component (Header and Body). In placeholders you can add another components, or any html markup.
+
+###Optionally you can add javascript file for widget, in case you need extra functionality.
+
+    define([
+        'templating/parser!./_container.html',
+        'widget/Constructor'
+    ], function (template, Constructor) {
+        return Constructor.extend({
+            template: template
+        });
+    });
+
+In this case you just require particular Javascript file.
 
 ###Then code for Cmp
 
