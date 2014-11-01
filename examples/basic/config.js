@@ -12,8 +12,8 @@ require.config({
         'coders/databind/bdDecoder'
     ],
     paths: {
-        'coders': '../../../node_modules/domtemplate/dev/coders',
-        'templating': '../../../node_modules/domtemplate/dev/templating',
+        'coders': '../../../node_modules/richtemplate/dev/coders',
+        'templating': '../../../node_modules/richtemplate/dev/templating',
         'widget': '../../../src/widget',
         'watch':'../../../bower_components/watch/src/watch'
     }

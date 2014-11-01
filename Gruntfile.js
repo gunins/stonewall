@@ -24,9 +24,9 @@ module.exports = function (grunt) {
         ]
     }
     var appPaths = {
-        coders: '../../../node_modules/domtemplate/dev/coders',
-        templating: '../../../node_modules/domtemplate/dev/templating',
-        htmlparser2: '../../../node_modules/domtemplate/dev/htmlparser2',
+        coders: '../../../node_modules/richtemplate/dev/coders',
+        templating: '../../../node_modules/richtemplate/dev/templating',
+        htmlparser2: '../../../node_modules/richtemplate/dev/htmlparser2',
         'widget': '../../../src/widget',
         'watch': '../../../bower_components/watch/src/watch',
         'd3': '../../../bower_components/d3/d3'
@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                     removeCombined: true,
                     paths: {
                         'watch': '../bower_components/watch/src/watch',
-                        templating: '../node_modules/domtemplate/dev/templating'
+                        templating: '../node_modules/richtemplate/dev/templating'
                     },
                     dir: 'target/prod',
                     modules: [
@@ -59,6 +59,36 @@ module.exports = function (grunt) {
                             exclude: [
                                 'widget/mediator',
                                 'widget/utils'
+                            ]
+                        }
+                    ]
+                }
+            },
+            dev: {
+                options: {
+                    baseUrl: 'src',
+                    optimize: 'uglify2',
+                    removeCombined: true,
+                    paths: {
+                        'watch': '../bower_components/watch/src/watch',
+                        templating: '../node_modules/richtemplate/dev/templating'
+                    },
+                    dir: 'target/dev',
+                    modules: [
+                        {
+                            name: 'widget/App'
+                        },
+                        {
+                            name: 'widget/Constructor',
+                            exclude: [
+                                'widget/mediator',
+                                'widget/utils'
+                            ]
+                        },
+                        {
+                            name: 'widget/parser',
+                            exclude: [
+                                'widget/Constructor'
                             ]
                         }
                     ]
@@ -146,7 +176,7 @@ module.exports = function (grunt) {
             },
             Widget: {
                 src: [
-                    'node_modules/domtemplate/prod/templating/Decoder.js',
+                    'node_modules/richtemplate/prod/templating/Decoder.js',
                     'target/prod/widget/App.js',
                     'target/prod/widget/Constructor.js',
                     'target/prod/loader.js'
@@ -158,6 +188,11 @@ module.exports = function (grunt) {
             prod: {
                 files: [
                     {expand: true, cwd: './', src: ['package.json', 'bower.json'], dest: 'dist'}
+                ]
+            },
+            dev: {
+                files: [
+                    {expand: true, cwd: './target/dev', src: ['widget/**', 'loader.js'], dest: 'dist/dev'}
                 ]
             }
         },
