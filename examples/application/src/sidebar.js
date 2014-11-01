@@ -1,5 +1,5 @@
 define([
-    'templating/parser!./sidebar/_sideBar.html',
+    'templating/parser!./sidebar/_sidebar.html',
     'widget/Constructor'
 ], function (template, Constructor) {
     return Constructor.extend({
