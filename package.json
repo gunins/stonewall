@@ -21,7 +21,8 @@
     "requirejs": "^2.1.15",
     "richtemplate": "^0.1.2"
   },
-  "script": {
-    "start": "node server.js"
+  "scripts": {
+    "start": "node server.js",
+    "test": "grunt"
   }
 }
