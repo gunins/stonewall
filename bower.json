@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/gunsim/domtemplate.git"
+    "url": "https://github.com/gunins/stonewall"
   },
   "dependencies": {
     "requirejs": "^2.1.15",
