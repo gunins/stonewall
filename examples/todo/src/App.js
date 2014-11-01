@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'container/Container',
+    'widget/parser!container/Container',
     'data',
     'watch'
 ], function (App, Container, data, WatchJS) {

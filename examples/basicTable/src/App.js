@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'container/Container',
+    'widget/parser!container/Container',
     'data'
 ], function (App, Container, data) {
 

@@ -81,7 +81,10 @@ define([
         },
         Element: Element
     }
-
+     // widget/dom.Element
+    // ------------------
+    // > @method Element
+     // > @param {Object} node
     function Element(node) {
         var obj = utils.extend({}, node);
         utils.extend(this, obj);

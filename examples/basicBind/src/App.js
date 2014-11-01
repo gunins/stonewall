@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'container/Container',
+    'widget/parser!container/Container',
 ], function (App, Container) {
 
     return App.extend({

@@ -31,10 +31,11 @@ module.exports = function (grunt) {
         'watch': '../../../bower_components/watch/src/watch',
         'd3': '../../../bower_components/d3/d3'
     };
+    var stubModules = ['templating/parser', 'widget/parser'];
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        clean: ['target'],
+        clean: ['target', 'dist'],
         exec: {
             npmpack: 'npm pack dist'
         },
@@ -70,7 +71,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: ['templating/parser'],
+                    stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/basic/target",
                     paths: appPaths,
@@ -85,7 +86,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: ['templating/parser'],
+                    stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/basicBind/target",
                     paths: appPaths,
@@ -100,7 +101,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: ['templating/parser'],
+                    stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/basicTable/target",
                     paths: appPaths,
@@ -115,7 +116,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: ['templating/parser'],
+                    stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/todo/target",
                     paths: appPaths,
@@ -130,7 +131,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     templateCoders: coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: ['templating/parser'],
+                    stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/application/target",
                     paths: appPaths,
@@ -159,6 +160,14 @@ module.exports = function (grunt) {
                     {expand: true, cwd: './', src: ['package.json', 'bower.json'], dest: 'dist'}
                 ]
             }
+        },
+        docco: {
+            debug: {
+                src: ['src/**/*.js'],
+                options: {
+                    output: 'dist/docs/'
+                }
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -166,7 +175,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-docco');
 
-    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'docco']);
 
 };
