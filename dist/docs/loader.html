@@ -73,7 +73,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
+              <h2 id="loader-loads-the-application-main-script">Loader Loads the Application main script</h2>
+<p>Following Attributes Supported</p>
+<pre><code> data-name: location of main script <span class="hljs-keyword">for</span> Application
+ data-target?: location to container <span class="hljs-keyword">if</span> not set,
+ use <span class="hljs-built_in">document</span>.body
+</code></pre><p>There below is Example of usage in <code>index.html</code></p>
+<pre><code> `&lt;script data-name=<span class="hljs-string">"App"</span> data-target=<span class="hljs-string">"body"</span>
+     src=<span class="hljs-string">"../../src/loader.js"</span>&gt;<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>`</span>
+</code></pre>
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
