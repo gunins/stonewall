@@ -1,6 +1,20 @@
 /**
  * Created by guntars on 10/10/2014.
  */
+/*globals define*/
+//## widget/Constructor Class
+// This is App Presenter class parse data, and apply to template. Also binding events to Element.
+// Basic Usage example
+//
+//      define([
+//          'templating/parser!widget.html',
+//          'widget/Constructor'
+//      ], function (template, Constructor) {
+//          var Widget = Constructor.extend({
+//              template: template
+//          });
+//          return Widget;
+//      });
 define([
     './utils',
     './dom',
@@ -13,7 +27,10 @@ define([
         watch = WatchJS.watch,
         unwatch = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
-
+    //Applying dom.Element to template elements.
+    //
+    //      @private applyElement
+    //      @param {Object} elements
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
             if (elements[key] instanceof  dom.Element !== true) {
@@ -26,6 +43,12 @@ define([
         return elements;
     }
 
+    //Aplying Events to elements
+    //
+    //      @private applyEvents
+    //      @param {dom.Element} element
+    //      @param {Array} events
+    //      @param {Object} data
     function applyEvents(element, events, data) {
         if (events !== undefined && element.el !== undefined) {
             events.forEach(function (event) {
@@ -241,6 +264,12 @@ define([
         }
     }
 
+    // Constructor Class
+    //
+    //      @Constructor
+    //      @param {Object} data
+    //      @param {Object} children
+    //      @param {Object} dataSet
     function Constructor(data, children, dataSet) {
         this.eventBus = new Mediator();
         this.context = context;
@@ -269,13 +298,60 @@ define([
     }
 
     utils.extend(Constructor.prototype, {
+        // `nodes` Object override default methods to Elements.
+        // Usage Example
+        //
+        //      nodes: {
+        //          listItem: function (el, parent, data) {
+        //              el.add(parent);
+        //              el.text(data);
+        //          }
+        //      }
         nodes: {},
+
+        // `events` Object applying events to elements
+        // You can apply more than one event on element
+        // Usage Example
+        //
+        //      events: {
+        //          delete: [
+        //              {
+        //                  name: 'click',
+        //                  action: function () {
+        //                      this.data.remove = true
+        //                      this.destroy();
+        //                  }
+        //              }
+        //          ]
         events: {},
-        bind: {},
+        // Applying extra methods to Element
+        // Usage Example
+        //
+        //      elReady: {
+        //          links: function (el, data) {
+        //              if(data.class==='active'){
+        //                  el.addClass('active');
+        //              }
+        //          }
+        //      },
         elReady: {},
-        init: function () {
+        // Running when Constructor is initialised
+        //
+        //      @method init
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        init: function (data, children, dataSet) {
         },
+        // Applying Binders manually, if use nodes function
+        //
+        //      @method applyBinders
         applyBinders: applyBinders,
+        //Removing widget from Dom
+        //
+        //      @method destroy
         destroy: function () {
             this.el.remove();
         }

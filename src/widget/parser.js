@@ -1,3 +1,25 @@
+/**
+ * Created by guntars on 11/10/2014.
+ */
+/*globals setTimeout, define*/
+// ### Requirejs plugin
+// For to simplify `widget/Constructor` Class
+// Usage Example
+//
+//      `<cp-widget src="widget/parser!widget.html"></cp-widget>`
+//
+//  This savining to create extra unnecessary javascript file.
+//
+//      define([
+//          'templating/parser!widget.html',
+//          'widget/Constructor'
+//      ], function (template, Constructor) {
+//          var Widget = Constructor.extend({
+//              template: template
+//          });
+//          return Widget;
+//      });
+
 define(function () {
     function getName(fileName) {
         return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName) : undefined;
@@ -8,7 +30,6 @@ define(function () {
         load: function (moduleName, req, onLoad, config) {
             moduleName = (getName(moduleName) !== undefined) ? moduleName : moduleName + '.html';
             if (config.isBuild) {
-                //don't do anything if this is a build, can't inline a web worker
                 req([
                     'templating/parser!' + moduleName,
                 ], function (template) {

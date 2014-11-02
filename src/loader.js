@@ -1,3 +1,14 @@
+// ## Loader Loads the Application main script
+// Following Attributes Supported
+//
+//      data-name: location of main script for Application
+//      data-target?: location to container if not set,
+//      use document.body
+//
+// There below is Example of usage in `index.html`
+//
+//      `<script data-name="App" data-target="body"
+//          src="../../src/loader.js"></script>`
 (function () {
 
     function getData(attributes, dataset) {
