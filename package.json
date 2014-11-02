@@ -1,6 +1,6 @@
 {
   "name": "stonewalljs",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/gunins/stonewall"
@@ -8,6 +8,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.0.1",
+    "grunt-bump": "0.0.16",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-copy": "^0.7.0",
