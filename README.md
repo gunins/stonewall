@@ -1,6 +1,5 @@
 ## "Stone Wall" is framework for creating "Rich Single Page Applications". [![Build Status](https://api.travis-ci.org/gunins/stonewall.svg?branch=master)](https://travis-ci.org/gunins/stonewall)
 
-
 Application framework based on "Rich Template" and requirejs. Will be good if before start you read about [**requirejs**](http://requirejs.org/)
 
 ## Why "Stone Wall"
@@ -8,6 +7,15 @@ Application framework based on "Rich Template" and requirejs. Will be good if be
 Most javascript frameworks not supporting large scale apps. And not allow to inject another frameworks. Also different versions of same frameworks. There is only one limitation, has to be require module.
 
 Also most frameworks has same code on production and development, except minifying. "Stone Wall" all code compile, and in production performing much faster.
+## installation
+
+Using npm
+
+    npm install stonewalljs
+
+Using bower
+
+    npm install stonewall
 
 ## How it works
 

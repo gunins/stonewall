@@ -212,7 +212,7 @@ module.exports = function (grunt) {
                 createTag: true,
                 tagName: '%VERSION%',
                 tagMessage: 'Version %VERSION%',
-                push: false,
+                push: false
             }
         }
     });
