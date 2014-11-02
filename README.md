@@ -43,6 +43,13 @@ Code is located in dist/prod/loader.js
 
 ## How to start
 
-Live examples you can see in examples section. To start go in ***examples/basic*** section.
-[API Docs](https://rawgit.com/gunins/stonewall/master/dist/docs/loader.html)
+- Live examples you can see in examples section. For see how to start, go in [examples/basic](https://github.com/gunins/stonewall/tree/master/examples/basic).
+
+- Also here is [API Docs](https://rawgit.com/gunins/stonewall/master/dist/docs/loader.html) available.
+
+- There is [skeleton project](https://github.com/gunins/skeleton), with predefined structure.
+
+
+
+
 
