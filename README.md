@@ -15,7 +15,7 @@ Using npm
 
 Using bower
 
-    npm install stonewall
+    bower install stonewall
 
 ## How it works
 
