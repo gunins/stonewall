@@ -37,7 +37,8 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         clean: ['target', 'dist'],
         exec: {
-            npmpack: 'npm pack dist'
+            npmpack: 'npm pack dist',
+            publish: 'npm publish dist'
         },
         requirejs: {
             prod: {
@@ -187,7 +188,7 @@ module.exports = function (grunt) {
         copy: {
             prod: {
                 files: [
-                    {expand: true, cwd: './', src: ['package.json', 'bower.json'], dest: 'dist'}
+                    {expand: true, cwd: './', src: ['package.json', 'bower.json', 'README.md'], dest: 'dist'}
                 ]
             },
             dev: {
@@ -203,6 +204,16 @@ module.exports = function (grunt) {
                     output: 'dist/docs/'
                 }
             }
+        },
+        bump: {
+            options: {
+                files: ['package.json', 'bower.json'],
+                commit: false,
+                createTag: true,
+                tagName: '%VERSION%',
+                tagMessage: 'Version %VERSION%',
+                push: false,
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -211,7 +222,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-docco');
+    grunt.loadNpmTasks('grunt-bump');
+
 
     grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'docco']);
+    grunt.registerTask('publish', ['bump', 'default', 'exec:publish']);
 
 };
