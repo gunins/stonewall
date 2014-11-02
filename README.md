@@ -44,4 +44,5 @@ Code is located in dist/prod/loader.js
 ## How to start
 
 Live examples you can see in examples section. To start go in ***examples/basic*** section.
+[API Docs](https://rawgit.com/gunins/stonewall/master/dist/docs/loader.html)
 
