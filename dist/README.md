@@ -1,6 +1,6 @@
 ## "Stone Wall" is framework for creating "Rich Single Page Applications". [![Build Status](https://api.travis-ci.org/gunins/stonewall.svg?branch=master)](https://travis-ci.org/gunins/stonewall)
 
-Application framework based on "Rich Template" and requirejs. Will be good if before start you read about [**requirejs**](http://requirejs.org/)
+Application framework based on "Rich Template" and requirejs. To start using need knowledge about [**requirejs**](http://requirejs.org/)
 
 ## Why "Stone Wall"
 
