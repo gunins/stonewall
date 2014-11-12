@@ -16,9 +16,19 @@
 //      });
 define([
     './mediator',
+    'router/Router',
     './utils'
-], function (Mediator, utils) {
+], function (Mediator, Router, utils) {
     'use strict';
+    function triggerRoute(router) {
+        router.start();
+        function onHashChange() {
+            var match = window.location.href.match(/#(.*)$/);
+            router.trigger(match ? match[1] : '');
+        };
+        window.addEventListener('hashchange', onHashChange, false);
+        onHashChange();
+    }
 
     // ### App Class
     // Creater App, EventBus and context for App.
@@ -27,24 +37,32 @@ define([
     //      var app= new App();
     //      app.start(document.body);
     function App() {
+        var router = new Router();
         this.context = utils.extend(this.setContext(), {
             // Creating `EventBus` More info look in `Mediator` Section
             eventBus: new Mediator()
         });
+
         this.beforeInit.apply(this, arguments);
         if (this.AppContainer !== undefined) {
             this.appContainer = new this.AppContainer({
-                appContext: this.context
+                appContext: this.context,
             });
+            if (this.appContainer._match !== undefined) {
+                router.match(this.appContainer._match.bind(this.appContainer));
+            }
+
             this.setContext();
             this.el = this.appContainer.el;
             setTimeout(function () {
                 this.el.classList.add('show');
             }.bind(this), 100);
+            triggerRoute(router);
 
         }
         this.init.apply(this, arguments);
     }
+
     // Extending the `App` Class
     //
     //      @Static method extend

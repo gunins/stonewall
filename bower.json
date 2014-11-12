@@ -9,9 +9,10 @@
     "requirejs": "^2.1.15",
     "bootstrap": "latest",
     "watch": "latest",
-    "d3": "~3.4.13"
+    "d3": "~3.4.13",
+    "urlmanager": "~0.1.12"
   },
-  "ignore":[
+  "ignore": [
     "docs",
     "examples",
     "src"

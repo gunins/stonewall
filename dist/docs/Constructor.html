@@ -49,6 +49,41 @@
               </a>
             
               
+              <a class="source" href="applyAttribute.html">
+                applyAttribute.js
+              </a>
+            
+              
+              <a class="source" href="applyBinders.html">
+                applyBinders.js
+              </a>
+            
+              
+              <a class="source" href="applyEvents.html">
+                applyEvents.js
+              </a>
+            
+              
+              <a class="source" href="deepBindings.html">
+                deepBindings.js
+              </a>
+            
+              
+              <a class="source" href="setBinders.html">
+                setBinders.js
+              </a>
+            
+              
+              <a class="source" href="setChildren.html">
+                setChildren.js
+              </a>
+            
+              
+              <a class="source" href="setRoutes.html">
+                setRoutes.js
+              </a>
+            
+              
               <a class="source" href="utils.html">
                 utils.js
               </a>
@@ -107,16 +142,16 @@ Basic Usage example</p>
             
             <div class="content"><div class='highlight'><pre>define([
     <span class="hljs-string">'./utils'</span>,
-    <span class="hljs-string">'./dom'</span>,
     <span class="hljs-string">'./mediator'</span>,
-    <span class="hljs-string">'watch'</span>,
-    <span class="hljs-string">'templating/Decoder'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(utils, dom, Mediator, WatchJS, Decoder)</span> </span>{
+    <span class="hljs-string">'templating/Decoder'</span>,
+    <span class="hljs-string">'./parsers/applyAttribute'</span>,
+    <span class="hljs-string">'./parsers/setChildren'</span>,
+    <span class="hljs-string">'./parsers/applyBinders'</span>,
+    <span class="hljs-string">'./parsers/setBinders'</span>,
+    <span class="hljs-string">'./parsers/setRoutes'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes)</span> </span>{
 <span class="hljs-pi">    'use strict'</span>;
-    <span class="hljs-keyword">var</span> context = {},
-        watch = WatchJS.watch,
-        unwatch = WatchJS.unwatch,
-        callWatchers = WatchJS.callWatchers;</pre></div></div>
+    <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
         </li>
         
@@ -126,278 +161,6 @@ Basic Usage example</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>Applying dom.Element to template elements.</p>
-<pre><code> @private applyElement
- @param {<span class="hljs-built_in">Object</span>} elements
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyElement</span><span class="hljs-params">(elements)</span> </span>{
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-            <span class="hljs-keyword">if</span> (elements[key] <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span>) {
-                elements[key] = <span class="hljs-keyword">new</span> dom.Element(elements[key]);
-            }
-            <span class="hljs-keyword">if</span> (elements[key].children) {
-                elements[key].children = applyElement(elements[key].children);
-            }
-        }.bind(<span class="hljs-keyword">this</span>));
-        <span class="hljs-keyword">return</span> elements;
-    }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <p>Aplying Events to elements</p>
-<pre><code> @private applyEvents
- @param {dom.Element} element
- @param {<span class="hljs-built_in">Array</span>} events
- @param {<span class="hljs-built_in">Object</span>} data
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyEvents</span><span class="hljs-params">(element, events, data)</span> </span>{
-        <span class="hljs-keyword">if</span> (events !== <span class="hljs-literal">undefined</span> &amp;&amp; element.el !== <span class="hljs-literal">undefined</span>) {
-            events.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
-                element.on(event.name, event.action, <span class="hljs-keyword">this</span>, data);
-            }.bind(<span class="hljs-keyword">this</span>));
-        }
-    }
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyAttribute</span><span class="hljs-params">(childBinder, data)</span> </span>{
-        <span class="hljs-keyword">var</span> bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update;
-        <span class="hljs-keyword">if</span> (bind) {
-            <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(bindItem)</span> </span>{
-                <span class="hljs-keyword">var</span> key = bind[bindItem];
-                <span class="hljs-keyword">if</span> (data[key] !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'class'</span>) {
-                        childBinder.addClass(data[key]);
-                        <span class="hljs-keyword">var</span> currClass = data[key];
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.removeClass(currClass);
-                                childBinder.addClass(data[key]);
-                                currClass = data[key];
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
-                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'checked'</span>) {
-                        childBinder.el.checked = data[key];
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.el.checked = data[key];
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
-                    } <span class="hljs-keyword">else</span> {
-                        childBinder.setAttribute(bindItem, data[key]);
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.setAttribute(bindItem, data[key]);
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
-                    }
-                }
-                <span class="hljs-keyword">if</span> (data.text !== <span class="hljs-literal">undefined</span>) {
-                    childBinder.text(data.text);
-                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                        watch(data, <span class="hljs-string">'text'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                            childBinder.text(data.text);
-                        }.bind(<span class="hljs-keyword">this</span>));
-                    }
-                }
-            });
-        }
-
-    }
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span><span class="hljs-params">(elements, parentChildren)</span> </span>{
-        parentChildren = (parentChildren) ? applyElement(parentChildren) : {};
-        elements = (elements) ? applyElement(elements) : {};
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-            <span class="hljs-keyword">var</span> children = elements[key].children;
-            <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-                children = setChildren.call(<span class="hljs-keyword">this</span>, children, parentChildren.children);
-                elements[key].bindings = setBinders(children);
-            }
-
-            <span class="hljs-keyword">var</span> child = elements[key],
-                parentChild = parentChildren[key];
-
-            <span class="hljs-keyword">if</span> (parentChild !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
-                    parentChild.bindings = deepBindings(parentChild.children);
-                }
-
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, parentChild);
-                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span>) {
-                    child.replace(parentChild);
-                    <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
-                        child.children = parentChild.children
-                    }
-                }
-
-            }
-
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; child.el !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, child);
-            }
-
-            <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[key];
-            applyEvents.call(<span class="hljs-keyword">this</span>, child, events)
-
-        }.bind(<span class="hljs-keyword">this</span>));
-        <span class="hljs-keyword">return</span> elements
-    }
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deepBindings</span><span class="hljs-params">(elements)</span> </span>{
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-            <span class="hljs-keyword">var</span> element = elements[key];
-            <span class="hljs-keyword">if</span> (element.children) {
-                elements[key].children = deepBindings(element.children);
-                elements[key].bindings = setBinders(element.children);
-            }
-        });
-        <span class="hljs-keyword">return</span> elements;
-    }
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setBinders</span><span class="hljs-params">(children)</span> </span>{
-        <span class="hljs-keyword">var</span> bindings = <span class="hljs-literal">false</span>
-        <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-            bindings = bindings || {};
-            <span class="hljs-keyword">var</span> el = children[key];
-            <span class="hljs-keyword">if</span> (el.bind !== <span class="hljs-literal">undefined</span>) {
-                bindings[el.bind] = bindings[el.bind] || []
-                bindings[el.bind].push(el)
-            }
-        }.bind(<span class="hljs-keyword">this</span>));
-        <span class="hljs-keyword">return</span> bindings;
-    }
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyBinders</span><span class="hljs-params">(obj, instance)</span> </span>{
-        <span class="hljs-keyword">var</span> binders = instance.bindings,
-            parent = instance.el;
-        <span class="hljs-keyword">if</span> (obj) {
-            <span class="hljs-built_in">Object</span>.keys(obj).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-                <span class="hljs-keyword">if</span> (binders !== <span class="hljs-literal">undefined</span> &amp;&amp; binders[key] !== <span class="hljs-literal">undefined</span>) {
-
-                    <span class="hljs-keyword">var</span> parseBinder = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(binder)</span> </span>{
-                        <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[binder.name];
-                        <span class="hljs-keyword">if</span> (binder !== <span class="hljs-literal">undefined</span>) {
-                            <span class="hljs-keyword">var</span> data = obj[key];
-                            binder.applyAttach();
-
-                            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key]) {
-                                <span class="hljs-keyword">var</span> childBinder = <span class="hljs-keyword">new</span> dom.Element(binder);
-                                <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, childBinder, parent, data);
-                            } <span class="hljs-keyword">else</span> {
-                                <span class="hljs-keyword">if</span> (!utils.isArray(data) &amp;&amp; !utils.isObject(data)) {
-                                    <span class="hljs-keyword">var</span> childBinder = <span class="hljs-keyword">new</span> dom.Element(binder);
-                                    childBinder.add(parent);
-                                    childBinder.text(data);
-                                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span>) {
-                                        <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, childBinder, data);
-                                    }
-                                    <span class="hljs-keyword">if</span> (childBinder.data.tplSet.update === <span class="hljs-string">'true'</span>) {
-                                        watch(obj, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                            childBinder.text(obj[key]);
-                                        }.bind(<span class="hljs-keyword">this</span>));
-                                    }
-                                    applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isArray(data)) {
-                                    binder.applyAttach();
-
-                                    <span class="hljs-keyword">var</span> updateChildren = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                        <span class="hljs-keyword">var</span> hasParent = <span class="hljs-literal">false</span>,
-                                            addItem = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> </span>{
-                                                <span class="hljs-keyword">var</span> childBinder = <span class="hljs-keyword">new</span> dom.Element(binder);
-
-                                                <span class="hljs-keyword">if</span> (!hasParent) {
-                                                    childBinder.add(parent);
-                                                    hasParent = binder.getParent();
-                                                } <span class="hljs-keyword">else</span> {
-                                                    childBinder.add(parent, hasParent);
-                                                }
-
-                                                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key]) {
-                                                    <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                                }
-
-                                                applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                                applyBinders.call(<span class="hljs-keyword">this</span>, item, childBinder);
-                                                applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, item);
-                                            };
-                                        data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
-                                        <span class="hljs-keyword">var</span> update = binder.data.tplSet.update;
-                                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                                            watch(obj, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(prop, action, newvalue, oldvalue)</span> </span>{
-                                                <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; action == <span class="hljs-string">'push'</span>) {
-                                                    addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>]);
-                                                }
-                                            }.bind(<span class="hljs-keyword">this</span>));
-                                        }
-                                    }
-
-                                    updateChildren.call(<span class="hljs-keyword">this</span>);
-
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isObject(data)) {
-                                    <span class="hljs-keyword">var</span> childBinder = <span class="hljs-keyword">new</span> dom.Element(binder);
-                                    childBinder.add(parent);
-                                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key]) {
-                                        <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, childBinder, data);
-                                    }
-                                    applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
-                                    <span class="hljs-keyword">if</span> (binder.data.type === <span class="hljs-string">'cp'</span>) {
-                                        childBinder.replace(binder, data);
-                                    }
-                                    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!childBinder.data.tplSet.bind) {
-                                        applyBinders.call(<span class="hljs-keyword">this</span>, data, childBinder);
-                                    } <span class="hljs-keyword">else</span> {
-                                        applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, data);
-                                    }
-                                }
-                            }
-                        }
-
-                    };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <p>TODO: Investigate, why not allways an Array</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (binders[key].forEach !== <span class="hljs-literal">undefined</span>) {
-                        binders[key].forEach(parseBinder.bind(<span class="hljs-keyword">this</span>));
-                    } <span class="hljs-keyword">else</span> {
-                        parseBinder.call(<span class="hljs-keyword">this</span>, binders[key])
-                    }
-                }
-            }.bind(<span class="hljs-keyword">this</span>));
-        }
-    }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Constructor Class</p>
 <pre><code> @Constructor
@@ -416,11 +179,11 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render();
-
             <span class="hljs-keyword">this</span>.el = template.fragment;
             <span class="hljs-keyword">this</span>.data = (dataSet) ? dataSet : <span class="hljs-keyword">this</span>.context.data[data.bind];
             <span class="hljs-keyword">this</span>.children = setChildren.call(<span class="hljs-keyword">this</span>, template.children, children);
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
+            <span class="hljs-keyword">this</span>.routes = setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.data) {
                 <span class="hljs-keyword">this</span>.applyBinders(<span class="hljs-keyword">this</span>.data, <span class="hljs-keyword">this</span>);
@@ -439,11 +202,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p><code>nodes</code> Object override default methods to Elements.
 Usage Example</p>
@@ -461,11 +224,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p><code>events</code> Object applying events to elements
 You can apply more than one event on element
@@ -488,11 +251,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Applying extra methods to Element
 Usage Example</p>
@@ -511,11 +274,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Running when Constructor is initialised</p>
 <pre><code> @method init
@@ -533,11 +296,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Applying Binders manually, if use nodes function</p>
 <pre><code> @method applyBinders
@@ -549,11 +312,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Removing widget from Dom</p>
 <pre><code> @method destroy

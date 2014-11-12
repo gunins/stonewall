@@ -49,6 +49,41 @@
               </a>
             
               
+              <a class="source" href="applyAttribute.html">
+                applyAttribute.js
+              </a>
+            
+              
+              <a class="source" href="applyBinders.html">
+                applyBinders.js
+              </a>
+            
+              
+              <a class="source" href="applyEvents.html">
+                applyEvents.js
+              </a>
+            
+              
+              <a class="source" href="deepBindings.html">
+                deepBindings.js
+              </a>
+            
+              
+              <a class="source" href="setBinders.html">
+                setBinders.js
+              </a>
+            
+              
+              <a class="source" href="setChildren.html">
+                setChildren.js
+              </a>
+            
+              
+              <a class="source" href="setRoutes.html">
+                setRoutes.js
+              </a>
+            
+              
               <a class="source" href="utils.html">
                 utils.js
               </a>
@@ -106,9 +141,19 @@
             
             <div class="content"><div class='highlight'><pre>define([
     <span class="hljs-string">'./mediator'</span>,
+    <span class="hljs-string">'router/Router'</span>,
     <span class="hljs-string">'./utils'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Mediator, utils)</span> </span>{
-<span class="hljs-pi">    'use strict'</span>;</pre></div></div>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Mediator, Router, utils)</span> </span>{
+<span class="hljs-pi">    'use strict'</span>;
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">triggerRoute</span><span class="hljs-params">(router)</span> </span>{
+        router.start();
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onHashChange</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">var</span> match = <span class="hljs-built_in">window</span>.location.href.match(<span class="hljs-regexp">/#(.*)$/</span>);
+            router.trigger(match ? match[<span class="hljs-number">1</span>] : <span class="hljs-string">''</span>);
+        };
+        <span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'hashchange'</span>, onHashChange, <span class="hljs-literal">false</span>);
+        onHashChange();
+    }</pre></div></div>
             
         </li>
         
@@ -128,6 +173,7 @@ Usage Example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">var</span> router = <span class="hljs-keyword">new</span> Router();
         <span class="hljs-keyword">this</span>.context = utils.extend(<span class="hljs-keyword">this</span>.setContext(), {</pre></div></div>
             
         </li>
@@ -145,16 +191,22 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>            eventBus: <span class="hljs-keyword">new</span> Mediator()
         });
+
         <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
             <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer({
-                appContext: <span class="hljs-keyword">this</span>.context
+                appContext: <span class="hljs-keyword">this</span>.context,
             });
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) {
+                router.match(<span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer));
+            }
+
             <span class="hljs-keyword">this</span>.setContext();
             <span class="hljs-keyword">this</span>.el = <span class="hljs-keyword">this</span>.appContainer.el;
             setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                 <span class="hljs-keyword">this</span>.el.classList.add(<span class="hljs-string">'show'</span>);
             }.bind(<span class="hljs-keyword">this</span>), <span class="hljs-number">100</span>);
+            triggerRoute(router);
 
         }
         <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);

@@ -1,0 +1,60 @@
+<div class="container-fluid">
+    <div class="col-xs-6 col-sm-3 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">Basic Example</div>
+
+
+            <div class="panel-body">
+                <h4>Below has different route bindings</h4>
+                <ul>
+                    <li><a href="#/levela">LevelA</a></li>
+                    <li><a href="#/levelb">LevelB</a>
+                        <ul>
+                            <li><a href="#/levelb/levelf">Level B / Level F</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#/levelc">LevelC</a>
+                        <ul>
+                            <li><a href="#/levelc/leveld">level C / level D</a>
+                                <ul>
+                                    <li><a href="#/levelc/leveld/levelf">level C / level D /level F</a>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <rt route="/levela" >
+                    <cp-val data-bind="cmp" src="cmp/Cmp">
+                        <pl-header>Header From Parent Container</pl-header>
+                        <pl-body>
+                            <p>Body From Parent Container</p>
+                        </pl-body>
+                    </cp-val>
+                </rt>
+                <rt route="/levelb">
+                    <cp-valB data-bind="cmpB" src="cmpB/CmpB">
+                        <pl-header>Header From Parent Container</pl-header>
+                        <pl-body>
+                            <p>Body From Parent Container</p>
+                        </pl-body>
+                    </cp-valB>
+                </rt>
+                <rt route="/levelc" class="container-fluid">
+                    <h3>Header 3</h3>
+
+                    <div>
+                        <rt route="/leveld">
+                            <h4>This is leveld</h4>
+                            <cp-valB data-bind="cmpB" src="cmpB/CmpB">
+                                <pl-header>Header From Parent Container</pl-header>
+                                <pl-body>
+                                    <p>Body From Parent Container</p>
+                                </pl-body>
+                            </cp-valB>
+                        </rt>
+                    </div>
+                </rt>
+            </div>
+        </div>
+    </div>
+</div>
