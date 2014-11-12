@@ -13,6 +13,7 @@ define([
         //      @param {dom.Element} child
         //      @param {Object} data
         append: function (parent, child, data) {
+            child.placeholder = parent.el.querySelector('#' + child.id);
             child.el = child.run(parent.el, true, false, data);
         },
         // Replacing element in to DOM
@@ -25,7 +26,18 @@ define([
             parent.el.innerHTML = '';
             dom.append.apply(this, arguments);
         },
+        detach: function (el) {
+            if(el.el.parentNode) {
+                el.el.parentNode.replaceChild(el.placeholder, el.el)
+            }
+        },
+        attach: function (el) {
+            if(el.placeholder.parentNode){
+                el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            }
+        },
         add: function (el, fragment, parent) {
+            el.placeholder = fragment.querySelector('#' + el.id);
             el.el = el.run(fragment, false, parent);
         },
         // Adding text in to node
@@ -144,15 +156,15 @@ define([
         //
         //      @method remove
         //      @param {dom.Element}
-        remove:function(el){
+        remove: function (el) {
             el.el.remove();
         },
         // Element
         Element: Element
     }
-     // ## widget/dom.Element
-     //     @method Element
-     //     @param {Object} node
+    // ## widget/dom.Element
+    //     @method Element
+    //     @param {Object} node
     function Element(node) {
         var obj = utils.extend({}, node);
         utils.extend(this, obj);
@@ -175,6 +187,12 @@ define([
         // Shortcut to - `dom.add`
         add: function (fragment, parent) {
             dom.add(this, fragment, parent);
+        },
+        detach: function () {
+            dom.detach(this);
+        },
+        attach: function () {
+            dom.attach(this);
         },
         // Shortcut to - `dom.setAttribute`
         setAttribute: function (prop, value) {
@@ -202,7 +220,7 @@ define([
         },
         // Shortcut to - `dom.val`
         val: function (val) {
-           return dom.val(this, val);
+            return dom.val(this, val);
         },
         // Shortcut to - `dom.on`
         on: function (event, cb, context) {
@@ -210,7 +228,7 @@ define([
             return dom.on.apply(false, [this].concat(args));
         },
         // Shortcut to - `dom.remove`
-        remove:function(){
+        remove: function () {
             dom.remove(this);
         }
 

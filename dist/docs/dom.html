@@ -49,6 +49,41 @@
               </a>
             
               
+              <a class="source" href="applyAttribute.html">
+                applyAttribute.js
+              </a>
+            
+              
+              <a class="source" href="applyBinders.html">
+                applyBinders.js
+              </a>
+            
+              
+              <a class="source" href="applyEvents.html">
+                applyEvents.js
+              </a>
+            
+              
+              <a class="source" href="deepBindings.html">
+                deepBindings.js
+              </a>
+            
+              
+              <a class="source" href="setBinders.html">
+                setBinders.js
+              </a>
+            
+              
+              <a class="source" href="setChildren.html">
+                setChildren.js
+              </a>
+            
+              
+              <a class="source" href="setRoutes.html">
+                setRoutes.js
+              </a>
+            
+              
               <a class="source" href="utils.html">
                 utils.js
               </a>
@@ -116,6 +151,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
+            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child.id);
             child.el = child.run(parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
         },</pre></div></div>
             
@@ -140,7 +176,18 @@
             parent.el.innerHTML = <span class="hljs-string">''</span>;
             dom.append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         },
+        detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
+            <span class="hljs-keyword">if</span>(el.el.parentNode) {
+                el.el.parentNode.replaceChild(el.placeholder, el.el)
+            }
+        },
+        attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
+            <span class="hljs-keyword">if</span>(el.placeholder.parentNode){
+                el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            }
+        },
         add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent)</span> </span>{
+            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id);
             el.el = el.run(fragment, <span class="hljs-literal">false</span>, parent);
         },</pre></div></div>
             
@@ -379,7 +426,7 @@
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        remove:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(el)</span></span>{
+            <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             el.el.remove();
         },</pre></div></div>
             
@@ -488,6 +535,12 @@
             
             <div class="content"><div class='highlight'><pre>        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fragment, parent)</span> </span>{
             dom.add(<span class="hljs-keyword">this</span>, fragment, parent);
+        },
+        detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            dom.detach(<span class="hljs-keyword">this</span>);
+        },
+        attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            dom.attach(<span class="hljs-keyword">this</span>);
         },</pre></div></div>
             
         </li>
@@ -606,7 +659,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        val: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(val)</span> </span>{
-           <span class="hljs-keyword">return</span> dom.val(<span class="hljs-keyword">this</span>, val);
+            <span class="hljs-keyword">return</span> dom.val(<span class="hljs-keyword">this</span>, val);
         },</pre></div></div>
             
         </li>
@@ -640,7 +693,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        remove:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             dom.remove(<span class="hljs-keyword">this</span>);
         }
 

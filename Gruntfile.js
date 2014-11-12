@@ -3,12 +3,14 @@ module.exports = function (grunt) {
         templateCoders: [
             'coders/component/CpCoder',
             'coders/placeholders/plCoder',
-            'coders/databind/bdCoder'
+            'coders/databind/bdCoder',
+            'coders/router/RouterCoder'
         ],
         templateDecoders: [
             'coders/component/CpDecoder',
             'coders/placeholders/plDecoder',
-            'coders/databind/bdDecoder'
+            'coders/databind/bdDecoder',
+            'coders/router/RouterDecoder'
         ],
         exclude: [
             'coders/component/CpCoder',
@@ -29,7 +31,8 @@ module.exports = function (grunt) {
         htmlparser2: '../../../node_modules/richtemplate/dev/htmlparser2',
         'widget': '../../../src/widget',
         'watch': '../../../bower_components/watch/src/watch',
-        'd3': '../../../bower_components/d3/d3'
+        'd3': '../../../bower_components/d3/d3',
+        'router': '../../../bower_components/urlmanager/dist/prod/router'
     };
     var stubModules = ['templating/parser', 'widget/parser'];
 
@@ -48,7 +51,8 @@ module.exports = function (grunt) {
                     removeCombined: true,
                     paths: {
                         'watch': '../bower_components/watch/src/watch',
-                        templating: '../node_modules/richtemplate/dev/templating'
+                        'templating': '../node_modules/richtemplate/dev/templating',
+                        'router': '../bower_components/urlmanager/dist/prod/router'
                     },
                     dir: 'target/prod',
                     modules: [
@@ -72,7 +76,8 @@ module.exports = function (grunt) {
                     removeCombined: true,
                     paths: {
                         'watch': '../bower_components/watch/src/watch',
-                        templating: '../node_modules/richtemplate/dev/templating'
+                        'templating': '../node_modules/richtemplate/dev/templating',
+                        'router': '../bower_components/urlmanager/dist/prod/router'
                     },
                     dir: 'target/dev',
                     modules: [
@@ -120,6 +125,21 @@ module.exports = function (grunt) {
                     stubModules: stubModules,
                     exclude: coders.exclude,
                     dir: "examples/basicBind/target",
+                    paths: appPaths,
+                    name: 'App'
+
+                }
+            },
+            routes: {
+                options: {
+                    baseUrl: 'examples/routes/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: stubModules,
+                    exclude: coders.exclude,
+                    dir: "examples/routes/target",
                     paths: appPaths,
                     name: 'App'
 
@@ -207,12 +227,13 @@ module.exports = function (grunt) {
         },
         bump: {
             options: {
-                files: ['package.json', 'bower.json'],
-                commit: false,
+                files: ['package.json', 'bower.json', 'dist/package.json', 'dist/bower.json'],
+                commit: true,
                 createTag: true,
                 tagName: '%VERSION%',
                 tagMessage: 'Version %VERSION%',
-                push: false
+                push: true,
+                pushTo: 'origin'
             }
         }
     });
@@ -224,8 +245,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-docco');
     grunt.loadNpmTasks('grunt-bump');
 
-
     grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'docco']);
-    grunt.registerTask('publish', ['bump', 'default', 'exec:publish']);
+    grunt.registerTask('publish', ['default', 'bump', 'exec:publish']);
 
 };

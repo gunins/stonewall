@@ -1,6 +1,6 @@
 {
   "name": "stonewall",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/gunins/stonewall"
@@ -9,9 +9,10 @@
     "requirejs": "^2.1.15",
     "bootstrap": "latest",
     "watch": "latest",
-    "d3": "~3.4.13"
+    "d3": "~3.4.13",
+    "urlmanager": "~0.1.13"
   },
-  "ignore":[
+  "ignore": [
     "docs",
     "examples",
     "src"
