@@ -177,11 +177,14 @@
             dom.append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            el.el.parentNode.replaceChild(el.placeholder, el.el)
-
+            <span class="hljs-keyword">if</span>(el.el.parentNode) {
+                el.el.parentNode.replaceChild(el.placeholder, el.el)
+            }
         },
         attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            <span class="hljs-keyword">if</span>(el.placeholder.parentNode){
+                el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            }
         },
         add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent)</span> </span>{
             el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id);

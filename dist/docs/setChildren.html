@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>setChildren.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="loader.html">
+                loader.js
+              </a>
+            
+              
+              <a class="source" href="App.html">
+                App.js
+              </a>
+            
+              
+              <a class="source" href="Constructor.html">
+                Constructor.js
+              </a>
+            
+              
+              <a class="source" href="dom.html">
+                dom.js
+              </a>
+            
+              
+              <a class="source" href="mediator.html">
+                mediator.js
+              </a>
+            
+              
+              <a class="source" href="parser.html">
+                parser.js
+              </a>
+            
+              
+              <a class="source" href="applyAttribute.html">
+                applyAttribute.js
+              </a>
+            
+              
+              <a class="source" href="applyBinders.html">
+                applyBinders.js
+              </a>
+            
+              
+              <a class="source" href="applyEvents.html">
+                applyEvents.js
+              </a>
+            
+              
+              <a class="source" href="deepBindings.html">
+                deepBindings.js
+              </a>
+            
+              
+              <a class="source" href="setBinders.html">
+                setBinders.js
+              </a>
+            
+              
+              <a class="source" href="setChildren.html">
+                setChildren.js
+              </a>
+            
+              
+              <a class="source" href="setRoutes.html">
+                setRoutes.js
+              </a>
+            
+              
+              <a class="source" href="utils.html">
+                utils.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>setChildren.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
+ * Created by guntars on 11/11/14.
+ */</span>
+define([
+    <span class="hljs-string">'../dom'</span>,
+    <span class="hljs-string">'./applyEvents'</span>,
+    <span class="hljs-string">'./setBinders'</span>,
+    <span class="hljs-string">'./deepBindings'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, applyEvents, setBinders, deepBindings)</span> </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Applying dom.Element to template elements.</p>
+<pre><code> @private applyElement
+ @param {<span class="hljs-built_in">Object</span>} elements
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyElement</span><span class="hljs-params">(elements)</span> </span>{
+        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+            <span class="hljs-keyword">if</span> (elements[key] <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span>) {
+                elements[key] = <span class="hljs-keyword">new</span> dom.Element(elements[key]);
+            }
+            <span class="hljs-keyword">if</span> (elements[key].children) {
+                elements[key].children = applyElement(elements[key].children);
+            }
+        }.bind(<span class="hljs-keyword">this</span>));
+        <span class="hljs-keyword">return</span> elements;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span><span class="hljs-params">(elements, parentChildren)</span> </span>{
+        parentChildren = (parentChildren) ? applyElement(parentChildren) : {};
+        elements = (elements) ? applyElement(elements) : {};
+        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+            <span class="hljs-keyword">var</span> children = elements[key].children;
+            <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
+                children = setChildren.call(<span class="hljs-keyword">this</span>, children, parentChildren.children);
+                elements[key].bindings = setBinders(children);
+            }
+
+            <span class="hljs-keyword">var</span> child = elements[key],
+                parentChild = parentChildren[key];
+
+            <span class="hljs-keyword">if</span> (parentChild !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
+                    parentChild.bindings = deepBindings(parentChild.children);
+                }
+
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span>) {
+                    <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, parentChild);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span>) {
+                    child.replace(parentChild);
+                    <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
+                        child.children = parentChild.children
+                    }
+                }
+
+            }
+
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; child.el !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, child);
+            }
+
+            <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[key];
+            applyEvents.call(<span class="hljs-keyword">this</span>, child, events)
+
+        }.bind(<span class="hljs-keyword">this</span>));
+        <span class="hljs-keyword">return</span> elements
+    }
+
+    <span class="hljs-keyword">return</span> setChildren;
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

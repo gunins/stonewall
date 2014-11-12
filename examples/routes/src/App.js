@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'container/Container'
+    'widget/parser!container/Container'
 ], function (App, Container) {
 
     return App.extend({
@@ -16,6 +16,69 @@ define([
                     },
                     cmpB: {
                         item: 'Binded Item From AppB'
+                    },
+                    links: {
+                        items: [
+                            {
+                                link: {
+                                    href: '#/levela',
+                                    text: 'LevelA'
+                                },
+                                children: [
+                                    {
+                                        link: {
+                                            href: '#/levela/levelb',
+                                            text: 'Level A / Level B'
+                                        },
+                                        children: [
+                                            {
+                                                link: {
+                                                    href: '#/levela/levelb/levelf',
+                                                    text: 'level A / Level B / Level F'
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                link: {
+                                    href: '#/levelb',
+                                    text: 'LevelB'
+                                },
+                                children: [
+                                    {
+                                        link: {
+
+                                            href: '#/levelb/levelf',
+                                            text: 'Level B / Level F'
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                link: {
+                                    href: '#/levelc',
+                                    text: 'LevelC'
+                                },
+                                children: [
+                                    {
+                                        link: {
+                                            href: '#/levelc/leveld',
+                                            text: 'level C / level D'
+                                        },
+                                        children: [
+                                            {
+                                                link: {
+                                                    href: '#/levelc/leveld/levelf',
+                                                    text: 'level C / level D /level F'
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 }
             }

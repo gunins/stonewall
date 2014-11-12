@@ -16,16 +16,14 @@ define(function () {
 
     function matchRoute(children, match, parent) {
         var names = Object.keys(children);
+        var currMatch = match;
         names.forEach(function (name) {
             var child = children[name];
             var route = child.data.route;
             if (route !== undefined) {
                 var matches = match(route, function (match) {
-                    if (child.children !== undefined) {
-                        matchRoute.call(this, child.children, match, parent);
-                    }
+                    currMatch = match;
                 }.bind(this));
-
                 matches.to(function () {
                     if (child.el === undefined) {
                         child.applyAttach();
@@ -51,6 +49,9 @@ define(function () {
                     child.detach();
                 }.bind(this))
 
+            }
+            if (child.children !== undefined) {
+                matchRoute.call(this, child.children, currMatch, parent);
             }
         }.bind(this));
     }

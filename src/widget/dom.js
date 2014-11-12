@@ -27,11 +27,14 @@ define([
             dom.append.apply(this, arguments);
         },
         detach: function (el) {
-            el.el.parentNode.replaceChild(el.placeholder, el.el)
-
+            if(el.el.parentNode) {
+                el.el.parentNode.replaceChild(el.placeholder, el.el)
+            }
         },
         attach: function (el) {
-            el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            if(el.placeholder.parentNode){
+                el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            }
         },
         add: function (el, fragment, parent) {
             el.placeholder = fragment.querySelector('#' + el.id);
