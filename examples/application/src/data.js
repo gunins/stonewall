@@ -60,25 +60,25 @@ define({
         group: [
             {
                 links: [
-                    {link: {text: 'Reports', href: '#link1'}, class: 'active'},
-                    {link: {text: 'Analytics', href: '#link2'}, class: 'inactive'},
-                    {link: {text: 'Export', href: '#link3'}, class: 'inactive'},
-                    {link: {text: 'Nav item', href: '#link4'}, class: 'inactive'}
+                    {link: {text: 'Reports', href: '#/dashboard/link1'}, class: 'active'},
+                    {link: {text: 'Analytics', href: '#/dashboard/link2'}, class: 'inactive'},
+                    {link: {text: 'Export', href: '#/dashboard/link3'}, class: 'inactive'},
+                    {link: {text: 'Nav item', href: '#/dashboard/link4'}, class: 'inactive'}
                 ]
             },
             {
                 links: [
-                    {link: {text: 'Nav item again', href: '#link4'}, class: 'inactive'},
-                    {link: {text: 'One more nav', href: '#link5'}, class: 'inactive'},
-                    {link: {text: 'Another nav item', href: '#link6'}, class: 'inactive'},
-                    {link: {text: 'More navigation', href: '#link7'}, class: 'inactive'}
+                    {link: {text: 'Nav item again', href: '#/dashboard/link4'}, class: 'inactive'},
+                    {link: {text: 'One more nav', href: '#/dashboard/link5'}, class: 'inactive'},
+                    {link: {text: 'Another nav item', href: '#/dashboard/link6'}, class: 'inactive'},
+                    {link: {text: 'More navigation', href: '#/dashboard/link7'}, class: 'inactive'}
                 ]
             },
             {
                 links: [
-                    {link: {text: 'Nav item again', href: '#link8'}, class: 'inactive'},
-                    {link: {text: 'One more nav', href: '#link9'}, class: 'inactive'},
-                    {link: {text: 'Another nav item', href: '#link10'}, class: 'inactive'}
+                    {link: {text: 'Nav item again', href: '#/dashboard/link8'}, class: 'inactive'},
+                    {link: {text: 'One more nav', href: '#/dashboard/link9'}, class: 'inactive'},
+                    {link: {text: 'Another nav item', href: '#/dashboard/link10'}, class: 'inactive'}
                 ]
             },
         ]

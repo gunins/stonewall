@@ -36,6 +36,7 @@ define(function () {
                                             cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
                                             routes.run();
                                         }.bind(this));
+
                                     }
                             }.bind(this));
                         }

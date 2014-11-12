@@ -1,33 +1,28 @@
-<div class="container-fluid">
-    <div class="row">
-        <cp-sideBar data-bind="sidebar" src="sidebar"></cp-sideBar>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <pl-page-header tp-tag="h1"></pl-page-header>
+<div>
+    <pl-page-header tp-tag="h1"></pl-page-header>
 
-            <cp-charts src="widget/parser!charts/Charts">
-                <pl-content>
-                    <cp-pie1 src="piechart" data-bind="pie1" >
-                        <pl-chartheader>Custom Header 1</pl-chartheader>
-                    </cp-pie1>
-                    <cp-pie2 src="piechart" data-bind="pie2" >
-                        <pl-chartheader>Custom Header 2</pl-chartheader>
-                    </cp-pie2>
-                    <cp-pie3 src="piechart" data-bind="pie3" >
-                        <pl-chartheader>Custom Header 3</pl-chartheader>
-                    </cp-pie3>
-                    <cp-pie4 src="piechart" data-bind="pie4" >
-                        <pl-chartheader>Custom Header 4</pl-chartheader>
-                    </cp-pie4>
-                </pl-content>
-            </cp-charts>
+    <cp-charts src="widget/parser!charts/Charts">
+        <pl-content>
+            <cp-pie1 src="piechart" data-bind="pie1">
+                <pl-chartheader>Custom Header 1</pl-chartheader>
+            </cp-pie1>
+            <cp-pie2 src="piechart" data-bind="pie2">
+                <pl-chartheader>Custom Header 2</pl-chartheader>
+            </cp-pie2>
+            <cp-pie3 src="piechart" data-bind="pie3">
+                <pl-chartheader>Custom Header 3</pl-chartheader>
+            </cp-pie3>
+            <cp-pie4 src="piechart" data-bind="pie4">
+                <pl-chartheader>Custom Header 4</pl-chartheader>
+            </cp-pie4>
+        </pl-content>
+    </cp-charts>
 
-            <pl-sub-header tp-tag="h3">Section title</pl-sub-header>
+    <pl-sub-header tp-tag="h3">Section title</pl-sub-header>
 
-            <cp-table src="table" data-bind="table">
-                <pl-header>Click on
-                    <bd-link tp-tag="a"></bd-link>
-                </pl-header>
-            </cp-table>
-        </div>
-    </div>
+    <cp-table src="table" data-bind="table">
+        <pl-header>Click on
+            <bd-link tp-tag="a"></bd-link>
+        </pl-header>
+    </cp-table>
 </div>
