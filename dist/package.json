@@ -1,6 +1,6 @@
 {
   "name": "stonewalljs",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "repository": {
     "type": "git",
     "url": "https://github.com/gunins/stonewall"
@@ -24,6 +24,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "postinstall":"bower install && grunt"
+    "test":"grunt"
   }
 }
