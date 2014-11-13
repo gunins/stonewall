@@ -8,11 +8,6 @@ define([
     return Constructor.extend({
         template: template,
         init: function () {
-
-            var evt = this.children.testevent.on('click', function (e) {
-                evt.remove();
-            }, this);
-
         },
         events: {
             tbody: [
@@ -37,12 +32,6 @@ define([
             header: function (el, parent) {
                 el.replace(parent);
                 this.applyBinders(this.data, parent);
-            },
-            link: function (el, parent, data) {
-                el.add(parent);
-                el.text(data.text);
-                el.setAttribute('href', data.href);
-
             },
             value: function (el, parent, data) {
                 el.add(parent);

@@ -24,7 +24,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "grunt",
     "postinstall":"bower install && grunt"
   }
 }

@@ -6,22 +6,21 @@ define([
         template: template,
         init: function () {
         },
-        elReady: {
-            links: function (el, data) {
-                if(data.class==='active'){
-                    this.context.eventBus.publish('setActive', data);
-                }
-            }
-        },
-        events: {
-            links: [
-                {
-                    name: 'click',
-                    action: function (e, el, data) {
-                        this.context.eventBus.publish('removeActive', data);
+        match:function(match){
+            var links = this.data.group.links;
+            match('/:link').to(function (link, param) {
+                links.forEach(function (item) {
+                    if (item.link.href.replace('#/', '')===param.getLocation('/' + link)) {
+                        item.class = 'active';
+                    } else {
+                        item.class = 'inactive';
                     }
-                }
-            ]
+                }.bind(this));
+            }.bind(this)).leave(function(){
+                links.forEach(function (item) {
+                    item.class = 'inactive';
+                }.bind(this));
+            }.bind(this));
         }
     });
 
