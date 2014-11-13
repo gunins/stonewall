@@ -19,8 +19,8 @@ define([
             input: [
                 {
                     name: 'change',
-                    action: function (e, el) {
-                        this.context.eventBus.publish('searchvValue', el.val());
+                    action: function (e, el) {h
+                        this.context.eventBus.publish('searcvValue', el.val());
                     }
                 }
             ]

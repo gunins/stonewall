@@ -1,28 +1,40 @@
 <div>
     <cp-NavBar src="widget/parser!navbar/NavBar">
-        <pl-navbar-brand>Databricks</pl-navbar-brand>
+        <pl-navbar-brand>Dashboard</pl-navbar-brand>
     </cp-NavBar>
     <div class="container-fluid">
-        <div class="row">
+        <rt route="/dashboard">
+            <div class="row">
                 <cp-sideBar data-bind="sidebar" src="sidebar"></cp-sideBar>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                <rt route="/dashboard">
-                    <cp-body src="widget/parser!body/Body">
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    <cp-body data-bind="body" src="body/Body">
                         <pl-page-header>Dashboard Test</pl-page-header>
                         <pl-sub-header>Dashboard Test Sub Header</pl-sub-header>
                     </cp-body>
-                </rt>
-                <rt route="/settings">
-                    <cp-settings src="widget/parser!settings/Settings"></cp-settings>
-                </rt>
-                <rt route="/profile">
-                    <cp-settings src="widget/parser!profile/Profile"></cp-settings>
-                </rt>
-                <rt route="/help">
-                    <cp-settings src="widget/parser!help/Help"></cp-settings>
-                </rt>
+                </div>
             </div>
-
-        </div>
+        </rt>
+        <rt route="/settings">
+            <div class="row">
+                <div class="container-fluid">
+                    <cp-settings src="widget/parser!settings/Settings"></cp-settings>
+                </div>
+            </div>
+        </rt>
+        <rt route="/profile">
+            <div class="row">
+                <div class="container-fluid">
+                    <cp-settings src="widget/parser!profile/Profile"></cp-settings>
+                </div>
+            </div>
+        </rt>
+        <rt route="/help">
+            <div class="row">
+                <div class="container-fluid">
+                    <cp-settings src="widget/parser!help/Help"></cp-settings>
+                </div>
+            </div>
+        </rt>
     </div>
+</div>
 </div>

@@ -102,3 +102,25 @@ body > div.show {
   width: 100%;
   height: 200px;
 }
+.chartInner {
+  width: 100%;
+  height: 400px;
+  /*Line chart css*/
+  /*    .x.axis path {
+          display: none;
+      }*/
+}
+.chartInner .axis path,
+.chartInner .axis line {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+.chartInner .axis .tick {
+  font-size: 0.8em;
+}
+.chartInner .line {
+  fill: none;
+  stroke: #5CB8E6;
+  stroke-width: 1.5px;
+}
