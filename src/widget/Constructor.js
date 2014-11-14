@@ -40,6 +40,8 @@ define([
         if (data.appContext !== undefined) {
             utils.extend(this.context, data.appContext);
         }
+        this.beforeInit.apply(this, arguments);
+
         if (this.template) {
             var decoder = new Decoder(this.template),
                 template = decoder.render();
@@ -108,6 +110,16 @@ define([
         //      @param {Object} datatSet (data passing if component is
         //      in template binders)
         init: function (data, children, dataSet) {
+        },
+        // Running before Constructor is initialised
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        beforeInit: function (data, children, dataSet) {
         },
         // Applying Binders manually, if use nodes function
         //
