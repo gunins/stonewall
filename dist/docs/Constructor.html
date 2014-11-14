@@ -176,6 +176,8 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (data.appContext !== <span class="hljs-literal">undefined</span>) {
             utils.extend(<span class="hljs-keyword">this</span>.context, data.appContext);
         }
+        <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render();
@@ -302,6 +304,28 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
+              <p>Running before Constructor is initialised</p>
+<pre><code> @method beforeInit
+ @param {<span class="hljs-built_in">Object</span>} data (comes from template data attributes)
+ @param {<span class="hljs-built_in">Object</span>} children (comes placeholder content
+ from template)
+ @param {<span class="hljs-built_in">Object</span>} datatSet (data passing <span class="hljs-keyword">if</span> component is
+ <span class="hljs-keyword">in</span> template binders)
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        beforeInit: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data, children, dataSet)</span> </span>{
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
               <p>Applying Binders manually, if use nodes function</p>
 <pre><code> @method applyBinders
 </code></pre>
@@ -312,11 +336,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Removing widget from Dom</p>
 <pre><code> @method destroy
