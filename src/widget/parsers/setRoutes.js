@@ -36,10 +36,20 @@ define(function () {
                     var args = [].slice.call(arguments, 0);
                     var params = args.pop();
                     applyToChildren.call(this, child.children, function (cp) {
-                        cp.data.dataset.params = params;
+                        var data = cp.data,
+                            dataSet = data.dataset,
+                            instance = data.instance;
+
+                        dataSet.params = params;
+
                         if (args.length > 0) {
-                            cp.data.dataset.link = args;
+                            dataSet.link = args;
                         }
+
+                        if (instance && instance.reset) {
+                            instance.reset.apply(instance, args.concat(params));
+                        }
+
                     });
 
                     if (child.el === undefined) {
@@ -57,12 +67,6 @@ define(function () {
                     } else {
                         child.attach();
                     }
-                    applyToChildren.call(this, child.children, function (cp) {
-                        if (!cp.el && cp.data.instance && cp.data.instance.reset) {
-                            cp.data.instance.reset.apply(cp.data.instance, args.concat(params));
-                        }
-                    });
-
                 }.bind(this));
 
                 matches.leave(function () {
