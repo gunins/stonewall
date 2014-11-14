@@ -149,10 +149,20 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                     <span class="hljs-keyword">var</span> args = [].slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>);
                     <span class="hljs-keyword">var</span> params = args.pop();
                     applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cp)</span> </span>{
-                        cp.data.dataset.params = params;
+                        <span class="hljs-keyword">var</span> data = cp.data,
+                            dataSet = data.dataset,
+                            instance = data.instance;
+
+                        dataSet.params = params;
+
                         <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
-                            cp.data.dataset.link = args;
+                            dataSet.link = args;
                         }
+
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.reset) {
+                            instance.reset.apply(instance, args.concat(params));
+                        }
+
                     });
 
                     <span class="hljs-keyword">if</span> (child.el === <span class="hljs-literal">undefined</span>) {
@@ -170,12 +180,6 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                     } <span class="hljs-keyword">else</span> {
                         child.attach();
                     }
-                    applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cp)</span> </span>{
-                        <span class="hljs-keyword">if</span> (!cp.el &amp;&amp; cp.data.instance &amp;&amp; cp.data.instance.reset) {
-                            cp.data.instance.reset.apply(cp.data.instance, args.concat(params));
-                        }
-                    });
-
                 }.bind(<span class="hljs-keyword">this</span>));
 
                 matches.leave(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
