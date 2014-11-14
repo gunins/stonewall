@@ -186,9 +186,9 @@
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
-        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent)</span> </span>{
+        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent, data)</span> </span>{
             el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id);
-            el.el = el.run(fragment, <span class="hljs-literal">false</span>, parent);
+            el.el = el.run(fragment, <span class="hljs-literal">false</span>, parent, data);
         },</pre></div></div>
             
         </li>
@@ -533,8 +533,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fragment, parent)</span> </span>{
-            dom.add(<span class="hljs-keyword">this</span>, fragment, parent);
+            <div class="content"><div class='highlight'><pre>        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fragment, parent, data)</span> </span>{
+            dom.add(<span class="hljs-keyword">this</span>, fragment, parent, data);
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             dom.detach(<span class="hljs-keyword">this</span>);
