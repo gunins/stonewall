@@ -33,24 +33,24 @@ define(function () {
                             Object.keys(child.children).forEach(function (name) {
                                 var cp = child.children[name];
                                 cp.data.dataset.params = params;
-                                if(args.length>0){
+                                if (args.length > 0) {
                                     cp.data.dataset.link = args;
                                 }
                             }.bind(this));
                         }
                         child.add(parent, false);
-                         if (child.children !== undefined) {
-                         Object.keys(child.children).forEach(function (name) {
-                         var cp = child.children[name];
-                         if (!cp.el && cp.data.instance && cp.data.instance._match) {
-                         matches.setRoutes(function (routes) {
-                         cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
-                         routes.run();
-                         }.bind(this));
+                        if (child.children !== undefined) {
+                            Object.keys(child.children).forEach(function (name) {
+                                var cp = child.children[name];
+                                if (!cp.el && cp.data.instance && cp.data.instance._match) {
+                                    matches.setRoutes(function (routes) {
+                                        cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
+                                        routes.run();
+                                    }.bind(this));
 
-                         }
-                         }.bind(this));
-                         }
+                                }
+                            }.bind(this));
+                        }
                     } else {
                         child.attach();
                     }

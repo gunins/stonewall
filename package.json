@@ -19,11 +19,11 @@
   },
   "dependencies": {
     "requirejs": "^2.1.15",
-    "richtemplate": "^0.1.6",
-    "urlmanager": "^0.2.1"
+    "richtemplate": "^0.1.7",
+    "urlmanager": "^0.2.6"
   },
   "scripts": {
     "start": "node server.js",
-    "test":"grunt"
+    "test": "grunt"
   }
 }
