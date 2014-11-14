@@ -36,9 +36,9 @@ define([
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
-        add: function (el, fragment, parent) {
+        add: function (el, fragment, parent, data) {
             el.placeholder = fragment.querySelector('#' + el.id);
-            el.el = el.run(fragment, false, parent);
+            el.el = el.run(fragment, false, parent, data);
         },
         // Adding text in to node
         //
@@ -185,8 +185,8 @@ define([
             dom.text(this, text);
         },
         // Shortcut to - `dom.add`
-        add: function (fragment, parent) {
-            dom.add(this, fragment, parent);
+        add: function (fragment, parent, data) {
+            dom.add(this, fragment, parent, data);
         },
         detach: function () {
             dom.detach(this);

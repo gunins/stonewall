@@ -7,7 +7,7 @@ define(function () {
             var parent = this.el;
             this._match = function (match) {
                 matchRoute.call(this, children, match, parent);
-                if(this.match){
+                if (this.match) {
                     this.match.call(this, match);
                 }
             }.bind(this)
@@ -27,23 +27,34 @@ define(function () {
                 matches.to(function () {
                     if (child.el === undefined) {
                         child.applyAttach();
-                        child.add(parent);
+                        var args = [].slice.call(arguments, 0);
+                        var params = args.pop();
                         if (child.children !== undefined) {
-                                Object.keys(child.children).forEach(function (name) {
-                                    var cp = child.children[name];
-                                    if (!cp.el && cp.data.instance && cp.data.instance._match) {
-                                        matches.setRoutes(function (routes) {
-                                            cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
-                                            routes.run();
-                                        }.bind(this));
-
-                                    }
+                            Object.keys(child.children).forEach(function (name) {
+                                var cp = child.children[name];
+                                cp.data.dataset.params = params;
+                                if(args.length>0){
+                                    cp.data.dataset.link = args;
+                                }
                             }.bind(this));
                         }
+                        child.add(parent, false);
+                         if (child.children !== undefined) {
+                         Object.keys(child.children).forEach(function (name) {
+                         var cp = child.children[name];
+                         if (!cp.el && cp.data.instance && cp.data.instance._match) {
+                         matches.setRoutes(function (routes) {
+                         cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
+                         routes.run();
+                         }.bind(this));
 
+                         }
+                         }.bind(this));
+                         }
                     } else {
                         child.attach();
                     }
+
                 }.bind(this));
 
                 matches.leave(function () {

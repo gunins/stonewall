@@ -24,6 +24,8 @@ define([
     };
     return Constructor.extend({
         template: template,
+        init:function(data){
+        },
         match: function (match) {
             match('(/)').query(function (params) {
                 this.children.input.val(params.getQuery().id || '');
