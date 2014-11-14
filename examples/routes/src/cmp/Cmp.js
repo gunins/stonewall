@@ -25,9 +25,10 @@ define([
     return Constructor.extend({
         template: template,
         init:function(data){
+            console.log(this.el);
         },
         reset:function(){
-            console.log(arguments);
+            //console.log(this);
         },
         match: function (match) {
             match('(/)').query(function (params) {

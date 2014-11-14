@@ -148,6 +148,9 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                 matches.to(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                     <span class="hljs-keyword">var</span> args = [].slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>);
                     <span class="hljs-keyword">var</span> params = args.pop();
+                    <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
+                        <span class="hljs-keyword">var</span> id = args.join(<span class="hljs-string">'_'</span>);
+                    }
                     applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cp)</span> </span>{
                         <span class="hljs-keyword">var</span> data = cp.data,
                             dataSet = data.dataset,
@@ -157,13 +160,19 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
 
                         <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
                             dataSet.link = args;
-                        }
+                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.reset) {
+                                instance.reset.apply(instance, args.concat(params));
 
-                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.reset) {
-                            instance.reset.apply(instance, args.concat(params));
+                            }
                         }
 
                     });
+
+                    <span class="hljs-keyword">if</span> (child.el !== <span class="hljs-literal">undefined</span> &amp;&amp; child.sessId !== id &amp;&amp; id !== <span class="hljs-literal">undefined</span>) {
+                        child.detach();
+                        child.el.remove();
+                        <span class="hljs-keyword">delete</span> child.el;
+                    }
 
                     <span class="hljs-keyword">if</span> (child.el === <span class="hljs-literal">undefined</span>) {
                         child.applyAttach();
@@ -177,6 +186,10 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
 
                             }
                         });
+                        <span class="hljs-keyword">if</span> (id) {
+                            child.sessId = id;
+                        }
+
                     } <span class="hljs-keyword">else</span> {
                         child.attach();
                     }

@@ -35,6 +35,9 @@ define(function () {
                 matches.to(function () {
                     var args = [].slice.call(arguments, 0);
                     var params = args.pop();
+                    if (args.length > 0) {
+                        var id = args.join('_');
+                    }
                     applyToChildren.call(this, child.children, function (cp) {
                         var data = cp.data,
                             dataSet = data.dataset,
@@ -44,13 +47,19 @@ define(function () {
 
                         if (args.length > 0) {
                             dataSet.link = args;
-                        }
+                            if (instance && instance.reset) {
+                                instance.reset.apply(instance, args.concat(params));
 
-                        if (instance && instance.reset) {
-                            instance.reset.apply(instance, args.concat(params));
+                            }
                         }
 
                     });
+
+                    if (child.el !== undefined && child.sessId !== id && id !== undefined) {
+                        child.detach();
+                        child.el.remove();
+                        delete child.el;
+                    }
 
                     if (child.el === undefined) {
                         child.applyAttach();
@@ -64,6 +73,10 @@ define(function () {
 
                             }
                         });
+                        if (id) {
+                            child.sessId = id;
+                        }
+
                     } else {
                         child.attach();
                     }
