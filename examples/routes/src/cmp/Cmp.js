@@ -26,6 +26,9 @@ define([
         template: template,
         init:function(data){
         },
+        reset:function(){
+            console.log(arguments);
+        },
         match: function (match) {
             match('(/)').query(function (params) {
                 this.children.input.val(params.getQuery().id || '');
