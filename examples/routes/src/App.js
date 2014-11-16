@@ -77,7 +77,20 @@ define([
                                         ]
                                     }
                                 ]
+                            },
+                            {
+                                link: {
+                                    href: '#/leveln/844',
+                                    text: 'Leven N / :id 844'
+                                }
+                            },
+                            {
+                                link: {
+                                    href: '#/leveln/845',
+                                    text: 'Leven N / :id 845'
+                                }
                             }
+
                         ]
                     }
                 }

@@ -2,22 +2,22 @@
  * Created by guntars on 11/11/14.
  */
 define(function () {
-    function setRoutes(children) {
-        if (!this._match) {
-            var parent = this.el;
-            this._match = function (match) {
-                matchRoute.call(this, children, match, parent);
-                if (this.match) {
-                    this.match.call(this, match);
-                }
-            }.bind(this)
+
+    function destroyComponent(cp) {
+        if (cp.data.instance) {
+            delete cp.data.instance;
         }
-    };
+        if (cp.el) {
+            cp.el.remove();
+            delete cp.el;
+        }
+    }
+
     function applyToChildren(children, cb) {
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
                 var cp = children[name];
-                cb.call(this, cp)
+                cb.call(this, cp, cp.data.instance);
             }.bind(this));
         }
     }
@@ -38,36 +38,41 @@ define(function () {
                     if (args.length > 0) {
                         var id = args.join('_');
                     }
-                    applyToChildren.call(this, child.children, function (cp) {
+
+                    if (child.el !== undefined && child.sessId !== id && id !== undefined) {
+                        applyToChildren.call(this, child.children, destroyComponent);
+                        destroyComponent(child);
+                    }
+
+                    applyToChildren.call(this, child.children, function (cp, instance) {
                         var data = cp.data,
-                            dataSet = data.dataset,
-                            instance = data.instance;
+                            dataSet = data.dataset;
 
                         dataSet.params = params;
 
+
+
+
                         if (args.length > 0) {
                             dataSet.link = args;
-                            if (instance && instance.reset) {
-                                instance.reset.apply(instance, args.concat(params));
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, args.concat(params));
 
                             }
                         }
 
                     });
 
-                    if (child.el !== undefined && child.sessId !== id && id !== undefined) {
-                        child.detach();
-                        child.el.remove();
-                        delete child.el;
-                    }
-
                     if (child.el === undefined) {
                         child.applyAttach();
                         child.add(parent, false);
-                        applyToChildren.call(this, child.children, function (cp) {
-                            if (!cp.el && cp.data.instance && cp.data.instance._match) {
+                        applyToChildren.call(this, child.children, function (cp, instance) {
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, args.concat(params));
+                            }
+                            if (!cp.el && instance && instance._match) {
                                 matches.setRoutes(function (routes) {
-                                    cp.data.instance._match.call(cp.data.instance, routes.match.bind(routes));
+                                    instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(this));
 
@@ -83,6 +88,11 @@ define(function () {
                 }.bind(this));
 
                 matches.leave(function () {
+                    applyToChildren.call(this, child.children, function (cp, instance) {
+                        if (instance && instance.leave !== undefined) {
+                            instance.leave();
+                        }
+                    }.bind(this));
                     child.detach();
                 }.bind(this))
 
@@ -92,6 +102,18 @@ define(function () {
             }
         }.bind(this));
     }
+
+    function setRoutes(children) {
+        if (!this._match) {
+            var parent = this.el;
+            this._match = function (match) {
+                matchRoute.call(this, children, match, parent);
+                if (this.match) {
+                    this.match.call(this, match);
+                }
+            }.bind(this)
+        }
+    };
 
     return setRoutes;
 });
