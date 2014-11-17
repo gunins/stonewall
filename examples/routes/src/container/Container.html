@@ -5,57 +5,48 @@
             <cp-links data-bind="links" src="widget/parser!links/Links"></cp-links>
         </pl-body>
     </cp-panellinks>
+        <cp-panelbody src="widget/parser!panel/Panel">
+            <pl-header>Links for Route example</pl-header>
+            <pl-body>
+                <rt route="/levela">
+                    <cp-val data-bind="cmp" src="cmp/Cmp">
+                        <pl-header>Header LevelA</pl-header>
+                        <pl-body>
+                            <rt route="/levelb">
+                                <cp-valB data-bind="cmpB" src="widget/parser!cmpB/CmpB">
+                                    <pl-header>HeaderlevelA/LevelB</pl-header>
+                                    <pl-body>
+                                        <p>Body levelA/levelB</p>
+                                    </pl-body>
+                                </cp-valB>
+                            </rt>
+                        </pl-body>
+                    </cp-val>
+                </rt>
+                <rt route="/levelb">
+                    <cp-valB data-bind="cmpB" src="widget/parser!cmpB/CmpB">
+                        <pl-header>Header levelB</pl-header>
+                        <pl-body>
+                            <p>Body levelB</p>
+                        </pl-body>
+                    </cp-valB>
+                </rt>
+                <rt route="/levelc" class="container-fluid">
+                    <h3>Header LevelC</h3>
 
-    <cp-panelbody src="widget/parser!panel/Panel">
-        <pl-header>Links for Route example</pl-header>
-        <pl-body>
-            <rt route="/levela">
-                <cp-val data-bind="cmp" src="cmp/Cmp">
-                    <pl-header>Header LevelA</pl-header>
-                    <pl-body>
-                        <rt route="/levelb">
+                    <div>
+                        <rt route="/leveld">
+                            <h4>Header levelC/levelD</h4>
                             <cp-valB data-bind="cmpB" src="widget/parser!cmpB/CmpB">
-                                <pl-header>HeaderlevelA/LevelB</pl-header>
+                                <pl-header>Component Header levelC/levelD</pl-header>
                                 <pl-body>
-                                    <p>Body levelA/levelB</p>
+                                    <p>Body Component Header levelC/levelD</p>
                                 </pl-body>
                             </cp-valB>
                         </rt>
-                    </pl-body>
-                </cp-val>
-            </rt>
-            <rt route="/levelb">
-                <cp-valB data-bind="cmpB" src="widget/parser!cmpB/CmpB">
-                    <pl-header>Header levelB</pl-header>
-                    <pl-body>
-                        <p>Body levelB</p>
-                    </pl-body>
-                </cp-valB>
-            </rt>
-            <rt route="/levelc" class="container-fluid">
-                <h3>Header LevelC</h3>
-
-                <div>
-                    <rt route="/leveld">
-                        <h4>Header levelC/levelD</h4>
-                        <cp-valB data-bind="cmpB" src="widget/parser!cmpB/CmpB">
-                            <pl-header>Component Header levelC/levelD</pl-header>
-                            <pl-body>
-                                <p>Body Component Header levelC/levelD</p>
-                            </pl-body>
-                        </cp-valB>
-                    </rt>
-                </div>
-            </rt>
-            <rt route="/leveln/:id" class="container-fluid">
-                <h3>Header LevelN + ID</h3>
-                <cp-valC data-bind="cmpB" src="cmp/Cmp">
-                    <pl-header>Component Header levelN/:ID</pl-header>
-                    <pl-body>
-                        <p>Body Component Header levelN/:ID</p>
-                    </pl-body>
-                </cp-valC>
-            </rt>
-        </pl-body>
-    </cp-panelbody>
+                    </div>
+                </rt>
+                <cp-testLevel src="widget/parser!testlevel/TestLevel"></cp-testLevel>
+            </pl-body>
+        </cp-panelbody>
 </div>

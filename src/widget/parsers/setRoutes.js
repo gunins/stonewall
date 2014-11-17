@@ -24,13 +24,14 @@ define(function () {
 
     function matchRoute(children, match, parent) {
         var names = Object.keys(children);
-        var currMatch = match;
         names.forEach(function (name) {
             var child = children[name];
             var route = child.data.route;
-            if (route !== undefined) {
+            if (route !== undefined && child.data.type !== 'cp') {
                 var matches = match(route, function (match) {
-                    currMatch = match;
+                    if (child.children !== undefined) {
+                        matchRoute.call(this, child.children, match, parent);
+                    }
                 }.bind(this));
                 matches.to(function () {
                     var args = [].slice.call(arguments, 0);
@@ -50,9 +51,6 @@ define(function () {
 
                         dataSet.params = params;
 
-
-
-
                         if (args.length > 0) {
                             dataSet.link = args;
                             if (instance && instance.to) {
@@ -66,11 +64,14 @@ define(function () {
                     if (child.el === undefined) {
                         child.applyAttach();
                         child.add(parent, false);
+
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
+
                             if (!cp.el && instance && instance._match) {
+
                                 matches.setRoutes(function (routes) {
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
@@ -86,7 +87,6 @@ define(function () {
                         child.attach();
                     }
                 }.bind(this));
-
                 matches.leave(function () {
                     applyToChildren.call(this, child.children, function (cp, instance) {
                         if (instance && instance.leave !== undefined) {
@@ -96,10 +96,13 @@ define(function () {
                     child.detach();
                 }.bind(this))
 
+            } else if (child.children !== undefined && child.data.type !== 'cp') {
+                matchRoute.call(this, child.children, match, parent);
+            } else if (child.data.type === 'cp' && child.data.instance) {
+                var instance = child.data.instance;
+                instance._match.call(instance, match);
             }
-            if (child.children !== undefined) {
-                matchRoute.call(this, child.children, currMatch, parent);
-            }
+
         }.bind(this));
     }
 
