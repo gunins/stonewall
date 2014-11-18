@@ -20,18 +20,9 @@
 
     <pl-sub-header tp-tag="h3">Section title</pl-sub-header>
     <ul class="nav nav-tabs">
-        <bd-tabs tp-tag="li" role="presentation" tp-bind-class="class" tp-update="true" >
+        <bd-tabs tp-tag="li" role="presentation" tp-bind-class="class" tp-update="true">
             <bd-link tp-bind-href="href" tp-tag="a"></bd-link>
         </bd-tabs>
     </ul>
-<rt route="/table">
-    <cp-table src="table" data-bind="table">
-        <pl-header>Table</pl-header>
-    </cp-table>
-</rt>
-    <rt route="/chart">
-        <cp-pietab src="lineChart/LineChart" data-bind="chart">
-            <pl-header>Line Chart</pl-header>
-        </cp-pietab>
-    </rt>
+    <cp-results tp-noattach="true" src="results/Results"></cp-results>
 </div>

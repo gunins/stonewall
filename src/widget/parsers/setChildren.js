@@ -50,6 +50,8 @@ define([
                     }
                 }
 
+            } else if (this.nodes[key] !== undefined && child.data.tplSet.noattach === 'true') {
+                this.nodes[key].call(this, child);
             }
 
             if (this.elReady[key] !== undefined && child.el !== undefined) {

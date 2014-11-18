@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "requirejs": "^2.1.15",
-    "richtemplate": "^0.1.7",
-    "urlmanager": "^0.2.6"
+    "richtemplate": "^0.1.8",
+    "urlmanager": "^0.2.7"
   },
   "scripts": {
     "start": "node server.js",

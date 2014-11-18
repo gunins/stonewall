@@ -71,12 +71,14 @@ define(function () {
                             }
 
                             if (!cp.el && instance && instance._match) {
-
                                 matches.setRoutes(function (routes) {
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(this));
 
+                                instance._reRoute = function(){
+                                    instance._applyRoutes(matches);
+                                };
                             }
                         });
                         if (id) {

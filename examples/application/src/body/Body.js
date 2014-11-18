@@ -1,26 +1,30 @@
 define([
-    'templating/parser!././_body.html',
-    'widget/Constructor'
-], function (template, Constructor) {
+    'templating/parser!./_body.html',
+    'widget/Constructor',
+    '../resultData'
+], function (template, Constructor, data) {
     return Constructor.extend({
         template: template,
-        init: function () {
-        },
         match: function (match) {
             match('/:tab').to(function (tab, param) {
                 this.data.tabs.forEach(function (item) {
-                    if (item.link.href.replace('#/', '')===param.getLocation('/' + tab)) {
+                    if (item.link.href.replace('#/', '') === param.getLocation('/' + tab)) {
                         item.class = 'active';
                     } else {
                         item.class = 'idle';
                     }
                 }.bind(this));
-            }.bind(this)).leave(function(){
+            }.bind(this)).leave(function () {
                 this.data.tabs.forEach(function (item) {
-                        item.class = 'idle';
+                    item.class = 'idle';
                 }.bind(this));
             }.bind(this));
 
+        },
+        nodes: {
+            results: function (el) {
+                this.setChildren(el, data);
+            }
         }
     });
 
