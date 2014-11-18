@@ -184,12 +184,14 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                             }
 
                             <span class="hljs-keyword">if</span> (!cp.el &amp;&amp; instance &amp;&amp; instance._match) {
-
                                 matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routes)</span> </span>{
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(<span class="hljs-keyword">this</span>));
 
+                                instance._reRoute = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+                                    instance._applyRoutes(matches);
+                                };
                             }
                         });
                         <span class="hljs-keyword">if</span> (id) {

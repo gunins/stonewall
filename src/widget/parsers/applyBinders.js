@@ -98,7 +98,7 @@ define([
                         }
 
                     };
-                    //TODO: Investigate, why not allways an Array
+                    //TODO: Investigate, why not always an Array
                     if (binders[key].forEach !== undefined) {
                         binders[key].forEach(parseBinder.bind(this));
                     } else {

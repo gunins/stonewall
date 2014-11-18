@@ -7,8 +7,6 @@ define([
 
     return Constructor.extend({
         template: template,
-        init: function () {
-        },
         events: {
             tbody: [
                 {
