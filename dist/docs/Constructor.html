@@ -141,6 +141,7 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>define([
+    <span class="hljs-string">'./dom'</span>,
     <span class="hljs-string">'./utils'</span>,
     <span class="hljs-string">'./mediator'</span>,
     <span class="hljs-string">'templating/Decoder'</span>,
@@ -149,7 +150,7 @@ Basic Usage example</p>
     <span class="hljs-string">'./parsers/applyBinders'</span>,
     <span class="hljs-string">'./parsers/setBinders'</span>,
     <span class="hljs-string">'./parsers/setRoutes'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes)</span> </span>{
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes)</span> </span>{
 <span class="hljs-pi">    'use strict'</span>;
     <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
@@ -171,6 +172,8 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span><span class="hljs-params">(data, children, dataSet)</span> </span>{
+        <span class="hljs-keyword">this</span>._routes = [];
+        <span class="hljs-keyword">this</span>.children = {};
         <span class="hljs-keyword">this</span>.eventBus = <span class="hljs-keyword">new</span> Mediator();
         <span class="hljs-keyword">this</span>.context = context;
         <span class="hljs-keyword">if</span> (data.appContext !== <span class="hljs-literal">undefined</span>) {
@@ -179,11 +182,15 @@ Basic Usage example</p>
         <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
 
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
+            <span class="hljs-keyword">var</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [];
+            <span class="hljs-keyword">this</span>.data = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data[data.bind];
+
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
-                template = decoder.render();
+                template = decoder.render(<span class="hljs-keyword">this</span>.data);
             <span class="hljs-keyword">this</span>.el = template.fragment;
-            <span class="hljs-keyword">this</span>.data = (dataSet) ? dataSet : <span class="hljs-keyword">this</span>.context.data[data.bind];
-            <span class="hljs-keyword">this</span>.children = setChildren.call(<span class="hljs-keyword">this</span>, template.children, children);
+
+            <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children), <span class="hljs-keyword">this</span>.children);
+
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.routes = setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
@@ -349,6 +356,41 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        destroy: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             <span class="hljs-keyword">this</span>.el.remove();
+        },
+        setRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(instance)</span> </span>{
+            <span class="hljs-keyword">this</span>._routes.push(instance);
+        },
+        _applyRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(matches)</span> </span>{
+            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._routes.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>._routes[<span class="hljs-number">0</span>];
+
+                matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routes)</span> </span>{
+                    instance._match.call(instance, routes.match.bind(routes));
+                    routes.run();
+                }.bind(<span class="hljs-keyword">this</span>));
+
+                <span class="hljs-keyword">this</span>._routes.shift();
+            }
+            matches.rebind();
+        },
+        _reRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+        },
+        rebind: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">this</span>._reRoute();
+        },
+        setChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[el.name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[el.name].el !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">this</span>.children[el.name].detach();
+            }
+            el.applyAttach();
+            <span class="hljs-keyword">this</span>.children[el.name] = <span class="hljs-keyword">new</span> dom.Element(el);
+
+            <span class="hljs-keyword">this</span>.children[el.name].placeholder = <span class="hljs-keyword">this</span>.el.querySelector(<span class="hljs-string">'#'</span> + el.id);
+            <span class="hljs-keyword">this</span>.children[el.name].el = el.run(<span class="hljs-keyword">this</span>.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
+
+            <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>.children[el.name].data.instance;
+            <span class="hljs-keyword">this</span>.setRoutes(instance);
+            <span class="hljs-keyword">this</span>.rebind();
         }
     });
 
