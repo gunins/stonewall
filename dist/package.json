@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "requirejs": "^2.1.15",
-    "richtemplate": "^0.1.8",
+    "richtemplate": "^0.1.10",
     "urlmanager": "^0.2.7"
   },
   "scripts": {
