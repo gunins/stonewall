@@ -161,19 +161,24 @@ define([
             this._reRoute();
         },
         setChildren: function (el, data) {
-            if (this.children[el.name] !== undefined && this.children[el.name].el !== undefined) {
-                this.children[el.name].detach();
+            var name = el.name;
+            if (this.children[name] !== undefined && this.children[name].el !== undefined) {
+                this.children[name].detach();
             }
             el.applyAttach();
-            this.children[el.name] = new dom.Element(el);
+            this.children[name] = new dom.Element(el);
 
-            this.children[el.name].placeholder = this.el.querySelector('#' + el.id);
-            this.children[el.name].el = el.run(this.el, false, false, data);
+            this.children[name].placeholder = this.el.querySelector('#' + el.id);
+            this.children[name].el = el.run(this.el, false, false, data);
 
-            var events = this.events[el.name];
-            applyEvents.call(this, this.children[el.name], events);
+            if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
+                this.elReady[name].call(this, this.children[name]);
+            }
 
-            var instance = this.children[el.name].data.instance;
+            var events = this.events[name];
+            applyEvents.call(this, this.children[name], events);
+
+            var instance = this.children[name].data.instance;
             this.setRoutes(instance);
             this.rebind();
         }
