@@ -144,12 +144,12 @@ define([
         _applyRoutes: function (matches) {
             while (this._routes.length > 0) {
                 var instance = this._routes[0];
-
-                matches.setRoutes(function (routes) {
-                    instance._match.call(instance, routes.match.bind(routes));
-                    routes.run();
-                }.bind(this));
-
+                if (instance && instance._match) {
+                    matches.setRoutes(function (routes) {
+                        instance._match.call(instance, routes.match.bind(routes));
+                        routes.run();
+                    }.bind(this));
+                }
                 this._routes.shift();
             }
             matches.rebind();
