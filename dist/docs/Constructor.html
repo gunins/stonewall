@@ -149,8 +149,9 @@ Basic Usage example</p>
     <span class="hljs-string">'./parsers/setChildren'</span>,
     <span class="hljs-string">'./parsers/applyBinders'</span>,
     <span class="hljs-string">'./parsers/setBinders'</span>,
-    <span class="hljs-string">'./parsers/setRoutes'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes)</span> </span>{
+    <span class="hljs-string">'./parsers/setRoutes'</span>,
+    <span class="hljs-string">'./parsers/applyEvents'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents)</span> </span>{
 <span class="hljs-pi">    'use strict'</span>;
     <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
@@ -387,6 +388,9 @@ Usage Example</p>
 
             <span class="hljs-keyword">this</span>.children[el.name].placeholder = <span class="hljs-keyword">this</span>.el.querySelector(<span class="hljs-string">'#'</span> + el.id);
             <span class="hljs-keyword">this</span>.children[el.name].el = el.run(<span class="hljs-keyword">this</span>.el, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, data);
+
+            <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[el.name];
+            applyEvents.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children[el.name], events);
 
             <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>.children[el.name].data.instance;
             <span class="hljs-keyword">this</span>.setRoutes(instance);

@@ -3,10 +3,10 @@
  */
 define(function () {
     return function (data) {
-        var pie1 = data.pie1.chartcontent;
-        var pie2 = data.pie2.chartcontent;
-        var pie3 = data.pie3.chartcontent;
-        var pie4 = data.pie4.chartcontent;
+        var pie1 = data.body.pie1.chartcontent;
+        var pie2 = data.body.pie2.chartcontent;
+        var pie3 = data.body.pie3.chartcontent;
+        var pie4 = data.body.pie4.chartcontent;
         setTimeout(function () {
             pie1.data = [
                 {age: '<6', population: 27046},

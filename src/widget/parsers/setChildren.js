@@ -59,7 +59,7 @@ define([
             }
 
             var events = this.events[key];
-            applyEvents.call(this, child, events)
+            applyEvents.call(this, child, events);
 
         }.bind(this));
         return elements

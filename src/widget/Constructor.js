@@ -24,8 +24,9 @@ define([
     './parsers/setChildren',
     './parsers/applyBinders',
     './parsers/setBinders',
-    './parsers/setRoutes'
-], function (dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes) {
+    './parsers/setRoutes',
+    './parsers/applyEvents'
+], function (dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
     'use strict';
     var context = {};
 
@@ -168,6 +169,9 @@ define([
 
             this.children[el.name].placeholder = this.el.querySelector('#' + el.id);
             this.children[el.name].el = el.run(this.el, false, false, data);
+
+            var events = this.events[el.name];
+            applyEvents.call(this, this.children[el.name], events);
 
             var instance = this.children[el.name].data.instance;
             this.setRoutes(instance);
