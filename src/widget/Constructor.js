@@ -167,7 +167,7 @@ define([
             this.children[el.name] = new dom.Element(el);
 
             this.children[el.name].placeholder = this.el.querySelector('#' + el.id);
-            this.children[el.name].el = el.run(this.el, true, false, data);
+            this.children[el.name].el = el.run(this.el, false, false, data);
 
             var instance = this.children[el.name].data.instance;
             this.setRoutes(instance);
