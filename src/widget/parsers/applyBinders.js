@@ -33,8 +33,8 @@ define([
                                     var childBinder = new dom.Element(binder);
                                     childBinder.add(parent);
                                     childBinder.text(data);
-                                    if (this.elReady[key] !== undefined) {
-                                        this.elReady[key].call(this, childBinder, data);
+                                    if (this.elReady[childBinder.name] !== undefined) {
+                                        this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
                                     if (childBinder.data.tplSet.update === 'true') {
                                         watch(obj, key, function () {
@@ -57,8 +57,8 @@ define([
                                                     childBinder.add(parent, hasParent);
                                                 }
 
-                                                if (this.elReady[key]) {
-                                                    this.elReady[key].call(this, childBinder, item);
+                                                if (this.elReady[childBinder.name]) {
+                                                    this.elReady[childBinder.name].call(this, childBinder, item);
                                                 }
 
                                                 applyAttribute.call(this, childBinder, item);
@@ -81,8 +81,8 @@ define([
                                 } else if (utils.isObject(data)) {
                                     var childBinder = new dom.Element(binder);
                                     childBinder.add(parent);
-                                    if (this.elReady[key]) {
-                                        this.elReady[key].call(this, childBinder, data);
+                                    if (this.elReady[childBinder.name]) {
+                                        this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
                                     applyEvents.call(this, childBinder, events, data);
                                     if (binder.data.type === 'cp') {

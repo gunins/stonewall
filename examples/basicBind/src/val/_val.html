@@ -3,10 +3,10 @@
         <input tp-name="input" tp-type="bd" data-bind="items" type="text" tp-bind-value="value" class="form-control"
                placeholder="Enter Value...">
     </div>
-    <bd-items tp-tag="ul" class="list-group">
+    <somename data-bind="items" tp-tag="ul" class="list-group">
         <li class="list-group-item active">Value below is binded from input field</li>
         <bd-value tp-tag="li" class="list-group-item" tp-update="true"></bd-value>
-    </bd-items>
+    </somename>
     <ul class="list-group">
         <li class="list-group-item active">Items below is passed to the new widget.</li>
         <bd-list tp-tag="li" class="list-group-item">
