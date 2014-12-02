@@ -47,6 +47,7 @@ define([
 
                                     var updateChildren = function () {
                                         var hasParent = false,
+                                            bindedData = [],
                                             addItem = function (item) {
                                                 var childBinder = new dom.Element(binder);
 
@@ -64,13 +65,22 @@ define([
                                                 applyAttribute.call(this, childBinder, item);
                                                 applyBinders.call(this, item, childBinder);
                                                 applyEvents.call(this, childBinder, events, item);
+                                                bindedData.push({binder: childBinder, data: item});
                                             };
                                         data.forEach(addItem.bind(this));
                                         var update = binder.data.tplSet.update;
                                         if (update === 'true') {
+                                            var methodNames = ['pop', 'shift', 'splice'];
                                             watch(obj, key, function (prop, action, newvalue, oldvalue) {
                                                 if (oldvalue === undefined && action == 'push') {
                                                     addItem.call(this, newvalue[0]);
+                                                } else if (methodNames.indexOf(action) !== -1) {
+                                                    bindedData.forEach(function (binder, index) {
+                                                        if (obj[key].indexOf(binder.data) === -1) {
+                                                            binder.binder.remove();
+                                                            bindedData.splice(index, 1);
+                                                        }
+                                                    }.bind(this));
                                                 }
                                             }.bind(this));
                                         }

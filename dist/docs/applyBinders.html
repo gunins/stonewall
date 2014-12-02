@@ -160,6 +160,7 @@ define([
 
                                     <span class="hljs-keyword">var</span> updateChildren = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                                         <span class="hljs-keyword">var</span> hasParent = <span class="hljs-literal">false</span>,
+                                            bindedData = [],
                                             addItem = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> </span>{
                                                 <span class="hljs-keyword">var</span> childBinder = <span class="hljs-keyword">new</span> dom.Element(binder);
 
@@ -177,13 +178,22 @@ define([
                                                 applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, item);
                                                 applyBinders.call(<span class="hljs-keyword">this</span>, item, childBinder);
                                                 applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, item);
+                                                bindedData.push({binder: childBinder, data: item});
                                             };
                                         data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
                                         <span class="hljs-keyword">var</span> update = binder.data.tplSet.update;
                                         <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                                            <span class="hljs-keyword">var</span> methodNames = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>];
                                             watch(obj, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(prop, action, newvalue, oldvalue)</span> </span>{
                                                 <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; action == <span class="hljs-string">'push'</span>) {
                                                     addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>]);
+                                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (methodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
+                                                    bindedData.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(binder, index)</span> </span>{
+                                                        <span class="hljs-keyword">if</span> (obj[key].indexOf(binder.data) === -<span class="hljs-number">1</span>) {
+                                                            binder.binder.remove();
+                                                            bindedData.splice(index, <span class="hljs-number">1</span>);
+                                                        }
+                                                    }.bind(<span class="hljs-keyword">this</span>));
                                                 }
                                             }.bind(<span class="hljs-keyword">this</span>));
                                         }
