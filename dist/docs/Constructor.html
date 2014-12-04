@@ -359,7 +359,9 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.el.remove();
         },
         setRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(instance)</span> </span>{
-            <span class="hljs-keyword">this</span>._routes.push(instance);
+            <span class="hljs-keyword">if</span> (instance !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">this</span>._routes.push(instance);
+            }
         },
         _applyRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(matches)</span> </span>{
             <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._routes.length &gt; <span class="hljs-number">0</span>) {

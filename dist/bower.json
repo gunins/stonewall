@@ -10,7 +10,7 @@
     "bootstrap": "latest",
     "watch": "latest",
     "d3": "~3.4.13",
-    "urlmanager": "~0.2.7"
+    "urlmanager": "~0.2.10"
   },
   "ignore": [
     "docs",

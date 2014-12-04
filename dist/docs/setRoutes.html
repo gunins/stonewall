@@ -209,7 +209,15 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                         }
                     }.bind(<span class="hljs-keyword">this</span>));
                     child.detach();
-                }.bind(<span class="hljs-keyword">this</span>))
+                }.bind(<span class="hljs-keyword">this</span>));
+
+                matches.query(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(params)</span> </span>{
+                    applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cp, instance)</span> </span>{
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
+                            instance.query(params);
+                        }
+                    }.bind(<span class="hljs-keyword">this</span>));
+                }.bind(<span class="hljs-keyword">this</span>));
 
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; child.data.type !== <span class="hljs-string">'cp'</span>) {
                 matchRoute.call(<span class="hljs-keyword">this</span>, child.children, match, parent);

@@ -140,7 +140,9 @@ define([
             this.el.remove();
         },
         setRoutes: function (instance) {
-            this._routes.push(instance);
+            if (instance !== undefined) {
+                this._routes.push(instance);
+            }
         },
         _applyRoutes: function (matches) {
             while (this._routes.length > 0) {

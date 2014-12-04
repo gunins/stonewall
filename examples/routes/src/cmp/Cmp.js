@@ -24,20 +24,18 @@ define([
     };
     return Constructor.extend({
         template: template,
-        init:function(data){
+        init: function (data) {
             console.log('init', this.el, data);
         },
-        to:function(id){
+        to: function (id) {
             console.log('to', this.el, id);
         },
-        leave:function(){
+        leave: function () {
             console.log('leave', this.el)
         },
-        match: function (match) {
-            match('(/)').query(function (params) {
+        query:function (params) {
                 this.children.input.val(params.getQuery().id || '');
                 this.children.inputA.val(params.getQuery().id || '');
-            }.bind(this));
         },
         getLocation: function () {
 
@@ -49,6 +47,13 @@ define([
         events: {
             input: action,
             inputA: action
+        },
+        nodes: {
+            footer: function (el) {
+                setTimeout(function () {
+                    this.setChildren(el);
+                }.bind(this), 2000)
+            }
         }
     });
 });

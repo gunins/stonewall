@@ -96,7 +96,15 @@ define(function () {
                         }
                     }.bind(this));
                     child.detach();
-                }.bind(this))
+                }.bind(this));
+
+                matches.query(function (params) {
+                    applyToChildren.call(this, child.children, function (cp, instance) {
+                        if (instance && instance.query !== undefined) {
+                            instance.query(params);
+                        }
+                    }.bind(this));
+                }.bind(this));
 
             } else if (child.children !== undefined && child.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
