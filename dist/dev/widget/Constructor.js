@@ -1,1 +1,1560 @@
-define("widget/dom",["./utils"],function(t){function e(e){var n=t.extend({},e);t.extend(this,n)}var n={append:function(t,e,n){e.placeholder=t.el.querySelector("#"+e.id),e.el=e.run(t.el,!0,!1,n)},replace:function(t){t.el.innerHTML="",n.append.apply(this,arguments)},detach:function(t){t.el.parentNode&&t.el.parentNode.replaceChild(t.placeholder,t.el)},attach:function(t){t.placeholder.parentNode&&t.placeholder.parentNode.replaceChild(t.el,t.placeholder)},add:function(t,e,n,i){t.placeholder=e.querySelector("#"+t.id),t.el=t.run(e,!1,n,i)},text:function(t,e){t.el.innerHTML=e},setAttribute:function(e,n,i){t.isObject(n)?Object.keys(n).forEach(function(t){e.el.setAttribute(t,n[t])}.bind(this)):e.el.setAttribute(n,i)},removeAttribute:function(t,e){t.el.removeAttribute(e)},setStyle:function(e,n,i){t.isObject(n)?Object.keys(n).forEach(function(t){e.el.style[t]=n[t]}.bind(this)):e.el.style[n]=i},removeStyle:function(t,e){delete t.el.style[e]},addClass:function(t,e){t.el.classList.add(e)},removeClass:function(t,e){t.el.classList.remove(e)},val:function(t,e){var n=t.el;return void 0===e?n.value:void(n.value=e)},on:function(t,e,n,i){var a=Array.prototype.slice.call(arguments,4,arguments.length),r=t.el,c=e.split(" "),s=function(e){n.apply(i||this,[e,t].concat(a))};return c.forEach(function(t){r.addEventListener(t,s)}),{remove:function(){c.forEach(function(t){r.removeEventListener(t,s)})}}},remove:function(t){t.el.remove()},Element:e};return t.extend(e.prototype,{append:function(t){n.append(this,t)},replace:function(t,e){n.replace(this,t,e)},text:function(t){n.text(this,t)},add:function(t,e,i){n.add(this,t,e,i)},detach:function(){n.detach(this)},attach:function(){n.attach(this)},setAttribute:function(t,e){n.setAttribute(this,t,e)},removeAttribute:function(t){n.removeAttribute(this,t)},setStyle:function(t,e){n.setStyle(this,t,e)},removeStyle:function(t){n.removeStyle(this,t)},addClass:function(t){n.addClass(this,t)},removeClass:function(t){n.removeClass(this,t)},val:function(t){return n.val(this,t)},on:function(){var t=Array.prototype.slice.call(arguments,0);return n.on.apply(!1,[this].concat(t))},remove:function(){n.remove(this)}}),e.extend=t.fnExtend,n}),function(t,e){"function"==typeof define&&define.amd?define("templating/utils",[],e):"object"==typeof exports?module.exports=e():(t.Templating=t.Templating||{},t.Templating.utils=e())}(this,function(){return{merge:function(t,e){Object.keys(e).forEach(function(n){t[n]=e[n]})}}}),function(t,e){"function"==typeof define&&define.amd?define("templating/Decoder",["templating/utils"],e):"object"==typeof exports?module.exports=e(require("./utils")):(t.Templating=t.Templating||{},t.Templating.Decoder=e(t.Templating.utils))}(this,function(t){function e(t,e){var n;n="li"===e?"ul":"td"===e||"th"===e?"tr":"tr"===e?"tbody":"div";var i=document.createElement(n),a=document.createDocumentFragment();return i.innerHTML=t,a.appendChild(i.firstChild),a.firstChild}function n(t,n,i,a){var r=this.tmpEl(n?t:!1,a),c=this.name,s=this.data.attribs,o=e(this.template,this.data.tag);if(Object.keys(s).forEach(function(t){r.setAttribute(t,s[t])}),void 0!==o)for(;o.childNodes.length>0;)r.appendChild(o.childNodes[0]);if(void 0!==c&&r.classList.add(c),i)this.setParent(i),null!==this.parent&&this.parent.appendChild(r);else{var l=t.parentNode;this.setParent(l),null!==this.parent&&this.parent.replaceChild(r,t)}return this.el=r,void 0!==this.parse&&this.parse(r),r}function i(e,i,a){var r=e.tagName;t.merge(this,{id:e.id,template:e.template,noAttach:s[r].noAttach||e.data.tplSet.noattach,instance:n.bind(this),applyAttach:function(){delete this.noAttach},setParent:function(t){this.parent=t}.bind(this),getParent:function(){return this.parent}.bind(this),run:function(t,e,n,i){if(void 0===this.noAttach){var r=t.querySelector("#"+this.id)||t;if(r)return this.instance(r,e,n,i||a)}}}),i&&(this.children=i)}function a(t,e){e||(e={});var n=!1,c=!1;return t.children.forEach(function(t){if(t.children&&t.children.length>0){var o=e[t.data.name]?e[t.data.name]:e;c=a.call(this,t,o)}var l=t.tagName;if(l){var h=s[l].decode(t,c,r);if(h){var d=h.name;void 0!==d&&(n=n||{},n[d]=h,i.call(n[d],t,c,e[d]||e))}}c=!1}.bind(this)),n}function r(t,e){Object.keys(t).forEach(function(n){t[n].run(e)})}function c(t){this._root="string"==typeof t?JSON.parse(t):t}var s={};return t.merge(c,{addDecoder:function(t){void 0===s[t.tagName]&&(s[t.tagName]=t)}}),t.merge(c.prototype,{addDecoder:c.addDecoder,_renderFragment:function(t,n){var i={},c=e(t.template);return t.children&&t.children.length>0&&(i=a.call(this,t,n||{})),r(i,c),{fragment:c,children:i}},render:function(t){var e=this._renderFragment(this._root,t);return e}}),c}),function(t){"object"==typeof exports?module.exports=t():"function"==typeof define&&define.amd?define("watch",t):(window.WatchJS=t(),window.watch=window.WatchJS.watch,window.unwatch=window.WatchJS.unwatch,window.callWatchers=window.WatchJS.callWatchers)}(function(){var t={noMore:!1},e=[],n=function(t){var e={};return t&&"[object Function]"==e.toString.call(t)},i=function(t){return"[object Array]"===Object.prototype.toString.call(t)},a=function(t,e){var n=[],a=[];if("string"!=typeof t&&"string"!=typeof e){if(i(t))for(var r=0;r<t.length;r++)void 0===e[r]&&n.push(r);else for(var r in t)t.hasOwnProperty(r)&&void 0===e[r]&&n.push(r);if(i(e))for(var c=0;c<e.length;c++)void 0===t[c]&&a.push(c);else for(var c in e)e.hasOwnProperty(c)&&void 0===t[c]&&a.push(c)}return{added:n,removed:a}},r=function(t){if(null==t||"object"!=typeof t)return t;var e=t.constructor();for(var n in t)e[n]=t[n];return e},c=function(t,e,n,i){try{Object.observe(t,function(t){t.forEach(function(t){t.name===e&&i(t.object[t.name])})})}catch(a){try{Object.defineProperty(t,e,{get:n,set:i,enumerable:!0,configurable:!0})}catch(r){try{Object.prototype.__defineGetter__.call(t,e,n),Object.prototype.__defineSetter__.call(t,e,i)}catch(c){throw new Error("watchJS error: browser not supported :/")}}}},s=function(t,e,n){try{Object.defineProperty(t,e,{enumerable:!1,configurable:!0,writable:!1,value:n})}catch(i){t[e]=n}},o=function(){n(arguments[1])?l.apply(this,arguments):i(arguments[1])?h.apply(this,arguments):d.apply(this,arguments)},l=function(t,e,n,a){if("string"!=typeof t&&(t instanceof Object||i(t))){var r=[];if(i(t))for(var c=0;c<t.length;c++)r.push(c);else for(var s in t)"$val"!=s&&Object.prototype.hasOwnProperty.call(t,s)&&r.push(s);h(t,r,e,n,a),a&&E(t,"$$watchlengthsubjectroot",e,n)}},h=function(t,e,n,a,r){if("string"!=typeof t&&(t instanceof Object||i(t)))for(var c=0;c<e.length;c++){var s=e[c];d(t,s,n,a,r)}},d=function(t,e,a,r,c){"string"!=typeof t&&(t instanceof Object||i(t))&&(n(t[e])||(null!=t[e]&&(void 0===r||r>0)&&l(t[e],a,void 0!==r?r-1:r),v(t,e,a,r),c&&(void 0===r||r>0)&&E(t,e,a,r)))},u=function(){n(arguments[1])?f.apply(this,arguments):i(arguments[1])?p.apply(this,arguments):w.apply(this,arguments)},f=function(t,e){if(!(t instanceof String)&&(t instanceof Object||i(t)))if(i(t)){for(var n=[],a=0;a<t.length;a++)n.push(a);p(t,n,e)}else{var r=function(t){var n=[];for(var i in t)t.hasOwnProperty(i)&&(t[i]instanceof Object?r(t[i]):n.push(i));p(t,n,e)};r(t)}},p=function(t,e,n){for(var i in e)e.hasOwnProperty(i)&&w(t,e[i],n)},v=function(e,n,i,a){var r=e[n];g(e,n),e.watchers||s(e,"watchers",{}),e.watchers[n]||(e.watchers[n]=[]);for(var o=0;o<e.watchers[n].length;o++)if(e.watchers[n][o]===i)return;e.watchers[n].push(i);var h=function(){return r},d=function(c){var s=r;r=c,0!==a&&e[n]&&l(e[n],i,void 0===a?a:a-1),g(e,n),t.noMore||s!==c&&(b(e,n,"set",c,s),t.noMore=!1)};c(e,n,h,d)},b=function(t,e,n,i,a){if(void 0!==e)for(var r=0;r<t.watchers[e].length;r++)t.watchers[e][r].call(t,e,n,i,a);else for(var e in t)t.hasOwnProperty(e)&&b(t,e,n,i,a)},m=["pop","push","reverse","shift","sort","slice","unshift","splice"],y=function(t,e,n,i){s(t[e],i,function(){var a=n.apply(t[e],arguments);return d(t,t[e]),"slice"!==i&&b(t,e,i,arguments),a})},g=function(t,e){if(t[e]&&!(t[e]instanceof String)&&i(t[e]))for(var n,a=m.length;a--;)n=m[a],y(t,e,t[e][n],n)},w=function(t,e,n){for(var i=0;i<t.watchers[e].length;i++){var a=t.watchers[e][i];a==n&&t.watchers[e].splice(i,1)}O(t,e,n)},j=function(){for(var t=0;t<e.length;t++){var n=e[t];if("$$watchlengthsubjectroot"===n.prop){var i=a(n.obj,n.actual);(i.added.length||i.removed.length)&&(i.added.length&&h(n.obj,i.added,n.watcher,n.level-1,!0),n.watcher.call(n.obj,"root","differentattr",i,n.actual)),n.actual=r(n.obj)}else{var i=a(n.obj[n.prop],n.actual);if(i.added.length||i.removed.length){if(i.added.length)for(var c=0;c<n.obj.watchers[n.prop].length;c++)h(n.obj[n.prop],i.added,n.obj.watchers[n.prop][c],n.level-1,!0);b(n.obj,n.prop,"differentattr",i,n.actual)}n.actual=r(n.obj[n.prop])}}},E=function(t,n,i,a){var c;c=r("$$watchlengthsubjectroot"===n?t:t[n]),e.push({obj:t,prop:n,actual:c,watcher:i,level:a})},O=function(t,n,i){for(var a=0;a<e.length;a++){var r=e[a];r.obj==t&&r.prop==n&&r.watcher==i&&e.splice(a,1)}};return setInterval(j,50),t.watch=o,t.unwatch=u,t.callWatchers=b,t}),define("widget/parsers/applyAttribute",["watch"],function(t){function e(t,e){var i=t.data.tplSet.bind,a=t.data.tplSet.update;i&&Object.keys(i).forEach(function(r){var c=i[r];if(void 0!==e[c])if("class"===r){t.addClass(e[c]);var s=e[c];"true"===a&&n(e,c,function(){t.removeClass(s),t.addClass(e[c]),s=e[c]}.bind(this))}else"checked"===r?(t.el.checked=e[c],"true"===a&&n(e,c,function(){t.el.checked=e[c]}.bind(this))):(t.setAttribute(r,e[c]),"true"===a&&n(e,c,function(){t.setAttribute(r,e[c])}.bind(this)));void 0!==e.text&&(t.text(e.text),"true"===a&&n(e,"text",function(){t.text(e.text)}.bind(this)))})}{var n=t.watch;t.unwatch,t.callWatchers}return e}),define("widget/parsers/applyEvents",[],function(){function t(t,e,n){void 0!==e&&void 0!==t.el&&e.forEach(function(e){t.on(e.name,e.action,this,n)}.bind(this))}return t}),define("widget/parsers/setBinders",[],function(){function t(t){var e=!1;return Object.keys(t).forEach(function(n){e=e||{};var i=t[n];void 0!==i.bind&&(e[i.bind]=e[i.bind]||[],e[i.bind].push(i))}.bind(this)),e}return t}),define("widget/parsers/deepBindings",["./setBinders"],function(t){function e(n){return Object.keys(n).forEach(function(i){var a=n[i];a.children&&(n[i].children=e(a.children),n[i].bindings=t(a.children))}),n}return e}),define("widget/parsers/setChildren",["../dom","./applyEvents","./setBinders","./deepBindings"],function(t,e,n,i){function a(e){return Object.keys(e).forEach(function(n){e[n]instanceof t.Element!=!0&&(e[n]=new t.Element(e[n])),e[n].children&&(e[n].children=a(e[n].children))}.bind(this)),e}function r(t,c){return c=c?a(c):{},t=t?a(t):{},Object.keys(t).forEach(function(a){var s=t[a].children;void 0!==s&&(s=r.call(this,s,c.children),t[a].bindings=n(s));var o=t[a],l=c[a];void 0!==l?(void 0!==l.children&&(l.bindings=i(l.children)),void 0!==this.nodes[a]?this.nodes[a].call(this,o,l):void 0!==o&&(o.replace(l),void 0!==l.children&&(o.children=l.children))):void 0!==this.nodes[a]&&"true"===o.data.tplSet.noattach&&this.nodes[a].call(this,o),void 0!==this.elReady[a]&&void 0!==o.el&&this.elReady[a].call(this,o);var h=this.events[a];e.call(this,o,h)}.bind(this)),t}return r}),define("widget/parsers/applyBinders",["../dom","../utils","watch","./applyEvents","./applyAttribute"],function(t,e,n,i,a){function r(n,s){var o=s.bindings,l=s.el;n&&Object.keys(n).forEach(function(s){if(void 0!==o&&void 0!==o[s]){var h=function(o){var h=this.events[o.name];if(void 0!==o){var d=n[s];if(o.applyAttach(),this.nodes[s]){var u=new t.Element(o);this.nodes[s].call(this,u,l,d)}else if(e.isArray(d)||e.isObject(d)){if(e.isArray(d)){o.applyAttach();var f=function(){var e=!1,u=[],f=function(n){var c=new t.Element(o);e?c.add(l,e):(c.add(l),e=o.getParent()),this.elReady[c.name]&&this.elReady[c.name].call(this,c,n),a.call(this,c,n),r.call(this,n,c),i.call(this,c,h,n),u.push({binder:c,data:n})};d.forEach(f.bind(this));var p=o.data.tplSet.update;if("true"===p){var v=["pop","shift","splice"];c(n,s,function(t,e,i,a){void 0===a&&"push"==e?f.call(this,i[0]):-1!==v.indexOf(e)&&u.forEach(function(t,e){-1===n[s].indexOf(t.data)&&(t.binder.remove(),u.splice(e,1))}.bind(this))}.bind(this))}};f.call(this)}else if(e.isObject(d)){var u=new t.Element(o);u.add(l),this.elReady[u.name]&&this.elReady[u.name].call(this,u,d),i.call(this,u,h,d),"cp"===o.data.type?u.replace(o,d):u.data.tplSet.bind?a.call(this,u,d):r.call(this,d,u)}}else{var u=new t.Element(o);u.add(l),u.text(d),void 0!==this.elReady[u.name]&&this.elReady[u.name].call(this,u,d),"true"===u.data.tplSet.update&&c(n,s,function(){u.text(n[s])}.bind(this)),i.call(this,u,h,d)}}};void 0!==o[s].forEach?o[s].forEach(h.bind(this)):h.call(this,o[s])}}.bind(this))}{var c=n.watch;n.unwatch,n.callWatchers}return r}),define("widget/parsers/setRoutes",[],function(){function t(t){t.data.instance&&delete t.data.instance,t.el&&(t.el.remove(),delete t.el)}function e(t,e){void 0!==t&&Object.keys(t).forEach(function(n){var i=t[n];e.call(this,i,i.data.instance)}.bind(this))}function n(i,a,r){var c=Object.keys(i);c.forEach(function(c){var s=i[c],o=s.data.route;if(void 0!==o&&"cp"!==s.data.type){var l=a(o,function(t){void 0!==s.children&&n.call(this,s.children,t,r)}.bind(this));l.to(function(){var n=[].slice.call(arguments,0),i=n.pop();if(n.length>0)var a=n.join("_");void 0!==s.el&&s.sessId!==a&&void 0!==a&&(e.call(this,s.children,t),t(s)),e.call(this,s.children,function(t,e){var a=t.data,r=a.dataset;r.params=i,n.length>0&&(r.link=n,e&&e.to&&e.to.apply(e,n.concat(i)))}),void 0===s.el?(s.applyAttach(),s.add(r,!1),e.call(this,s.children,function(t,e){e&&e.to&&e.to.apply(e,n.concat(i)),!t.el&&e&&e._match&&(l.setRoutes(function(t){e._match.call(e,t.match.bind(t)),t.run()}.bind(this)),e._reRoute=function(){e._applyRoutes(l)})}),a&&(s.sessId=a)):s.attach()}.bind(this)),l.leave(function(){e.call(this,s.children,function(t,e){e&&void 0!==e.leave&&e.leave()}.bind(this)),s.detach()}.bind(this)),l.query(function(t){e.call(this,s.children,function(e,n){n&&void 0!==n.query&&n.query(t)}.bind(this))}.bind(this))}else if(void 0!==s.children&&"cp"!==s.data.type)n.call(this,s.children,a,r);else if("cp"===s.data.type&&s.data.instance){var h=s.data.instance;h._match.call(h,a)}}.bind(this))}function i(t){if(!this._match){var e=this.el;this._match=function(i){n.call(this,t,i,e),this.match&&this.match.call(this,i)}.bind(this)}}return i}),define("widget/Constructor",["./dom","./utils","./mediator","templating/Decoder","./parsers/applyAttribute","./parsers/setChildren","./parsers/applyBinders","./parsers/setBinders","./parsers/setRoutes","./parsers/applyEvents"],function(t,e,n,i,a,r,c,s,o,l){function h(t,a,c){if(this._routes=[],this.children={},this.eventBus=new n,this.context=d,void 0!==t.appContext&&e.extend(this.context,t.appContext),this.beforeInit.apply(this,arguments),this.template){var l=c?Object.keys(c):[];this.data=l.length>0?c:this.context.data[t.bind];var h=new i(this.template),u=h.render(this.data);this.el=u.fragment,this.children=e.extend(r.call(this,u.children,a),this.children),this.bindings=s.call(this,this.children),this.routes=o.call(this,this.children),this.data&&this.applyBinders(this.data,this)}else this.el=document.createElement("div");this.init.apply(this,arguments)}var d={};return e.extend(h.prototype,{nodes:{},events:{},elReady:{},init:function(){},beforeInit:function(){},applyBinders:c,destroy:function(){this.el.remove()},setRoutes:function(t){void 0!==t&&this._routes.push(t)},_applyRoutes:function(t){for(;this._routes.length>0;){var e=this._routes[0];e&&e._match&&t.setRoutes(function(t){e._match.call(e,t.match.bind(t)),t.run()}.bind(this)),this._routes.shift()}t.rebind()},_reRoute:function(){},rebind:function(){this._reRoute()},setChildren:function(e,n){var i=e.name;void 0!==this.children[i]&&void 0!==this.children[i].el&&this.children[i].detach(),e.applyAttach(),this.children[i]=new t.Element(e),this.children[i].placeholder=this.el.querySelector("#"+e.id),this.children[i].el=e.run(this.el,!1,!1,n),void 0!==this.elReady[i]&&void 0!==this.children[i].el&&this.elReady[i].call(this,this.children[i]);var a=this.events[i];l.call(this,this.children[i],a);var r=this.children[i].data.instance;this.setRoutes(r),this.rebind()}}),h.extend=e.fnExtend,h});
+/**
+ * Created by guntars on 10/10/2014.
+ */
+//## widget/dom Class for dom manipulation
+define('widget/dom',[
+    './utils'
+], function (utils) {
+    var dom = {
+        // Method to attach to DOM
+        //
+        //      @method append
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        //      @param {Object} data
+        append: function (parent, child, data) {
+            child.placeholder = parent.el.querySelector('#' + child.id);
+            child.el = child.run(parent.el, true, false, data);
+        },
+        // Replacing element in to DOM
+        //
+        //      @method replace
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        //      @param {Object} data
+        replace: function (parent, child, data) {
+            parent.el.innerHTML = '';
+            dom.append.apply(this, arguments);
+        },
+        detach: function (el) {
+            if(el.el.parentNode) {
+                el.el.parentNode.replaceChild(el.placeholder, el.el)
+            }
+        },
+        attach: function (el) {
+            if(el.placeholder.parentNode){
+                el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
+            }
+        },
+        add: function (el, fragment, parent, data) {
+            el.placeholder = fragment.querySelector('#' + el.id);
+            el.el = el.run(fragment, false, parent, data);
+        },
+        // Adding text in to node
+        //
+        //      @method text
+        //      @param {dom.Element}
+        //      @param {String} text
+        text: function (node, text) {
+            node.el.innerHTML = text;
+        },
+        // Setting Attribute in to node
+        //
+        //      @method setAttribute
+        //      @prop {dom.Element} node
+        //      @prop {String||Object} prop
+        //      @prop {String} value
+        setAttribute: function (node, prop, value) {
+            if (utils.isObject(prop)) {
+                Object.keys(prop).forEach(function (key) {
+                    node.el.setAttribute(key, prop[key]);
+                }.bind(this));
+            } else {
+                node.el.setAttribute(prop, value);
+            }
+        },
+        // Removing Attribute from node
+        //
+        //      @method removeAttribute
+        //      @prop {dom.Element} node
+        //      @prop {String} prop
+        removeAttribute: function (node, prop) {
+            node.el.removeAttribute(prop);
+        },
+        // Setting css style in to node
+        //
+        //      @method setStyle
+        //      @prop {dom.Element} node
+        //      @prop {String||Object} prop
+        //      @prop {String} value
+        setStyle: function (node, prop, value) {
+            if (utils.isObject(prop)) {
+                Object.keys(prop).forEach(function (key) {
+                    node.el.style[key] = prop[key];
+                }.bind(this));
+            } else {
+                node.el.style[prop] = value;
+            }
+        },
+        // Removing css style from node
+        //
+        //      @method removeAttribute
+        //      @prop {dom.Element} node
+        //      @prop {String} prop
+        removeStyle: function (node, prop) {
+            delete node.el.style[prop];
+
+        },
+        // Adding class in to node
+        //
+        //      @method addClass
+        //      @param {dom.Element} node
+        //      @param {String} className
+        addClass: function (node, className) {
+            node.el.classList.add(className);
+        },
+        // Remove class from node
+        //
+        //      @method removeClass
+        //      @param {dom.Element} node
+        //      @param {string} className
+        removeClass: function (node, className) {
+            node.el.classList.remove(className);
+        },
+        // Setting, Getting value to input element
+        //
+        //      @method val
+        //      @param {dom.Element} node
+        //      @param? {String} val
+        //      @return {String}
+        val: function (node, val) {
+            var el = node.el;
+            if (val !== undefined) {
+                el.value = val;
+            } else {
+                return el.value;
+            }
+        },
+        // Adding DOM Event in to Element
+        //
+        //      @method on
+        //      @param {dom.Element} element
+        //      @param {String} ev
+        //      @param {Function} cb
+        //      @param {Object} context
+        //      @return {Object} { remove() }
+        on: function (element, ev, cb, context) {
+            var args = Array.prototype.slice.call(arguments, 4, arguments.length),
+                el = element.el,
+                events = ev.split(' '),
+                fn = function (e) {
+                    cb.apply(context || this, [e, element].concat(args));
+                };
+
+            events.forEach(function (event) {
+                el.addEventListener(event, fn);
+            });
+            return {
+                remove: function () {
+                    events.forEach(function (event) {
+                        el.removeEventListener(event, fn);
+                    });
+                }
+            }
+        },
+        // Remove Dom Element from Dom
+        //
+        //      @method remove
+        //      @param {dom.Element}
+        remove: function (el) {
+            el.el.remove();
+        },
+        // Element
+        Element: Element
+    }
+    // ## widget/dom.Element
+    //     @method Element
+    //     @param {Object} node
+    function Element(node) {
+        var obj = utils.extend({}, node);
+        utils.extend(this, obj);
+
+    }
+
+    utils.extend(Element.prototype, {
+        // Shortcut to - `dom.append`
+        append: function (child) {
+            dom.append(this, child)
+        },
+        // Shortcut to - `dom.replace`
+        replace: function (child, data) {
+            dom.replace(this, child, data);
+        },
+        // Shortcut to - `dom.text`
+        text: function (text) {
+            dom.text(this, text);
+        },
+        // Shortcut to - `dom.add`
+        add: function (fragment, parent, data) {
+            dom.add(this, fragment, parent, data);
+        },
+        detach: function () {
+            dom.detach(this);
+        },
+        attach: function () {
+            dom.attach(this);
+        },
+        // Shortcut to - `dom.setAttribute`
+        setAttribute: function (prop, value) {
+            dom.setAttribute(this, prop, value);
+        },
+        // Shortcut to - `dom.removeAttribute`
+        removeAttribute: function (prop) {
+            dom.removeAttribute(this, prop);
+        },
+        // Shortcut to - `dom.setStyle`
+        setStyle: function (prop, value) {
+            dom.setStyle(this, prop, value);
+        },
+        // Shortcut to - `dom.removeStyle`
+        removeStyle: function (prop) {
+            dom.removeStyle(this, prop);
+        },
+        // Shortcut to - `dom.addClass`
+        addClass: function (className) {
+            dom.addClass(this, className);
+        },
+        // Shortcut to - `dom.removeClass`
+        removeClass: function (className) {
+            dom.removeClass(this, className);
+        },
+        // Shortcut to - `dom.val`
+        val: function (val) {
+            return dom.val(this, val);
+        },
+        // Shortcut to - `dom.on`
+        on: function (event, cb, context) {
+            var args = Array.prototype.slice.call(arguments, 0);
+            return dom.on.apply(false, [this].concat(args));
+        },
+        // Shortcut to - `dom.remove`
+        remove: function () {
+            dom.remove(this);
+        }
+
+    });
+    Element.extend = utils.fnExtend;
+    return dom;
+});
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define('templating/utils',[], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals (root is window)
+        root.Templating = root.Templating || {};
+        root.Templating.utils = factory();
+    }
+}(this, function () {
+    return {
+        merge: function (obj, dest) {
+            Object.keys(dest).forEach(function (key) {
+                obj[key] = dest[key];
+            });
+        }
+    }
+
+}));
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        // AMD. Register as an anonymous module.
+        define('templating/Decoder',[
+            'templating/utils'
+        ], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./utils'));
+    } else {
+        // Browser globals (root is window)
+        root.Templating = root.Templating || {};
+        root.Templating.Decoder = factory(root.Templating.utils);
+    }
+}(this, function (utils) {
+    var _decoders = {};
+
+    function applyFragment(template, tag) {
+        var elTag;
+        if (tag === 'li') {
+            elTag = 'ul'
+
+        } else if (tag === 'td' || tag === 'th') {
+            elTag = 'tr'
+
+        } else if (tag === 'tr') {
+            elTag = 'tbody'
+
+        } else {
+            elTag = 'div'
+        }
+        var el = document.createElement(elTag),
+            fragment = document.createDocumentFragment();
+        el.innerHTML = template;
+        fragment.appendChild(el.firstChild);
+        return fragment.firstChild;
+    }
+
+    function setElement(placeholder, keep, parent, data) {
+        var el = this.tmpEl((keep) ? placeholder : false, data),
+            name = this.name,
+            attributes = this.data.attribs,
+            plFragment = applyFragment(this.template, this.data.tag);
+
+        Object.keys(attributes).forEach(function (key) {
+            el.setAttribute(key, attributes[key]);
+        });
+
+        if (plFragment !== undefined) {
+            while (plFragment.childNodes.length > 0) {
+                el.appendChild(plFragment.childNodes[0]);
+            }
+        }
+
+        if (name !== undefined) {
+            el.classList.add(name);
+        }
+
+        if (!parent) {
+            var parentNode = placeholder.parentNode;
+            this.setParent(parentNode);
+            if (this.parent !== null) {
+                this.parent.replaceChild(el, placeholder);
+            }
+        } else {
+            this.setParent(parent);
+            if (this.parent !== null) {
+                this.parent.appendChild(el);
+            }
+        }
+
+        this.el = el;
+        if (this.parse !== undefined) {
+            this.parse(el);
+        }
+        return el;
+
+    }
+
+    function setParams(node, children, obj) {
+        var tagName = node.tagName;
+        utils.merge(this, {
+            id: node.id,
+            template: node.template,
+            noAttach: _decoders[tagName].noAttach || node.data.tplSet.noattach,
+            instance: setElement.bind(this),
+
+            applyAttach: function () {
+                delete this.noAttach;
+            },
+
+            setParent: function (parent) {
+                this.parent = parent;
+            }.bind(this),
+            getParent: function () {
+                return this.parent;
+            }.bind(this),
+            run: function (fragment, keep, parent, data) {
+                if (this.noAttach === undefined) {
+                    var placeholder = fragment.querySelector('#' + this.id) || fragment;
+                    if (placeholder) {
+                        return this.instance(placeholder, keep, parent, data || obj);
+
+                    }
+                }
+            }
+        });
+
+        if (children) {
+            this.children = children;
+        }
+    }
+
+    function parseElements(root, obj) {
+        if (!obj) {
+            obj = {};
+        }
+        var context = false,
+            children = false;
+        root.children.forEach(function (node) {
+            if (node.children &&
+                node.children.length > 0) {
+                var contextData = (obj[node.data.name]) ? obj[node.data.name] : obj;
+                children = parseElements.call(this, node, contextData);
+            }
+            var tagName = node.tagName;
+            if (tagName) {
+                var data = _decoders[tagName].decode(node, children, runEls);
+                if (data) {
+                    var name = data.name;
+
+                    if (name !== undefined) {
+                        context = context || {};
+                        context[name] = data;
+                        setParams.call(context[name], node, children, obj[name] || obj);
+                    }
+                }
+            }
+            children = false;
+        }.bind(this));
+
+        return context;
+    };
+    function runEls(children, fragment) {
+        Object.keys(children).forEach(function (key) {
+            children[key].run(fragment);
+        });
+    }
+
+    /**
+     *
+     * @constructor
+     * @param root
+     */
+    function Decoder(root) {
+        this._root = (typeof root === 'string') ? JSON.parse(root) : root;
+    }
+
+    utils.merge(Decoder, {
+        addDecoder: function (decoder) {
+            if (_decoders[decoder.tagName] === undefined) {
+                _decoders[decoder.tagName] = decoder;
+            }
+        }
+    });
+
+    utils.merge(Decoder.prototype, {
+        addDecoder: Decoder.addDecoder,
+        _renderFragment: function (root, data) {
+            var children = {},
+                fragment = applyFragment(root.template);
+
+            if (root.children && root.children.length > 0) {
+                children = parseElements.call(this, root, data || {});
+
+            }
+            runEls(children, fragment);
+
+            return {
+                fragment: fragment,
+                children: children
+            };
+        },
+
+        render: function (data) {
+            var fragment = this._renderFragment(this._root, data);
+
+            return fragment;
+        }
+    });
+
+    return Decoder;
+
+}));
+/**
+ * DEVELOPED BY
+ * GIL LOPES BUENO
+ * gilbueno.mail@gmail.com
+ *
+ * WORKS WITH:
+ * IE 9+, FF 4+, SF 5+, WebKit, CH 7+, OP 12+, BESEN, Rhino 1.7+
+ *
+ * FORK:
+ * https://github.com/melanke/Watch.JS
+ */
+
+
+(function (factory) {
+    if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like enviroments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define('watch',factory);
+    } else {
+        // Browser globals
+        window.WatchJS = factory();
+        window.watch = window.WatchJS.watch;
+        window.unwatch = window.WatchJS.unwatch;
+        window.callWatchers = window.WatchJS.callWatchers;
+    }
+}(function () {
+
+    var WatchJS = {
+        noMore: false
+    },
+    lengthsubjects = [];
+
+    var isFunction = function (functionToCheck) {
+            var getType = {};
+            return functionToCheck && getType.toString.call(functionToCheck) == '[object Function]';
+    };
+
+    var isInt = function (x) {
+        return x % 1 === 0;
+    };
+
+    var isArray = function(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+    };
+
+    var getObjDiff = function(a, b){
+        var aplus = [],
+        bplus = [];
+
+        if(!(typeof a == "string") && !(typeof b == "string")){
+
+            if (isArray(a)) {
+                for (var i=0; i<a.length; i++) {
+                    if (b[i] === undefined) aplus.push(i);
+                }
+            } else {
+                for(var i in a){
+                    if (a.hasOwnProperty(i)) {
+                        if(b[i] === undefined) {
+                            aplus.push(i);
+                        }
+                    }
+                }
+            }
+
+            if (isArray(b)) {
+                for (var j=0; j<b.length; j++) {
+                    if (a[j] === undefined) bplus.push(j);
+                }
+            } else {
+                for(var j in b){
+                    if (b.hasOwnProperty(j)) {
+                        if(a[j] === undefined) {
+                            bplus.push(j);
+                        }
+                    }
+                }
+            }
+        }
+
+        return {
+            added: aplus,
+            removed: bplus
+        }
+    };
+
+    var clone = function(obj){
+
+        if (null == obj || "object" != typeof obj) {
+            return obj;
+        }
+
+        var copy = obj.constructor();
+
+        for (var attr in obj) {
+            copy[attr] = obj[attr];
+        }
+
+        return copy;
+
+    }
+
+    var defineGetAndSet = function (obj, propName, getter, setter) {
+        try {
+
+            
+            Object.observe(obj, function(changes) {
+                changes.forEach(function(change) {
+                    if (change.name === propName) {
+                        setter(change.object[change.name]);
+                    }
+                });
+            });
+            
+        } catch(e) {
+
+            try {
+                    Object.defineProperty(obj, propName, {
+                            get: getter,
+                            set: setter,
+                            enumerable: true,
+                            configurable: true
+                    });
+            } catch(e2) {
+                try{
+                    Object.prototype.__defineGetter__.call(obj, propName, getter);
+                    Object.prototype.__defineSetter__.call(obj, propName, setter);
+                } catch(e3) {
+                    throw new Error("watchJS error: browser not supported :/")
+                }
+            }
+
+        }
+    };
+
+    var defineProp = function (obj, propName, value) {
+        try {
+            Object.defineProperty(obj, propName, {
+                enumerable: false,
+                configurable: true,
+                writable: false,
+                value: value
+            });
+        } catch(error) {
+            obj[propName] = value;
+        }
+    };
+
+    var watch = function () {
+
+        if (isFunction(arguments[1])) {
+            watchAll.apply(this, arguments);
+        } else if (isArray(arguments[1])) {
+            watchMany.apply(this, arguments);
+        } else {
+            watchOne.apply(this, arguments);
+        }
+
+    };
+
+
+    var watchAll = function (obj, watcher, level, addNRemove) {
+
+        if ((typeof obj == "string") || (!(obj instanceof Object) && !isArray(obj))) { //accepts only objects and array (not string)
+            return;
+        }
+
+        var props = [];
+
+
+        if(isArray(obj)) {
+            for (var prop = 0; prop < obj.length; prop++) { //for each item if obj is an array
+                props.push(prop); //put in the props
+            }
+        } else {
+            for (var prop2 in obj) { //for each attribute if obj is an object
+				if (prop2 == "$val") {
+					continue;
+				}
+
+                if (Object.prototype.hasOwnProperty.call(obj, prop2)) {
+                    props.push(prop2); //put in the props
+                }
+            }
+        }
+
+        watchMany(obj, props, watcher, level, addNRemove); //watch all items of the props
+
+        if (addNRemove) {
+            pushToLengthSubjects(obj, "$$watchlengthsubjectroot", watcher, level);
+        }
+    };
+
+
+    var watchMany = function (obj, props, watcher, level, addNRemove) {
+
+        if ((typeof obj == "string") || (!(obj instanceof Object) && !isArray(obj))) { //accepts only objects and array (not string)
+            return;
+        }
+
+        for (var i=0; i<props.length; i++) { //watch each property
+            var prop = props[i];
+            watchOne(obj, prop, watcher, level, addNRemove);
+        }
+
+    };
+
+    var watchOne = function (obj, prop, watcher, level, addNRemove) {
+        if ((typeof obj == "string") || (!(obj instanceof Object) && !isArray(obj))) { //accepts only objects and array (not string)
+            return;
+        }
+
+        if(isFunction(obj[prop])) { //dont watch if it is a function
+            return;
+        }
+        if(obj[prop] != null && (level === undefined || level > 0)){
+            watchAll(obj[prop], watcher, level!==undefined? level-1 : level); //recursively watch all attributes of this
+        }
+
+        defineWatcher(obj, prop, watcher, level);
+
+        if(addNRemove && (level === undefined || level > 0)){
+            pushToLengthSubjects(obj, prop, watcher, level);
+        }
+
+    };
+
+    var unwatch = function () {
+
+        if (isFunction(arguments[1])) {
+            unwatchAll.apply(this, arguments);
+        } else if (isArray(arguments[1])) {
+            unwatchMany.apply(this, arguments);
+        } else {
+            unwatchOne.apply(this, arguments);
+        }
+
+    };
+
+    var unwatchAll = function (obj, watcher) {
+
+        if (obj instanceof String || (!(obj instanceof Object) && !isArray(obj))) { //accepts only objects and array (not string)
+            return;
+        }
+
+        if (isArray(obj)) {
+            var props = [];
+            for (var prop = 0; prop < obj.length; prop++) { //for each item if obj is an array
+                props.push(prop); //put in the props
+            }
+            unwatchMany(obj, props, watcher); //watch all itens of the props
+        } else {
+            var unwatchPropsInObject = function (obj2) {
+                var props = [];
+                for (var prop2 in obj2) { //for each attribute if obj is an object
+                    if (obj2.hasOwnProperty(prop2)) {
+                        if (obj2[prop2] instanceof Object) {
+                            unwatchPropsInObject(obj2[prop2]); //recurs into object props
+                        } else {
+                            props.push(prop2); //put in the props
+                        }
+                    }
+                }
+                unwatchMany(obj2, props, watcher); //unwatch all of the props
+            };
+            unwatchPropsInObject(obj);
+        }
+    };
+
+
+    var unwatchMany = function (obj, props, watcher) {
+
+        for (var prop2 in props) { //watch each attribute of "props" if is an object
+            if (props.hasOwnProperty(prop2)) {
+                unwatchOne(obj, props[prop2], watcher);
+            }
+        }
+    };
+
+    var defineWatcher = function (obj, prop, watcher, level) {
+
+        var val = obj[prop];
+
+        watchFunctions(obj, prop);
+
+        if (!obj.watchers) {
+            defineProp(obj, "watchers", {});
+        }
+
+        if (!obj.watchers[prop]) {
+            obj.watchers[prop] = [];
+        }
+
+        for (var i=0; i<obj.watchers[prop].length; i++) {
+            if(obj.watchers[prop][i] === watcher){
+                return;
+            }
+        }
+
+
+        obj.watchers[prop].push(watcher); //add the new watcher in the watchers array
+
+
+        var getter = function () {
+            return val;
+        };
+
+
+        var setter = function (newval) {
+            var oldval = val;
+            val = newval;
+
+            if (level !== 0 && obj[prop]){
+                // watch sub properties
+                watchAll(obj[prop], watcher, (level===undefined)?level:level-1);
+            }
+
+            watchFunctions(obj, prop);
+
+            if (!WatchJS.noMore){
+                //if (JSON.stringify(oldval) !== JSON.stringify(newval)) {
+                if (oldval !== newval) {
+                    callWatchers(obj, prop, "set", newval, oldval);
+                    WatchJS.noMore = false;
+                }
+            }
+        };
+
+        defineGetAndSet(obj, prop, getter, setter);
+
+    };
+
+    var callWatchers = function (obj, prop, action, newval, oldval) {
+        if (prop !== undefined) {
+            for (var wr=0; wr<obj.watchers[prop].length; wr++) {
+                obj.watchers[prop][wr].call(obj, prop, action, newval, oldval);
+            }
+        } else {
+            for (var prop in obj) {//call all
+                if (obj.hasOwnProperty(prop)) {
+                    callWatchers(obj, prop, action, newval, oldval);
+                }
+            }
+        }
+    };
+
+    // @todo code related to "watchFunctions" is certainly buggy
+    var methodNames = ['pop', 'push', 'reverse', 'shift', 'sort', 'slice', 'unshift', 'splice'];
+    var defineArrayMethodWatcher = function (obj, prop, original, methodName) {
+        defineProp(obj[prop], methodName, function () {
+            var response = original.apply(obj[prop], arguments);
+            watchOne(obj, obj[prop]);
+            if (methodName !== 'slice') {
+                callWatchers(obj, prop, methodName,arguments);
+            }
+            return response;
+        });
+    };
+
+    var watchFunctions = function(obj, prop) {
+
+        if ((!obj[prop]) || (obj[prop] instanceof String) || (!isArray(obj[prop]))) {
+            return;
+        }
+
+        for (var i = methodNames.length, methodName; i--;) {
+            methodName = methodNames[i];
+            defineArrayMethodWatcher(obj, prop, obj[prop][methodName], methodName);
+        }
+
+    };
+
+    var unwatchOne = function (obj, prop, watcher) {
+        for (var i=0; i<obj.watchers[prop].length; i++) {
+            var w = obj.watchers[prop][i];
+
+            if(w == watcher) {
+                obj.watchers[prop].splice(i, 1);
+            }
+        }
+
+        removeFromLengthSubjects(obj, prop, watcher);
+    };
+
+    var loop = function(){
+
+        for(var i=0; i<lengthsubjects.length; i++) {
+
+            var subj = lengthsubjects[i];
+
+            if (subj.prop === "$$watchlengthsubjectroot") {
+
+                var difference = getObjDiff(subj.obj, subj.actual);
+
+                if(difference.added.length || difference.removed.length){
+                    if(difference.added.length){
+                        watchMany(subj.obj, difference.added, subj.watcher, subj.level - 1, true);
+                    }
+
+                    subj.watcher.call(subj.obj, "root", "differentattr", difference, subj.actual);
+                }
+                subj.actual = clone(subj.obj);
+
+
+            } else {
+
+                var difference = getObjDiff(subj.obj[subj.prop], subj.actual);
+
+                if(difference.added.length || difference.removed.length){
+                    if(difference.added.length){
+                        for (var j=0; j<subj.obj.watchers[subj.prop].length; j++) {
+                            watchMany(subj.obj[subj.prop], difference.added, subj.obj.watchers[subj.prop][j], subj.level - 1, true);
+                        }
+                    }
+
+                    callWatchers(subj.obj, subj.prop, "differentattr", difference, subj.actual);
+                }
+
+                subj.actual = clone(subj.obj[subj.prop]);
+
+            }
+
+        }
+
+    };
+
+    var pushToLengthSubjects = function(obj, prop, watcher, level){
+
+        var actual;
+
+        if (prop === "$$watchlengthsubjectroot") {
+            actual =  clone(obj);
+        } else {
+            actual = clone(obj[prop]);
+        }
+
+        lengthsubjects.push({
+            obj: obj,
+            prop: prop,
+            actual: actual,
+            watcher: watcher,
+            level: level
+        });
+    };
+
+    var removeFromLengthSubjects = function(obj, prop, watcher){
+
+        for (var i=0; i<lengthsubjects.length; i++) {
+            var subj = lengthsubjects[i];
+
+            if (subj.obj == obj && subj.prop == prop && subj.watcher == watcher) {
+                lengthsubjects.splice(i, 1);
+            }
+        }
+
+    };
+
+    setInterval(loop, 50);
+
+    WatchJS.watch = watch;
+    WatchJS.unwatch = unwatch;
+    WatchJS.callWatchers = callWatchers;
+
+    return WatchJS;
+
+}));
+
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/applyAttribute',[
+    'watch'
+], function (WatchJS) {
+    var watch = WatchJS.watch,
+        unwatch = WatchJS.unwatch,
+        callWatchers = WatchJS.callWatchers;
+
+    function applyAttribute(childBinder, data) {
+        var bind = childBinder.data.tplSet.bind,
+            update = childBinder.data.tplSet.update;
+        if (bind) {
+            Object.keys(bind).forEach(function (bindItem) {
+                var key = bind[bindItem];
+                if (data[key] !== undefined) {
+                    if (bindItem === 'class') {
+                        childBinder.addClass(data[key]);
+                        var currClass = data[key];
+                        if (update === 'true') {
+                            watch(data, key, function () {
+                                childBinder.removeClass(currClass);
+                                childBinder.addClass(data[key]);
+                                currClass = data[key];
+                            }.bind(this));
+                        }
+                    } else if (bindItem === 'checked') {
+                        childBinder.el.checked = data[key];
+                        if (update === 'true') {
+                            watch(data, key, function () {
+                                childBinder.el.checked = data[key];
+                            }.bind(this));
+                        }
+                    } else {
+                        childBinder.setAttribute(bindItem, data[key]);
+                        if (update === 'true') {
+                            watch(data, key, function () {
+                                childBinder.setAttribute(bindItem, data[key]);
+                            }.bind(this));
+                        }
+                    }
+                }
+                if (data.text !== undefined) {
+                    childBinder.text(data.text);
+                    if (update === 'true') {
+                        watch(data, 'text', function () {
+                            childBinder.text(data.text);
+                        }.bind(this));
+                    }
+                }
+            });
+        }
+
+    }
+
+    return applyAttribute;
+});
+define('widget/parsers/applyEvents',[],function () {
+    
+    //Aplying Events to elements
+    //
+    //      @private applyEvents
+    //      @param {dom.Element} element
+    //      @param {Array} events
+    //      @param {Object} data
+    function applyEvents(element, events, data) {
+        if (events !== undefined && element.el !== undefined) {
+            events.forEach(function (event) {
+                element.on(event.name, event.action, this, data);
+            }.bind(this));
+        }
+    }
+
+    return applyEvents;
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/setBinders',[],function () {
+
+    function setBinders(children) {
+        var bindings = false
+        Object.keys(children).forEach(function (key) {
+            bindings = bindings || {};
+            var el = children[key];
+            if (el.bind !== undefined) {
+                bindings[el.bind] = bindings[el.bind] || []
+                bindings[el.bind].push(el)
+            }
+        }.bind(this));
+        return bindings;
+    }
+
+    return setBinders;
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/deepBindings',[
+    './setBinders'
+],function (setBinders) {
+    function deepBindings(elements) {
+        Object.keys(elements).forEach(function (key) {
+            var element = elements[key];
+            if (element.children) {
+                elements[key].children = deepBindings(element.children);
+                elements[key].bindings = setBinders(element.children);
+            }
+        });
+        return elements;
+    }
+    return deepBindings;
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/setChildren',[
+    '../dom',
+    './applyEvents',
+    './setBinders',
+    './deepBindings'
+], function (dom, applyEvents, setBinders, deepBindings) {
+    //Applying dom.Element to template elements.
+    //
+    //      @private applyElement
+    //      @param {Object} elements
+    function applyElement(elements) {
+        Object.keys(elements).forEach(function (key) {
+            if (elements[key] instanceof  dom.Element !== true) {
+                elements[key] = new dom.Element(elements[key]);
+            }
+            if (elements[key].children) {
+                elements[key].children = applyElement(elements[key].children);
+            }
+        }.bind(this));
+        return elements;
+    }
+
+    function setChildren(elements, parentChildren) {
+        parentChildren = (parentChildren) ? applyElement(parentChildren) : {};
+        elements = (elements) ? applyElement(elements) : {};
+        Object.keys(elements).forEach(function (key) {
+            var children = elements[key].children;
+            if (children !== undefined) {
+                children = setChildren.call(this, children, parentChildren.children);
+                elements[key].bindings = setBinders(children);
+            }
+
+            var child = elements[key],
+                parentChild = parentChildren[key];
+
+            if (parentChild !== undefined) {
+                if (parentChild.children !== undefined) {
+                    parentChild.bindings = deepBindings(parentChild.children);
+                }
+
+                if (this.nodes[key] !== undefined) {
+                    this.nodes[key].call(this, child, parentChild);
+                } else if (child !== undefined) {
+                    child.replace(parentChild);
+                    if (parentChild.children !== undefined) {
+                        child.children = parentChild.children
+                    }
+                }
+
+            } else if (this.nodes[key] !== undefined && child.data.tplSet.noattach === 'true') {
+                this.nodes[key].call(this, child);
+            }
+
+            if (this.elReady[key] !== undefined && child.el !== undefined) {
+                this.elReady[key].call(this, child);
+            }
+
+            var events = this.events[key];
+            applyEvents.call(this, child, events);
+
+        }.bind(this));
+        return elements
+    }
+
+    return setChildren;
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/applyBinders',[
+    '../dom',
+    '../utils',
+    'watch',
+    './applyEvents',
+    './applyAttribute'
+], function (dom, utils, WatchJS, applyEvents, applyAttribute) {
+    var watch = WatchJS.watch,
+        unwatch = WatchJS.unwatch,
+        callWatchers = WatchJS.callWatchers;
+
+    function applyBinders(obj, instance) {
+        var binders = instance.bindings,
+            parent = instance.el;
+        if (obj) {
+            Object.keys(obj).forEach(function (key) {
+                if (binders !== undefined && binders[key] !== undefined) {
+
+                    var parseBinder = function (binder) {
+                        var events = this.events[binder.name];
+                        if (binder !== undefined) {
+                            var data = obj[key];
+                            binder.applyAttach();
+
+                            if (this.nodes[key]) {
+                                var childBinder = new dom.Element(binder);
+                                this.nodes[key].call(this, childBinder, parent, data);
+                            } else {
+                                if (!utils.isArray(data) && !utils.isObject(data)) {
+                                    var childBinder = new dom.Element(binder);
+                                    childBinder.add(parent);
+                                    childBinder.text(data);
+                                    if (this.elReady[childBinder.name] !== undefined) {
+                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    }
+                                    if (childBinder.data.tplSet.update === 'true') {
+                                        watch(obj, key, function () {
+                                            childBinder.text(obj[key]);
+                                        }.bind(this));
+                                    }
+                                    applyEvents.call(this, childBinder, events, data);
+                                } else if (utils.isArray(data)) {
+                                    binder.applyAttach();
+
+                                    var updateChildren = function () {
+                                        var hasParent = false,
+                                            bindedData = [],
+                                            addItem = function (item) {
+                                                var childBinder = new dom.Element(binder);
+
+                                                if (!hasParent) {
+                                                    childBinder.add(parent);
+                                                    hasParent = binder.getParent();
+                                                } else {
+                                                    childBinder.add(parent, hasParent);
+                                                }
+
+                                                if (this.elReady[childBinder.name]) {
+                                                    this.elReady[childBinder.name].call(this, childBinder, item);
+                                                }
+
+                                                applyAttribute.call(this, childBinder, item);
+                                                applyBinders.call(this, item, childBinder);
+                                                applyEvents.call(this, childBinder, events, item);
+                                                bindedData.push({binder: childBinder, data: item});
+                                            };
+                                        data.forEach(addItem.bind(this));
+                                        var update = binder.data.tplSet.update;
+                                        if (update === 'true') {
+                                            var methodNames = ['pop', 'shift', 'splice'];
+                                            watch(obj, key, function (prop, action, newvalue, oldvalue) {
+                                                if (oldvalue === undefined && action == 'push') {
+                                                    addItem.call(this, newvalue[0]);
+                                                } else if (methodNames.indexOf(action) !== -1) {
+                                                    bindedData.forEach(function (binder, index) {
+                                                        if (obj[key].indexOf(binder.data) === -1) {
+                                                            binder.binder.remove();
+                                                            bindedData.splice(index, 1);
+                                                        }
+                                                    }.bind(this));
+                                                }
+                                            }.bind(this));
+                                        }
+                                    }
+
+                                    updateChildren.call(this);
+
+                                } else if (utils.isObject(data)) {
+                                    var childBinder = new dom.Element(binder);
+                                    childBinder.add(parent);
+                                    if (this.elReady[childBinder.name]) {
+                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    }
+                                    applyEvents.call(this, childBinder, events, data);
+                                    if (binder.data.type === 'cp') {
+                                        childBinder.replace(binder, data);
+                                    }
+                                    else if (!childBinder.data.tplSet.bind) {
+                                        applyBinders.call(this, data, childBinder);
+                                    } else {
+                                        applyAttribute.call(this, childBinder, data);
+                                    }
+                                }
+                            }
+                        }
+
+                    };
+                    //TODO: Investigate, why not always an Array
+                    if (binders[key].forEach !== undefined) {
+                        binders[key].forEach(parseBinder.bind(this));
+                    } else {
+                        parseBinder.call(this, binders[key])
+                    }
+                }
+            }.bind(this));
+        }
+    }
+
+    return applyBinders;
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/setRoutes',[],function () {
+
+    function destroyComponent(cp) {
+        if (cp.data.instance) {
+            delete cp.data.instance;
+        }
+        if (cp.el) {
+            cp.el.remove();
+            delete cp.el;
+        }
+    }
+
+    function applyToChildren(children, cb) {
+        if (children !== undefined) {
+            Object.keys(children).forEach(function (name) {
+                var cp = children[name];
+                cb.call(this, cp, cp.data.instance);
+            }.bind(this));
+        }
+    }
+
+    function matchRoute(children, match, parent) {
+        var names = Object.keys(children);
+        names.forEach(function (name) {
+            var child = children[name];
+            var route = child.data.route;
+            if (route !== undefined && child.data.type !== 'cp') {
+                var matches = match(route, function (match) {
+                    if (child.children !== undefined) {
+                        matchRoute.call(this, child.children, match, parent);
+                    }
+                }.bind(this));
+                matches.to(function () {
+                    var args = [].slice.call(arguments, 0);
+                    var params = args.pop();
+                    if (args.length > 0) {
+                        var id = args.join('_');
+                    }
+
+                    if (child.el !== undefined && child.sessId !== id && id !== undefined) {
+                        applyToChildren.call(this, child.children, destroyComponent);
+                        destroyComponent(child);
+                    }
+
+                    applyToChildren.call(this, child.children, function (cp, instance) {
+                        var data = cp.data,
+                            dataSet = data.dataset;
+
+                        dataSet.params = params;
+
+                        if (args.length > 0) {
+                            dataSet.link = args;
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, args.concat(params));
+
+                            }
+                        }
+
+                    });
+
+                    if (child.el === undefined) {
+                        child.applyAttach();
+                        child.add(parent, false);
+
+                        applyToChildren.call(this, child.children, function (cp, instance) {
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, args.concat(params));
+                            }
+
+                            if (!cp.el && instance && instance._match) {
+                                matches.setRoutes(function (routes) {
+                                    instance._match.call(instance, routes.match.bind(routes));
+                                    routes.run();
+                                }.bind(this));
+
+                                instance._reRoute = function(){
+                                    instance._applyRoutes(matches);
+                                };
+                            }
+                        });
+                        if (id) {
+                            child.sessId = id;
+                        }
+
+                    } else {
+                        child.attach();
+                    }
+                }.bind(this));
+                matches.leave(function () {
+                    applyToChildren.call(this, child.children, function (cp, instance) {
+                        if (instance && instance.leave !== undefined) {
+                            instance.leave();
+                        }
+                    }.bind(this));
+                    child.detach();
+                }.bind(this));
+
+                matches.query(function (params) {
+                    applyToChildren.call(this, child.children, function (cp, instance) {
+                        if (instance && instance.query !== undefined) {
+                            instance.query(params);
+                        }
+                    }.bind(this));
+                }.bind(this));
+
+            } else if (child.children !== undefined && child.data.type !== 'cp') {
+                matchRoute.call(this, child.children, match, parent);
+            } else if (child.data.type === 'cp' && child.data.instance) {
+                var instance = child.data.instance;
+                instance._match.call(instance, match);
+            }
+
+        }.bind(this));
+    }
+
+    function setRoutes(children) {
+        if (!this._match) {
+            var parent = this.el;
+            this._match = function (match) {
+                matchRoute.call(this, children, match, parent);
+                if (this.match) {
+                    this.match.call(this, match);
+                }
+            }.bind(this)
+        }
+    };
+
+    return setRoutes;
+});
+/**
+ * Created by guntars on 10/10/2014.
+ */
+/*globals define*/
+//## widget/Constructor Class
+// This is App Presenter class parse data, and apply to template. Also binding events to Element.
+// Basic Usage example
+//
+//      define([
+//          'templating/parser!widget.html',
+//          'widget/Constructor'
+//      ], function (template, Constructor) {
+//          var Widget = Constructor.extend({
+//              template: template
+//          });
+//          return Widget;
+//      });
+define('widget/Constructor',[
+    './dom',
+    './utils',
+    './mediator',
+    'templating/Decoder',
+    './parsers/applyAttribute',
+    './parsers/setChildren',
+    './parsers/applyBinders',
+    './parsers/setBinders',
+    './parsers/setRoutes',
+    './parsers/applyEvents'
+], function (dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
+    
+    var context = {};
+
+    // Constructor Class
+    //
+    //      @Constructor
+    //      @param {Object} data
+    //      @param {Object} children
+    //      @param {Object} dataSet
+    function Constructor(data, children, dataSet) {
+        this._routes = [];
+        this.children = {};
+        this.eventBus = new Mediator();
+        this.context = context;
+        if (data.appContext !== undefined) {
+            utils.extend(this.context, data.appContext);
+        }
+        this.beforeInit.apply(this, arguments);
+
+        if (this.template) {
+            var keys = (dataSet) ? Object.keys(dataSet) : [];
+            this.data = (keys.length > 0) ? dataSet : this.context.data[data.bind];
+
+            var decoder = new Decoder(this.template),
+                template = decoder.render(this.data);
+            this.el = template.fragment;
+
+            this.children = utils.extend(setChildren.call(this, template.children, children), this.children);
+
+            this.bindings = setBinders.call(this, this.children);
+            this.routes = setRoutes.call(this, this.children);
+
+            if (this.data) {
+                this.applyBinders(this.data, this);
+            }
+
+        } else {
+
+            this.el = document.createElement('div');
+        }
+
+        this.init.apply(this, arguments);
+    }
+
+    utils.extend(Constructor.prototype, {
+        // `nodes` Object override default methods to Elements.
+        // Usage Example
+        //
+        //      nodes: {
+        //          listItem: function (el, parent, data) {
+        //              el.add(parent);
+        //              el.text(data);
+        //          }
+        //      }
+        nodes: {},
+
+        // `events` Object applying events to elements
+        // You can apply more than one event on element
+        // Usage Example
+        //
+        //      events: {
+        //          delete: [
+        //              {
+        //                  name: 'click',
+        //                  action: function () {
+        //                      this.data.remove = true
+        //                      this.destroy();
+        //                  }
+        //              }
+        //          ]
+        events: {},
+        // Applying extra methods to Element
+        // Usage Example
+        //
+        //      elReady: {
+        //          links: function (el, data) {
+        //              if(data.class==='active'){
+        //                  el.addClass('active');
+        //              }
+        //          }
+        //      },
+        elReady: {},
+        // Running when Constructor is initialised
+        //
+        //      @method init
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        init: function (data, children, dataSet) {
+        },
+        // Running before Constructor is initialised
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        beforeInit: function (data, children, dataSet) {
+        },
+        // Applying Binders manually, if use nodes function
+        //
+        //      @method applyBinders
+        applyBinders: applyBinders,
+        //Removing widget from Dom
+        //
+        //      @method destroy
+        destroy: function () {
+            this.el.remove();
+        },
+        setRoutes: function (instance) {
+            if (instance !== undefined) {
+                this._routes.push(instance);
+            }
+        },
+        _applyRoutes: function (matches) {
+            while (this._routes.length > 0) {
+                var instance = this._routes[0];
+                if (instance && instance._match) {
+                    matches.setRoutes(function (routes) {
+                        instance._match.call(instance, routes.match.bind(routes));
+                        routes.run();
+                    }.bind(this));
+                }
+                this._routes.shift();
+            }
+            matches.rebind();
+        },
+        _reRoute: function () {
+        },
+        rebind: function () {
+            this._reRoute();
+        },
+        setChildren: function (el, data) {
+            var name = el.name;
+            if (this.children[name] !== undefined && this.children[name].el !== undefined) {
+                this.children[name].detach();
+            }
+            el.applyAttach();
+            this.children[name] = new dom.Element(el);
+
+            this.children[name].placeholder = this.el.querySelector('#' + el.id);
+            this.children[name].el = el.run(this.el, false, false, data);
+
+            if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
+                this.elReady[name].call(this, this.children[name]);
+            }
+
+            var events = this.events[name];
+            applyEvents.call(this, this.children[name], events);
+
+            var instance = this.children[name].data.instance;
+            this.setRoutes(instance);
+            this.rebind();
+        }
+    });
+
+    Constructor.extend = utils.fnExtend;
+
+    return Constructor;
+});
