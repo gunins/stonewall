@@ -72,7 +72,7 @@ module.exports = function (grunt) {
             dev: {
                 options: {
                     baseUrl: 'src',
-                    optimize: 'uglify2',
+                    optimize: 'none',
                     removeCombined: true,
                     paths: {
                         'watch': '../bower_components/watch/src/watch',
