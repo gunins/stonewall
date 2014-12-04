@@ -27,12 +27,12 @@ define([
             dom.append.apply(this, arguments);
         },
         detach: function (el) {
-            if(el.el.parentNode) {
+            if (el && el.el && el.el.parentNode) {
                 el.el.parentNode.replaceChild(el.placeholder, el.el)
             }
         },
         attach: function (el) {
-            if(el.placeholder.parentNode){
+            if (el && el.el && el.placeholder && el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
@@ -46,7 +46,9 @@ define([
         //      @param {dom.Element}
         //      @param {String} text
         text: function (node, text) {
-            node.el.innerHTML = text;
+            if (node && node.el) {
+                node.el.innerHTML = text;
+            }
         },
         // Setting Attribute in to node
         //
@@ -55,12 +57,14 @@ define([
         //      @prop {String||Object} prop
         //      @prop {String} value
         setAttribute: function (node, prop, value) {
-            if (utils.isObject(prop)) {
-                Object.keys(prop).forEach(function (key) {
-                    node.el.setAttribute(key, prop[key]);
-                }.bind(this));
-            } else {
-                node.el.setAttribute(prop, value);
+            if (node && node.el) {
+                if (utils.isObject(prop)) {
+                    Object.keys(prop).forEach(function (key) {
+                        node.el.setAttribute(key, prop[key]);
+                    }.bind(this));
+                } else {
+                    node.el.setAttribute(prop, value);
+                }
             }
         },
         // Removing Attribute from node
@@ -69,7 +73,9 @@ define([
         //      @prop {dom.Element} node
         //      @prop {String} prop
         removeAttribute: function (node, prop) {
-            node.el.removeAttribute(prop);
+            if (node && node.el) {
+                node.el.removeAttribute(prop);
+            }
         },
         // Setting css style in to node
         //
@@ -78,12 +84,14 @@ define([
         //      @prop {String||Object} prop
         //      @prop {String} value
         setStyle: function (node, prop, value) {
-            if (utils.isObject(prop)) {
-                Object.keys(prop).forEach(function (key) {
-                    node.el.style[key] = prop[key];
-                }.bind(this));
-            } else {
-                node.el.style[prop] = value;
+            if (node && node.el) {
+                if (utils.isObject(prop)) {
+                    Object.keys(prop).forEach(function (key) {
+                        node.el.style[key] = prop[key];
+                    }.bind(this));
+                } else {
+                    node.el.style[prop] = value;
+                }
             }
         },
         // Removing css style from node
@@ -92,8 +100,9 @@ define([
         //      @prop {dom.Element} node
         //      @prop {String} prop
         removeStyle: function (node, prop) {
-            delete node.el.style[prop];
-
+            if (node && node.el) {
+                delete node.el.style[prop];
+            }
         },
         // Adding class in to node
         //
@@ -101,7 +110,9 @@ define([
         //      @param {dom.Element} node
         //      @param {String} className
         addClass: function (node, className) {
-            node.el.classList.add(className);
+            if (node && node.el) {
+                node.el.classList.add(className);
+            }
         },
         // Remove class from node
         //
@@ -109,7 +120,9 @@ define([
         //      @param {dom.Element} node
         //      @param {string} className
         removeClass: function (node, className) {
-            node.el.classList.remove(className);
+            if (node && node.el) {
+                node.el.classList.remove(className);
+            }
         },
         // Setting, Getting value to input element
         //
@@ -118,11 +131,13 @@ define([
         //      @param? {String} val
         //      @return {String}
         val: function (node, val) {
-            var el = node.el;
-            if (val !== undefined) {
-                el.value = val;
-            } else {
-                return el.value;
+            if (node && node.el) {
+                var el = node.el;
+                if (val !== undefined) {
+                    el.value = val;
+                } else {
+                    return el.value;
+                }
             }
         },
         // Adding DOM Event in to Element

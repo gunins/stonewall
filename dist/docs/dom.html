@@ -177,12 +177,12 @@
             dom.append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            <span class="hljs-keyword">if</span>(el.el.parentNode) {
+            <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.el.parentNode) {
                 el.el.parentNode.replaceChild(el.placeholder, el.el)
             }
         },
         attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            <span class="hljs-keyword">if</span>(el.placeholder.parentNode){
+            <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.placeholder &amp;&amp; el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
@@ -208,7 +208,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        text: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, text)</span> </span>{
-            node.el.innerHTML = text;
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                node.el.innerHTML = text;
+            }
         },</pre></div></div>
             
         </li>
@@ -229,12 +231,14 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        setAttribute: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, prop, value)</span> </span>{
-            <span class="hljs-keyword">if</span> (utils.isObject(prop)) {
-                <span class="hljs-built_in">Object</span>.keys(prop).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-                    node.el.setAttribute(key, prop[key]);
-                }.bind(<span class="hljs-keyword">this</span>));
-            } <span class="hljs-keyword">else</span> {
-                node.el.setAttribute(prop, value);
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                <span class="hljs-keyword">if</span> (utils.isObject(prop)) {
+                    <span class="hljs-built_in">Object</span>.keys(prop).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+                        node.el.setAttribute(key, prop[key]);
+                    }.bind(<span class="hljs-keyword">this</span>));
+                } <span class="hljs-keyword">else</span> {
+                    node.el.setAttribute(prop, value);
+                }
             }
         },</pre></div></div>
             
@@ -255,7 +259,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        removeAttribute: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, prop)</span> </span>{
-            node.el.removeAttribute(prop);
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                node.el.removeAttribute(prop);
+            }
         },</pre></div></div>
             
         </li>
@@ -276,12 +282,14 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        setStyle: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, prop, value)</span> </span>{
-            <span class="hljs-keyword">if</span> (utils.isObject(prop)) {
-                <span class="hljs-built_in">Object</span>.keys(prop).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
-                    node.el.style[key] = prop[key];
-                }.bind(<span class="hljs-keyword">this</span>));
-            } <span class="hljs-keyword">else</span> {
-                node.el.style[prop] = value;
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                <span class="hljs-keyword">if</span> (utils.isObject(prop)) {
+                    <span class="hljs-built_in">Object</span>.keys(prop).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+                        node.el.style[key] = prop[key];
+                    }.bind(<span class="hljs-keyword">this</span>));
+                } <span class="hljs-keyword">else</span> {
+                    node.el.style[prop] = value;
+                }
             }
         },</pre></div></div>
             
@@ -302,8 +310,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        removeStyle: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, prop)</span> </span>{
-            <span class="hljs-keyword">delete</span> node.el.style[prop];
-
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                <span class="hljs-keyword">delete</span> node.el.style[prop];
+            }
         },</pre></div></div>
             
         </li>
@@ -323,7 +332,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        addClass: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, className)</span> </span>{
-            node.el.classList.add(className);
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                node.el.classList.add(className);
+            }
         },</pre></div></div>
             
         </li>
@@ -343,7 +354,9 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        removeClass: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, className)</span> </span>{
-            node.el.classList.remove(className);
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                node.el.classList.remove(className);
+            }
         },</pre></div></div>
             
         </li>
@@ -364,11 +377,13 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        val: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, val)</span> </span>{
-            <span class="hljs-keyword">var</span> el = node.el;
-            <span class="hljs-keyword">if</span> (val !== <span class="hljs-literal">undefined</span>) {
-                el.value = val;
-            } <span class="hljs-keyword">else</span> {
-                <span class="hljs-keyword">return</span> el.value;
+            <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
+                <span class="hljs-keyword">var</span> el = node.el;
+                <span class="hljs-keyword">if</span> (val !== <span class="hljs-literal">undefined</span>) {
+                    el.value = val;
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">return</span> el.value;
+                }
             }
         },</pre></div></div>
             
