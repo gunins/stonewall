@@ -16,7 +16,7 @@ require.config({
         'templating': '../../../node_modules/richtemplate/dev/templating',
         'htmlparser2': '../../../node_modules/richtemplate/dev/htmlparser2',
         'widget': '../../../src/widget',
-        'watch':'../../../bower_components/watch/src/watch',
+        'watch':'../../../lib/watch/src/watch',
         'd3':'../../../bower_components/d3/d3',
         'router':'../../../bower_components/urlmanager/dist/prod/router'
     }

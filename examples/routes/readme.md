@@ -49,7 +49,7 @@
             'coders': '../../../node_modules/richtemplate/dev/coders',
             'templating': '../../../node_modules/richtemplate/dev/templating',
             'widget': '../../../src/widget',
-            'watch':'../../../bower_components/watch/src/watch',
+            'watch':'../../../lib/watch/src/watch',
         }
     });
 

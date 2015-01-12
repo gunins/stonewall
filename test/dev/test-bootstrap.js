@@ -55,7 +55,7 @@ require.config({
         templating: '../../../node_modules/richtemplate/dev/templating',
         coders: '../../../node_modules/richtemplate/dev/coders',
         widget:'../../../dist/dev/widget',
-        'watch':'../../../bower_components/watch/src/watch',
+        'watch':'../../../lib/watch/src/watch',
         'router':'../../../bower_components/urlmanager/dist/prod/router'
     }
 });

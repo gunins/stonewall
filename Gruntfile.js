@@ -35,7 +35,7 @@ module.exports = function (grunt) {
         coders: '../../../node_modules/richtemplate/dev/coders',
         templating: '../../../node_modules/richtemplate/dev/templating',
         'widget': '../../../src/widget',
-        'watch': '../../../bower_components/watch/src/watch',
+        'watch': '../../../lib/watch/src/watch',
         'd3': '../../../bower_components/d3/d3',
         'router': '../../../bower_components/urlmanager/dist/prod/router'
     };
@@ -55,7 +55,7 @@ module.exports = function (grunt) {
                     optimize: 'uglify2',
                     removeCombined: true,
                     paths: {
-                        'watch': '../bower_components/watch/src/watch',
+                        'watch': '../lib/watch/src/watch',
                         'templating': '../node_modules/richtemplate/dev/templating',
                         'router': '../bower_components/urlmanager/dist/prod/router'
                     },
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
                     optimize: 'none',
                     removeCombined: true,
                     paths: {
-                        'watch': '../bower_components/watch/src/watch',
+                        'watch': '../lib/watch/src/watch',
                         'templating': '../node_modules/richtemplate/dev/templating',
                         'router': '../bower_components/urlmanager/dist/prod/router'
                     },

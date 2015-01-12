@@ -19,7 +19,7 @@ require.config({
         'templating': '../../../node_modules/richtemplate/dev/templating',
         'widget': '../../../src/widget',
         'd3':'../../../bower_components/d3/d3',
-        'watch':'../../../bower_components/watch/src/watch',
+        'watch':'../../../lib/watch/src/watch',
         'router':'../../../bower_components/urlmanager/dist/prod/router'
     }
 });
