@@ -22,7 +22,7 @@ define([
 
         },
         nodes: {
-            results: function (el) {
+            results: function (el, parent, data) {
                 this.setChildren(el, data);
             }
         }

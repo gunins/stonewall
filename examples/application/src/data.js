@@ -2,8 +2,8 @@
  * Created by guntars on 10/10/2014.
  */
 define([
-    'chartData'
-], function (chartData) {
+    'resultData'
+], function (resultData) {
     return {
         sidebar: {
             group: {
@@ -84,13 +84,9 @@ define([
                     ]
                 }
             },
-        },
-        chart: {
-            content: {
-                data: chartData
-            }
-        }
+            results:resultData
 
+        }
     }
 
 });

@@ -18,8 +18,8 @@ require.config({
         'coders': '../../../node_modules/richtemplate/dev/coders',
         'templating': '../../../node_modules/richtemplate/dev/templating',
         'widget': '../../../src/widget',
-        'watch':'../../../bower_components/watch/src/watch',
         'd3':'../../../bower_components/d3/d3',
+        'watch':'../../../bower_components/watch/src/watch',
         'router':'../../../bower_components/urlmanager/dist/prod/router'
     }
 });

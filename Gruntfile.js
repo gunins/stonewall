@@ -4,13 +4,15 @@ module.exports = function (grunt) {
             'coders/component/CpCoder',
             'coders/placeholders/plCoder',
             'coders/databind/bdCoder',
-            'coders/router/RouterCoder'
+            'coders/router/RouterCoder',
+            'coders/style/styleCoder'
         ],
         templateDecoders: [
             'coders/component/CpDecoder',
             'coders/placeholders/plDecoder',
             'coders/databind/bdDecoder',
-            'coders/router/RouterDecoder'
+            'coders/router/RouterDecoder',
+            'coders/style/styleDecoder'
         ],
         exclude: [
             'coders/component/CpCoder',
@@ -19,16 +21,19 @@ module.exports = function (grunt) {
             'coders/placeholders/plDecoder',
             'coders/databind/bdDecoder',
             'coders/databind/bdCoder',
+            'coders/router/RouterDecoder',
+            'coders/router/RouterCoder',
+            'coders/style/styleCoder',
+            'coders/style/styleDecoder',
             'widget/Constructor',
             'widget/App',
-            'templating/Decoder',
+            'templating/Decoder'
 
         ]
     }
     var appPaths = {
         coders: '../../../node_modules/richtemplate/dev/coders',
         templating: '../../../node_modules/richtemplate/dev/templating',
-        htmlparser2: '../../../node_modules/richtemplate/dev/htmlparser2',
         'widget': '../../../src/widget',
         'watch': '../../../bower_components/watch/src/watch',
         'd3': '../../../bower_components/d3/d3',
@@ -217,6 +222,30 @@ module.exports = function (grunt) {
                 ]
             }
         },
+        mocha_phantomjs: {
+            dev: {
+                options: {
+                    urls: [
+                        'http://localhost:8000/test/dev/index.html'
+                    ]
+                }
+            },
+            prod: {
+                options: {
+                    urls: [
+                        'http://localhost:8000/test/prod/index.html'
+                    ]
+                }
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8000,
+                    base: '.'
+                }
+            }
+        },
         docco: {
             debug: {
                 src: ['src/**/*.js'],
@@ -243,10 +272,15 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
+
+    grunt.loadNpmTasks('grunt-mocha-phantomjs');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+
     grunt.loadNpmTasks('grunt-docco');
     grunt.loadNpmTasks('grunt-bump');
 
-    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'docco']);
+    grunt.registerTask('test', ['connect', 'mocha_phantomjs']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'test', 'docco']);
     grunt.registerTask('publish', ['default', 'bump', 'exec:publish']);
 
 };

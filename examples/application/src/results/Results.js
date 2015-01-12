@@ -6,6 +6,6 @@ define([
     'templating/parser!./_results.html'
 ], function (Constructor, template) {
     return Constructor.extend({
-        template: template,
+        template: template
     });
 });
