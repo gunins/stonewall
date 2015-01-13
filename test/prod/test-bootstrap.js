@@ -34,26 +34,57 @@ if (Function.prototype.bind === undefined) {
         }
     })();
 }
+
+var paths = {
+    test: '../../test/prod',
+    chai: '../../node_modules/chai/chai',
+    'templating/Decoder': '../../dist/prod/loader'
+};
+
+var tests = [
+    {
+        path: ['test/basicTest'],
+        name: 'Basic',
+        config: {
+            baseUrl: '../../examples/basic/'
+        }
+    },
+    {
+        path: ['test/bindTest'],
+        name: 'BasicBind',
+        config: {
+            baseUrl: '../../examples/basicBind/'
+        }
+    }
+];
+
 require.config({
-    baseUrl: '../../examples/basic',
+    baseUrl: '../../',
     paths: {
-        test: '../../test/prod',
-        chai: "../../node_modules/chai/chai",
-        Basic:'target/Basic'
+        test: './test/prod',
+        chai: "./node_modules/chai/chai",
+        Basic: 'target/Basic',
+        BasicBind: 'target/BasicBind'
     }
 });
 
 mocha.ui('bdd');
 
-require([
-    'test/widgetTest'
-], function () {
+tests.forEach(function (test, index) {
+    test.config.context = test.name;
+    test.config.paths = paths;
+    test.config.paths[test.name] = 'target/' + test.name;
 
-    if (window.mochaPhantomJS) {
-        window.mochaPhantomJS.run();
-    }
-    else {
-        mocha.run();
-    }
+    var req = require.config(test.config);
 
+    req(test.path, function () {
+        if (index == tests.length - 1) {
+            if (window.mochaPhantomJS) {
+                window.mochaPhantomJS.run();
+            }
+            else {
+                mocha.run();
+            }
+        }
+    });
 });

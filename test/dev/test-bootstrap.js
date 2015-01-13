@@ -34,8 +34,7 @@ if (Function.prototype.bind === undefined) {
         }
     })();
 }
-require.config({
-    baseUrl: '../../examples/basic/src',
+var coders = {
     templateCoders: [
         'coders/component/CpCoder',
         'coders/placeholders/plCoder',
@@ -48,30 +47,68 @@ require.config({
         'coders/placeholders/plDecoder',
         'coders/router/RouterDecoder',
         'coders/style/styleDecoder'
-    ],
+    ]
+};
+var paths = {
+    test: '../../../test/dev',
+    chai: '../../../node_modules/chai/chai',
+    templating: '../../../node_modules/richtemplate/dev/templating',
+    coders: '../../../node_modules/richtemplate/dev/coders',
+    widget: '../../../dist/dev/widget',
+    'watch': '../../../lib/watch/src/watch',
+    'router': '../../../bower_components/urlmanager/dist/prod/router'
+}
+
+
+require.config({
+    baseUrl: '../../',
+    templateCoders: coders.templateCoders,
+    templateDecoders: coders.templateDecoders,
     paths: {
-        test: '../../../test/dev',
-        chai: '../../../node_modules/chai/chai',
-        templating: '../../../node_modules/richtemplate/dev/templating',
-        coders: '../../../node_modules/richtemplate/dev/coders',
-        widget:'../../../dist/dev/widget',
-        'watch':'../../../lib/watch/src/watch',
-        'router':'../../../bower_components/urlmanager/dist/prod/router'
+        test: './test/dev',
+        chai: './node_modules/chai/chai',
+        templating: './node_modules/richtemplate/dev/templating',
+        coders: './node_modules/richtemplate/dev/coders',
+        widget: './dist/dev/widget',
+        'watch': './lib/watch/src/watch',
+        'router': './bower_components/urlmanager/dist/prod/router'
     }
 });
-
 mocha.ui('bdd');
 
-require([
-    'test/basicTest',
-    'test/bindTest'
-], function () {
-
-    if (window.mochaPhantomJS) {
-        window.mochaPhantomJS.run();
+var tests = [
+    {
+        path: ['test/basicTest'],
+        name:'Basic',
+        config: {
+            baseUrl: '../../examples/basic/src'
+        }
+    },
+    {
+        path: ['test/bindTest'],
+        name:'BasicBind',
+        config: {
+            baseUrl: '../../examples/basicBind/src'
+        }
     }
-    else {
-        mocha.run();
-    }
+];
 
+
+tests.forEach(function (test, index) {
+    test.config.context = test.name;
+    test.config.paths = paths;
+
+    var req = require.config(test.config);
+
+    req(test.path, function () {
+        if (index == tests.length - 1) {
+            if (window.mochaPhantomJS) {
+                window.mochaPhantomJS.run();
+            }
+            else {
+                mocha.run();
+            }
+        }
+    });
 });
+
