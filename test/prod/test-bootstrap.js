@@ -39,7 +39,7 @@ require.config({
     paths: {
         test: '../../test/prod',
         chai: "../../node_modules/chai/chai",
-        App:'target/App'
+        Basic:'target/Basic'
     }
 });
 

@@ -13,7 +13,7 @@ define([
 
     app.start(container);
 
-    describe('Widget Development Tests', function () {
+    describe('Basic Data Binding test Tests', function () {
         describe('Testing app rendered structure', function () {
             it('data in context defined and available', function () {
                 expect(app.context.data).to.deep.equal({

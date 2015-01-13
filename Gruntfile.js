@@ -116,7 +116,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/basic/target",
                     paths: appPaths,
-                    name: 'App'
+                    name: 'Basic'
 
                 }
             },
@@ -131,7 +131,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/basicBind/target",
                     paths: appPaths,
-                    name: 'App'
+                    name: 'BasicBind'
 
                 }
             },

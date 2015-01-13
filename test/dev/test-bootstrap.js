@@ -63,7 +63,8 @@ require.config({
 mocha.ui('bdd');
 
 require([
-    'test/widgetTest'
+    'test/basicTest',
+    'test/bindTest'
 ], function () {
 
     if (window.mochaPhantomJS) {
