@@ -45,38 +45,26 @@ var tests = [
     {
         path: ['test/basicTest'],
         name: 'Basic',
-        config: {
-            baseUrl: '../../examples/basic/'
-        }
+        baseUrl: '../../examples/basic/'
     },
     {
         path: ['test/bindTest'],
         name: 'BasicBind',
-        config: {
-            baseUrl: '../../examples/basicBind/'
-        }
+        baseUrl: '../../examples/basicBind/'
     }
 ];
-
-require.config({
-    baseUrl: '../../',
-    paths: {
-        test: './test/prod',
-        chai: "./node_modules/chai/chai",
-        Basic: 'target/Basic',
-        BasicBind: 'target/BasicBind'
-    }
-});
 
 mocha.ui('bdd');
 
 tests.forEach(function (test, index) {
-    test.config.context = test.name;
-    test.config.paths = paths;
-    test.config.paths[test.name] = 'target/' + test.name;
+    var config = {
+        context: test.name,
+        baseUrl: test.baseUrl,
+        paths: paths
+    };
+    config.paths[test.name] = 'target/' + test.name;
 
-    var req = require.config(test.config);
-
+    var req = require.config(config);
     req(test.path, function () {
         if (index == tests.length - 1) {
             if (window.mochaPhantomJS) {

@@ -59,46 +59,36 @@ var paths = {
     'router': '../../../bower_components/urlmanager/dist/prod/router'
 }
 
-
 require.config({
-    baseUrl: '../../',
+    baseUrl: '../../node_modules/richtemplate/dev/',
     templateCoders: coders.templateCoders,
-    templateDecoders: coders.templateDecoders,
-    paths: {
-        test: './test/dev',
-        chai: './node_modules/chai/chai',
-        templating: './node_modules/richtemplate/dev/templating',
-        coders: './node_modules/richtemplate/dev/coders',
-        widget: './dist/dev/widget',
-        'watch': './lib/watch/src/watch',
-        'router': './bower_components/urlmanager/dist/prod/router'
-    }
+    templateDecoders: coders.templateDecoders
 });
+
 mocha.ui('bdd');
 
 var tests = [
     {
         path: ['test/basicTest'],
-        name:'Basic',
-        config: {
-            baseUrl: '../../examples/basic/src'
-        }
+        name: 'Basic',
+        baseUrl: '../../examples/basic/src'
     },
     {
         path: ['test/bindTest'],
-        name:'BasicBind',
-        config: {
-            baseUrl: '../../examples/basicBind/src'
-        }
+        name: 'BasicBind',
+        baseUrl: '../../examples/basicBind/src'
     }
 ];
 
-
 tests.forEach(function (test, index) {
-    test.config.context = test.name;
-    test.config.paths = paths;
 
-    var req = require.config(test.config);
+    var config = {
+        context: test.name,
+        baseUrl: test.baseUrl,
+        paths: paths
+    };
+
+    var req = require.config(config);
 
     req(test.path, function () {
         if (index == tests.length - 1) {
