@@ -1,9 +1,8 @@
 /* globals describe, it, expect, beforeEach */
 define([
-    'chai',
     'templating/Decoder',
     'BasicBind'
-], function (chai, Decoder, App) {
+], function (Decoder, App) {
     var expect, container, app;
 
     expect = chai.expect;
@@ -13,7 +12,7 @@ define([
 
     app.start(container);
 
-    describe('Basic Data Binding test Tests', function () {
+    describe('Basic Data Binding production Tests', function () {
         describe('Testing app rendered structure', function () {
             it('data in context defined and available', function () {
                 expect(app.context.data).to.deep.equal({

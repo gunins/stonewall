@@ -5,6 +5,8 @@ define([
     'widget/App',
     'widget/parser!container/Container'
 ], function (App, Container) {
+    'use strict';
+
     return App.extend({
         AppContainer: Container,
         setContext: function () {

@@ -34,11 +34,27 @@ if (Function.prototype.bind === undefined) {
         }
     })();
 }
-
+var coders = {
+    templateCoders: [
+        'coders/component/CpCoder',
+        'coders/placeholders/plCoder',
+        'coders/databind/bdCoder',
+        'coders/router/RouterCoder',
+        'coders/style/styleCoder'
+    ],
+    templateDecoders: [
+        'coders/component/CpDecoder',
+        'coders/placeholders/plDecoder',
+        'coders/databind/bdDecoder',
+        'coders/router/RouterDecoder',
+        'coders/style/styleDecoder'
+    ]
+};
 var paths = {
     test: '../../test/prod',
-    chai: '../../node_modules/chai/chai',
-    'templating/Decoder': '../../dist/prod/loader'
+    'templating/Decoder': '../../dist/prod/loader',
+    'widget/App': '../../dist/prod/loader',
+    'coders/component/CpDecoder': '../../dist/prod/loader'
 };
 
 var tests = [
@@ -60,7 +76,8 @@ tests.forEach(function (test, index) {
     var config = {
         context: test.name,
         baseUrl: test.baseUrl,
-        paths: paths
+        paths: paths,
+        templateDecoders: coders.templateDecoders
     };
     config.paths[test.name] = 'target/' + test.name;
 

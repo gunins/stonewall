@@ -1,9 +1,8 @@
 /* globals describe, it, expect, beforeEach */
 define([
-    'chai',
     'templating/Decoder',
     'BasicBind'
-], function (chai, Decoder, App) {
+], function (Decoder, App) {
     var expect, container, app;
 
     expect = chai.expect;

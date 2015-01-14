@@ -38,20 +38,20 @@ var coders = {
     templateCoders: [
         'coders/component/CpCoder',
         'coders/placeholders/plCoder',
+        'coders/databind/bdCoder',
         'coders/router/RouterCoder',
         'coders/style/styleCoder'
-
     ],
     templateDecoders: [
         'coders/component/CpDecoder',
         'coders/placeholders/plDecoder',
+        'coders/databind/bdDecoder',
         'coders/router/RouterDecoder',
         'coders/style/styleDecoder'
     ]
 };
 var paths = {
     test: '../../../test/dev',
-    chai: '../../../node_modules/chai/chai',
     templating: '../../../node_modules/richtemplate/dev/templating',
     coders: '../../../node_modules/richtemplate/dev/coders',
     widget: '../../../dist/dev/widget',
@@ -85,7 +85,9 @@ tests.forEach(function (test, index) {
     var config = {
         context: test.name,
         baseUrl: test.baseUrl,
-        paths: paths
+        paths: paths,
+        templateCoders: coders.templateCoders,
+        templateDecoders: coders.templateDecoders
     };
 
     var req = require.config(config);
