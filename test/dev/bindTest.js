@@ -8,10 +8,14 @@ define([
     expect = chai.expect;
 
     container = document.createElement('div');
-    app = new App();
+    var $container = $(container);
 
+    $container.css('opacity', 0).appendTo('body');
+
+    app = new App();
     app.start(container);
 
+    var $template = $container.children();
     describe('Basic Data Binding test Tests', function () {
         describe('Testing app rendered structure', function () {
             it('data in context defined and available', function () {
@@ -19,7 +23,6 @@ define([
                     val: {
                         items: {
                             value: 'Some Value'
-
                         },
                         list: [
                             {

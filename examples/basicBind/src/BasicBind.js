@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'widget/parser!container/Container',
+    'container/Container'
 ], function (App, Container) {
     var data = {
         val: {
@@ -27,33 +27,39 @@ define([
             ]
         }
     };
-    setTimeout(function () {
-        data.val.list.splice(0, 1);
-    }, 2000);
 
-    setTimeout(function () {
-        data.val.list.push({
-            test: {
-                value: 'Test Value New',
-                badge: 16
-            }
-        });
-    }, 3000);
-    setTimeout(function () {
-        data.val.list.push({
-            test: {
-                value: 'Test Value New2',
-                badge: 18
-            }
-        });
-    }, 4000);
+    function changeValues() {
+        setTimeout(function () {
+            data.val.list.splice(0, 1);
+        }, 2000);
 
-    setTimeout(function () {
-        data.val.list.splice(1, 1);
-    }, 5000);
+        setTimeout(function () {
+            data.val.list.push({
+                test: {
+                    value: 'Test Value New',
+                    badge: 16
+                }
+            });
+        }, 3000);
+        setTimeout(function () {
+            data.val.list.push({
+                test: {
+                    value: 'Test Value New2',
+                    badge: 18
+                }
+            });
+        }, 4000);
+
+        setTimeout(function () {
+            data.val.list.splice(1, 1);
+        }, 5000);
+    }
 
     return App.extend({
         AppContainer: Container,
+        init: function () {
+            this.context.eventBus.subscribe('changeValues', changeValues);
+        },
         setContext: function () {
             return {
                 data: data

@@ -54,7 +54,8 @@ var paths = {
     test: '../../test/prod',
     'templating/Decoder': '../../dist/prod/loader',
     'widget/App': '../../dist/prod/loader',
-    'coders/component/CpDecoder': '../../dist/prod/loader'
+    'coders/component/CpDecoder': '../../dist/prod/loader',
+    'coders/placeholders/plDecoder':'../../dist/prod/loader'
 };
 
 var tests = [
