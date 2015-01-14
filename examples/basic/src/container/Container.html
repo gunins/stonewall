@@ -1,11 +1,11 @@
 <div class="container-fluid">
     <style-less>
         p {
-            color: #c60000;
+            color: ~'rgb(198, 0, 0)';
         }
 
         .panel-heading {
-            color: #007700;
+            color: ~'rgb(0, 119, 0)';
         }
     </style-less>
     <div class="col-xs-6 col-sm-3 ">
@@ -15,7 +15,7 @@
                 <cp-val data-bind="cmp" src="widget/parser!cmp/Cmp">
                     <pl-header>Header From Parent Container</pl-header>
                     <pl-body>
-                        <p>Body From Parent Container</p>
+                        <p class="testCustom">Body From Parent Container</p>
                     </pl-body>
                 </cp-val>
             </div>

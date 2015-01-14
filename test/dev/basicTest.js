@@ -8,12 +8,15 @@ define([
     expect = chai.expect;
 
     container = document.createElement('div');
-    app = new App();
+    var $container = $(container);
 
+    $container.css('opacity', 0).appendTo('body');
+
+    app = new App();
     app.start(container);
-    var $container = $(container),
-        $template = $container.children();
-    describe('Basic App Tests', function () {
+
+    var $template = $container.children();
+    describe('Basic App Tests Dev environment', function () {
         describe('Testing app rendered structure', function () {
             it('data in context defined and available', function () {
                 var data = app.context.data;
@@ -25,34 +28,45 @@ define([
                 expect(app.appContainer.context.data).to.equal(data);
                 expect(app.el).to.equal(app.appContainer.el);
             });
-            it('Check if all Items are rendered correctly', function () {
-                expect($template).to.have.class('container-fluid');
+        });
+        describe('Test HTML and css structure rendered as expected', function () {
+            describe('Test How Container is rendered', function () {
+
+                it('Check if Root Element Items are rendered correctly', function () {
+                    expect($template).to.have.class('container-fluid');
+                });
+                it('Check if panel-heading are rendered correctly and css are applied', function () {
+                    var el = $template.find('.panel-heading');
+                    expect(el).to.have.html('Basic Example');
+                    expect(el).to.have.css('color', 'rgb(0, 119, 0)');
+                });
+                it('Check if HTML for other component are rendered correctly and css are applied', function () {
+                    var el = $template.find('.testCustom');
+                    expect(el).to.have.html('Body From Parent Container');
+                    expect(el).to.have.css('color', 'rgb(198, 0, 0)');
+                });
+            });
+            describe('Check if Component ir rendered', function () {
+
+                it('Check if paragraph are rendered correctly and css are applied', function () {
+                    var el = $template.find('.cmpP');
+                    expect(el).to.have.html('sample text');
+                    expect(el).to.have.css('color', 'rgb(45, 85, 246)');
+                });
+
+                it('Check if Header are rendered correctly, css are applied, and content taked from Container', function () {
+                    var el = $template.find('h4');
+                    expect(el).to.have.html('Header From Parent Container');
+                    expect(el).to.have.css('color', 'rgb(255, 255, 255)');
+                });
+
+                it('Check if Binder are rendered correctly, css are applied, and content taked from App data', function () {
+                    var el = $template.find('.binded');
+                    expect(el).to.have.html('Binded Item From App');
+                    expect(el).to.have.css('color', 'rgb(200, 200, 200)');
+                });
             });
         });
 
     });
 });
-
-/*
- *
-
- <div>
-     <div class="tid_14212355870340 container-fluid show">
-        <div class="tid_14212355870340 col-xs-6 col-sm-3">
-            <div class="tid_14212355870340 panel panel-default">
-                <div class="tid_14212355870340 panel-heading">Basic Example</div>
-                <div class="tid_14212355870340 panel-body">
-                    <div class="tid_14212355870722 container-fluid cmp">
-                       <h2 class="tid_14212355870722">Header From Parent Container</h2>
-                       <p class="tid_14212355870722">sample text</p>
-                      <div class="tid_14212355870722">
-                           <p class="tid_14212355870340">Body From Parent Container</p>
-                        </div>
-                        <div class="tid_14212355870722">Binded Item From App</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- </div>
- * */

@@ -1,20 +1,23 @@
 <div class="container-fluid cmp">
     <style-less>
         p {
-            color: #2d55f6;
+            color: ~'rgb(45, 85, 246)';
         }
 
-        h2 {
+        h4 {
             background: #00bffa;
             padding: 5px;
             border-radius: 10px;
             border: solid 1px #123456;
             margin: -5px -15px 10px -15px;
-            color: #FFFFFF;
+            color: ~'rgb(255, 255, 255)';
+        }
+        div{
+            color: ~'rgb(200, 200, 200)';
         }
     </style-less>
-    <pl-header tp-tag="h2"></pl-header>
-    <p>sample text</p>
+    <pl-header tp-tag="h4"></pl-header>
+    <p class="cmpP">sample text</p>
     <pl-body></pl-body>
-    <bd-item></bd-item>
+    <bd-item class="binded"></bd-item>
 </div>

@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "requirejs": "^2.1.15",
-    "richtemplate": "0.1.18",
+    "richtemplate": "0.1.19",
     "urlmanager": "^0.2.10"
   },
   "scripts": {
