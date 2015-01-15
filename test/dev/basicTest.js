@@ -33,37 +33,37 @@ define([
             describe('Test How Container is rendered', function () {
 
                 it('Check if Root Element Items are rendered correctly', function () {
-                    expect($template).to.have.class('container-fluid');
+                    expect($template).to.have.$class('container-fluid');
                 });
                 it('Check if panel-heading are rendered correctly and css are applied', function () {
                     var el = $template.find('.panel-heading');
-                    expect(el).to.have.html('Basic Example');
-                    expect(el).to.have.css('color', 'rgb(0, 119, 0)');
+                    expect(el).to.have.$html('Basic Example');
+                    expect(el).to.have.$css('color', 'rgb(0, 119, 0)');
                 });
                 it('Check if HTML for other component are rendered correctly and css are applied', function () {
                     var el = $template.find('.testCustom');
-                    expect(el).to.have.html('Body From Parent Container');
-                    expect(el).to.have.css('color', 'rgb(198, 0, 0)');
+                    expect(el).to.have.$html('Body From Parent Container');
+                    expect(el).to.have.$css('color', 'rgb(198, 0, 0)');
                 });
             });
             describe('Check if Component ir rendered', function () {
 
                 it('Check if paragraph are rendered correctly and css are applied', function () {
                     var el = $template.find('.cmpP');
-                    expect(el).to.have.html('sample text');
-                    expect(el).to.have.css('color', 'rgb(45, 85, 246)');
+                    expect(el).to.have.$html('sample text');
+                    expect(el).to.have.$css('color', 'rgb(45, 85, 246)');
                 });
 
                 it('Check if Header are rendered correctly, css are applied, and content taked from Container', function () {
                     var el = $template.find('h4');
-                    expect(el).to.have.html('Header From Parent Container');
-                    expect(el).to.have.css('color', 'rgb(255, 255, 255)');
+                    expect(el).to.have.$html('Header From Parent Container');
+                    expect(el).to.have.$css('color', 'rgb(255, 255, 255)');
                 });
 
                 it('Check if Binder are rendered correctly, css are applied, and content taked from App data', function () {
                     var el = $template.find('.binded');
-                    expect(el).to.have.html('Binded Item From App');
-                    expect(el).to.have.css('color', 'rgb(200, 200, 200)');
+                    expect(el).to.have.$html('Binded Item From App');
+                    expect(el).to.have.$css('color', 'rgb(200, 200, 200)');
                 });
             });
         });

@@ -172,7 +172,7 @@ define([
         //      @method remove
         //      @param {dom.Element}
         remove: function (el) {
-            el.el.remove();
+                el.el.remove();
         },
         // Element
         Element: Element
