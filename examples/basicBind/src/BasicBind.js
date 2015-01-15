@@ -20,6 +20,12 @@ define([
                 },
                 {
                     test: {
+                        value: 'Test Inner',
+                        badge: 14
+                    }
+                },
+                {
+                    test: {
                         value: 'Test Value1',
                         badge: 17
                     }
@@ -31,6 +37,9 @@ define([
     function changeValues() {
         setTimeout(function () {
             data.val.list.splice(0, 1);
+        }, 2000);
+        setTimeout(function () {
+            data.val.items.value = 'test Value';
         }, 2000);
 
         setTimeout(function () {

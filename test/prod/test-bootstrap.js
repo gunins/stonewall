@@ -1,96 +1,62 @@
-// PhantomJS doesn't support bind yet
-if (Function.prototype.bind === undefined) {
-    (function () {
-        var Ap = Array.prototype;
-        var slice = Ap.slice;
-        var Fp = Function.prototype;
-
-        if (!Fp.bind) {
-            // PhantomJS doesn't support Function.prototype.bind natively, so
-            // polyfill it whenever this module is required.
-            Fp.bind = function (context) {
-                var func = this;
-                var args = slice.call(arguments, 1);
-
-                function bound() {
-                    var invokedAsConstructor = func.prototype && (this instanceof func);
-                    return func.apply(
-                        // Ignore the context parameter when invoking the bound function
-                        // as a constructor. Note that this includes not only constructor
-                        // invocations using the new keyword but also calls to base class
-                        // constructors such as BaseClass.call(this, ...) or super(...).
-                        !invokedAsConstructor && context || this,
-                        args.concat(slice.call(arguments))
-                    );
-                }
-
-                // The bound function must share the .prototype of the unbound
-                // function so that any object created by one constructor will count
-                // as an instance of both constructors.
-                bound.prototype = func.prototype;
-
-                return bound;
-            };
-        }
-    })();
-}
-var coders = {
-    templateCoders: [
-        'coders/component/CpCoder',
-        'coders/placeholders/plCoder',
-        'coders/databind/bdCoder',
-        'coders/router/RouterCoder',
-        'coders/style/styleCoder'
-    ],
-    templateDecoders: [
-        'coders/component/CpDecoder',
-        'coders/placeholders/plDecoder',
-        'coders/databind/bdDecoder',
-        'coders/router/RouterDecoder',
-        'coders/style/styleDecoder'
-    ]
-};
-var paths = {
-    test: '../../test/prod',
-    'templating/Decoder': '../../dist/prod/loader',
-    'widget/App': '../../dist/prod/loader',
-    'coders/component/CpDecoder': '../../dist/prod/loader',
-    'coders/placeholders/plDecoder':'../../dist/prod/loader'
-};
-
-var tests = [
-    {
-        path: ['test/basicTest'],
-        name: 'Basic',
-        baseUrl: '../../examples/basic/'
-    },
-    {
-        path: ['test/bindTest'],
-        name: 'BasicBind',
-        baseUrl: '../../examples/basicBind/'
-    }
-];
-
-mocha.ui('bdd');
-
-tests.forEach(function (test, index) {
-    var config = {
-        context: test.name,
-        baseUrl: test.baseUrl,
-        paths: paths,
-        templateDecoders: coders.templateDecoders
+(function (window) {
+    var coders = {
+        templateCoders: [
+            'coders/component/CpCoder',
+            'coders/placeholders/plCoder',
+            'coders/databind/bdCoder',
+            'coders/router/RouterCoder',
+            'coders/style/styleCoder'
+        ],
+        templateDecoders: [
+            'coders/component/CpDecoder',
+            'coders/placeholders/plDecoder',
+            'coders/databind/bdDecoder',
+            'coders/router/RouterDecoder',
+            'coders/style/styleDecoder'
+        ]
     };
-    config.paths[test.name] = 'target/' + test.name;
+    var paths = {
+        test: '../../test/prod',
+        'templating/Decoder': '../../dist/prod/loader',
+        'widget/App': '../../dist/prod/loader',
+        'coders/component/CpDecoder': '../../dist/prod/loader',
+        'coders/placeholders/plDecoder': '../../dist/prod/loader'
+    };
 
-    var req = require.config(config);
-    req(test.path, function () {
-        if (index == tests.length - 1) {
-            if (window.mochaPhantomJS) {
-                window.mochaPhantomJS.run();
-            }
-            else {
-                mocha.run();
-            }
+    var tests = [
+        {
+            path: ['test/basicTest'],
+            name: 'Basic',
+            baseUrl: '../../examples/basic/'
+        },
+        {
+            path: ['test/bindTest'],
+            name: 'BasicBind',
+            baseUrl: '../../examples/basicBind/'
         }
+    ];
+
+    mocha.ui('bdd');
+
+    tests.forEach(function (test, index) {
+        var config = {
+            context: test.name,
+            baseUrl: test.baseUrl,
+            paths: paths,
+            templateDecoders: coders.templateDecoders
+        };
+        config.paths[test.name] = 'target/' + test.name;
+
+        var req = require.config(config);
+        req(test.path, function () {
+            if (index == tests.length - 1) {
+                if (window.mochaPhantomJS) {
+                    window.mochaPhantomJS.run();
+                }
+                else {
+                    mocha.run();
+                }
+            }
+        });
     });
-});
+})(window)
