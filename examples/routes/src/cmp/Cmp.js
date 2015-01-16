@@ -28,7 +28,7 @@ define([
             console.log('init'); //, this.el, data);
         },
         to: function (id) {
-            this.children.showid.text(id);
+            this.children.showid.text((typeof id !== 'object')?id:'Link id not dynamic');
             console.log('to', id); //, this.el, id);
         },
         leave: function () {
