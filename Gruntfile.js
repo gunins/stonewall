@@ -146,7 +146,7 @@ module.exports = function (grunt) {
                     exclude: coders.exclude,
                     dir: "examples/routes/target",
                     paths: appPaths,
-                    name: 'App'
+                    name: 'Routes'
 
                 }
             },

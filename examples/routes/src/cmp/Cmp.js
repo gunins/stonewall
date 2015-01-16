@@ -25,13 +25,14 @@ define([
     return Constructor.extend({
         template: template,
         init: function (data) {
-            console.log('init', this.el, data);
+            console.log('init'); //, this.el, data);
         },
         to: function (id) {
-            console.log('to', this.el, id);
+            this.children.showid.text(id);
+            console.log('to', id); //, this.el, id);
         },
         leave: function () {
-            console.log('leave', this.el)
+            console.log('leave'); //, this.el)
         },
         query:function (params) {
                 this.children.input.val(params.getQuery().id || '');

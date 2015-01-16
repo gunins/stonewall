@@ -42,6 +42,11 @@
             path: ['test/bindTest'],
             name: 'BasicBind',
             baseUrl: '../../examples/basicBind/src'
+        },
+        {
+            path: ['test/routesTest'],
+            name: 'Routes',
+            baseUrl: '../../examples/routes/src'
         }
     ];
 

@@ -20,7 +20,11 @@
         'templating/Decoder': '../../dist/prod/loader',
         'widget/App': '../../dist/prod/loader',
         'coders/component/CpDecoder': '../../dist/prod/loader',
-        'coders/placeholders/plDecoder': '../../dist/prod/loader'
+        'coders/placeholders/plDecoder': '../../dist/prod/loader',
+        'coders/databind/bdDecoder': '../../dist/prod/loader',
+        'coders/router/RouterDecoder': '../../dist/prod/loader',
+        'coders/style/styleDecoder': '../../dist/prod/loader',
+        'widget/Constructor': '../../dist/prod/loader'
     };
 
     var tests = [
@@ -33,6 +37,11 @@
             path: ['test/bindTest'],
             name: 'BasicBind',
             baseUrl: '../../examples/basicBind/'
+        },
+        {
+            path: ['test/routesTest'],
+            name: 'Routes',
+            baseUrl: '../../examples/routes/'
         }
     ];
 
