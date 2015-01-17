@@ -311,7 +311,7 @@
             
             <div class="content"><div class='highlight'><pre>        removeStyle: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(node, prop)</span> </span>{
             <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
-                <span class="hljs-keyword">delete</span> node.el.style[prop];
+                node.el.style[prop] = <span class="hljs-string">''</span>;
             }
         },</pre></div></div>
             

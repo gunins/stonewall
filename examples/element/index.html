@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Binding Example</title>
+
+    <!-- Requirejs file -->
+    <script src="../../bower_components/requirejs/require.js"></script>
+    <!-- Configuration for requirejs -->
+    <script src="config.js"></script>
+    <!--
+        location of framework
+        data-name: location of main script for Application
+        data-target?: location to container if not set, use document.body
+    -->
+    <script src="../../src/loader.js"></script>
+    <script>
+        require(['Element'], function (element) {
+                console.log(element.render());
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

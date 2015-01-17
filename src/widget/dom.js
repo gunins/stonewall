@@ -101,7 +101,7 @@ define([
         //      @prop {String} prop
         removeStyle: function (node, prop) {
             if (node && node.el) {
-                delete node.el.style[prop];
+                node.el.style[prop] = '';
             }
         },
         // Adding class in to node

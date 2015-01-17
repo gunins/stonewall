@@ -105,6 +105,21 @@ module.exports = function (grunt) {
                     ]
                 }
             },
+            element: {
+                options: {
+                    baseUrl: 'examples/element/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: stubModules,
+                    exclude: coders.exclude,
+                    dir: "examples/element/target",
+                    paths: appPaths,
+                    name: 'Element'
+
+                }
+            },
             basic: {
                 options: {
                     baseUrl: 'examples/basic/src',

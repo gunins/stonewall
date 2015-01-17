@@ -20,6 +20,8 @@
         templating: '../../../node_modules/richtemplate/dev/templating',
         coders: '../../../node_modules/richtemplate/dev/coders',
         widget: '../../../dist/dev/widget',
+        'widget/dom': '../../../dist/dev/widget/Constructor',
+        'widget/utils': '../../../dist/dev/widget/App',
         'watch': '../../../lib/watch/src/watch',
         'router': '../../../bower_components/urlmanager/dist/prod/router'
     }
@@ -47,6 +49,11 @@
             path: ['test/routesTest'],
             name: 'Routes',
             baseUrl: '../../examples/routes/src'
+        },
+        {
+            path: ['test/elementTest'],
+            name: 'Element',
+            baseUrl: '../../examples/element/src'
         }
     ];
 
@@ -64,12 +71,15 @@
 
         req(test.path, function () {
             if (index == tests.length - 1) {
-                if (window.mochaPhantomJS) {
-                    window.mochaPhantomJS.run();
-                }
-                else {
-                    mocha.run();
-                }
+                //setTimeout(function () {
+
+                    if (window.mochaPhantomJS) {
+                        window.mochaPhantomJS.run();
+                    }
+                    else {
+                        mocha.run();
+                    }
+                //}, 100);
             }
         });
     });
