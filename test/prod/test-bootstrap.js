@@ -24,7 +24,8 @@
         'coders/databind/bdDecoder': '../../dist/prod/loader',
         'coders/router/RouterDecoder': '../../dist/prod/loader',
         'coders/style/styleDecoder': '../../dist/prod/loader',
-        'widget/Constructor': '../../dist/prod/loader'
+        'widget/Constructor': '../../dist/prod/loader',
+        'widget/dom': '../../dist/prod/loader'
     };
 
     var tests = [
@@ -42,7 +43,13 @@
             path: ['test/routesTest'],
             name: 'Routes',
             baseUrl: '../../examples/routes/'
+        },
+        {
+            path: ['test/elementTest'],
+            name: 'Element',
+            baseUrl: '../../examples/element/'
         }
+
     ];
 
     mocha.ui('bdd');

@@ -16,10 +16,10 @@
         ]
     };
     var paths = {
-        test: '../../../test/dev',
-        templating: '../../../node_modules/richtemplate/dev/templating',
-        coders: '../../../node_modules/richtemplate/dev/coders',
-        widget: '../../../dist/dev/widget',
+        'test': '../../../test/dev',
+        'templating': '../../../node_modules/richtemplate/dev/templating',
+        'coders': '../../../node_modules/richtemplate/dev/coders',
+        'widget': '../../../dist/dev/widget',
         'widget/dom': '../../../dist/dev/widget/Constructor',
         'widget/utils': '../../../dist/dev/widget/App',
         'watch': '../../../lib/watch/src/watch',
@@ -71,15 +71,13 @@
 
         req(test.path, function () {
             if (index == tests.length - 1) {
-                //setTimeout(function () {
 
-                    if (window.mochaPhantomJS) {
-                        window.mochaPhantomJS.run();
-                    }
-                    else {
-                        mocha.run();
-                    }
-                //}, 100);
+                if (window.mochaPhantomJS) {
+                    window.mochaPhantomJS.run();
+                }
+                else {
+                    mocha.run();
+                }
             }
         });
     });
