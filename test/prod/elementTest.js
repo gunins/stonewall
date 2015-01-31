@@ -119,12 +119,13 @@ define([
                     expect(a).to.equal(10);
                 });
                 simulatedEvent(el.el, {type: 'click'});
+
                 evt.remove();
                 simulatedEvent(el.el, {type: 'click'});
                 setTimeout(function () {
                     expect(a).to.equal(10);
                     done();
-                }, 50);
+                }, 200);
 
             });
             it('Testing method "remove"', function () {

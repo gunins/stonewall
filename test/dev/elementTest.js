@@ -125,7 +125,7 @@ define([
                 setTimeout(function () {
                     expect(a).to.equal(10);
                     done();
-                }, 50);
+                }, 200);
 
             });
             it('Testing method "remove"', function () {
