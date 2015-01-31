@@ -9,7 +9,6 @@ define([
 
     instance = element.render();
 
-
     container = document.createElement('div');
     var $container = $(container);
 
@@ -104,28 +103,28 @@ define([
             });
             it('Testing method "on"', function (done) {
                 var a = 5;
-                var evt  = el.on('click', function(e){
+                var evt = el.on('click', function (e) {
                     a = 10
                     expect(a).to.equal(10);
                     evt.remove();
                     done()
                 });
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
             });
 
             it('Testing method "on" remove()', function (done) {
                 var a = 5;
-                var evt = el.on('click', function(e){
+                var evt = el.on('click', function (e) {
                     a += 5;
                     expect(a).to.equal(10);
                 });
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
                 evt.remove();
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
                 setTimeout(function () {
                     expect(a).to.equal(10);
                     done();
-                },100);
+                }, 50);
 
             });
             it('Testing method "remove"', function () {
