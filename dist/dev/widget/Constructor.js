@@ -5,6 +5,11 @@
 define('widget/dom',[
     './utils'
 ], function (utils) {
+    function createPlaceholder(tag){
+        var placeholder = document.createElement(tag || 'div');
+        placeholder.setAttribute('style', 'display:none;');
+        return placeholder;
+    }
     var dom = {
         // Method to attach to DOM
         //
@@ -13,7 +18,7 @@ define('widget/dom',[
         //      @param {dom.Element} child
         //      @param {Object} data
         append: function (parent, child, data) {
-            child.placeholder = parent.el.querySelector('#' + child.id);
+            child.placeholder = parent.el.querySelector('#' + child.id) || createPlaceholder(child.data.tag);
             child.el = child.run(parent.el, true, false, data);
         },
         // Replacing element in to DOM
@@ -27,17 +32,24 @@ define('widget/dom',[
             dom.append.apply(this, arguments);
         },
         detach: function (el) {
+            if (el.placeholder instanceof HTMLElement === false) {
+                el.placeholder = createPlaceholder(el.data.tag);
+            }
+
             if (el && el.el && el.el.parentNode) {
                 el.el.parentNode.replaceChild(el.placeholder, el.el)
             }
         },
         attach: function (el) {
+            if (el.placeholder instanceof HTMLElement === false) {
+                el.placeholder = createPlaceholder(el.data.tag);
+            }
             if (el && el.el && el.placeholder && el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
         add: function (el, fragment, parent, data) {
-            el.placeholder = fragment.querySelector('#' + el.id);
+            el.placeholder = fragment.querySelector('#' + el.id) || createPlaceholder(el.data.tag);
             el.el = el.run(fragment, false, parent, data);
         },
         // Adding text in to node
@@ -172,7 +184,7 @@ define('widget/dom',[
         //      @method remove
         //      @param {dom.Element}
         remove: function (el) {
-                el.el.remove();
+            el.el.remove();
         },
         // Element
         Element: Element

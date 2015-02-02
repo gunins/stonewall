@@ -4,11 +4,10 @@ define([
 ], function (dom, element) {
     'use strict';
 
-    var expect, container, el, input, target, instance;
+    var expect, container, el, input, child, childContainer, instance;
     expect = chai.expect;
 
     instance = element.render();
-
 
     container = document.createElement('div');
     var $container = $(container);
@@ -21,11 +20,32 @@ define([
                 container.appendChild(instance.fragment);
 
                 el = new dom.Element(instance.children.element);
+                childContainer = new dom.Element(instance.children.childcontainer);
+                child = new dom.Element(instance.children.child);
+                child.applyAttach();
                 input = new dom.Element(instance.children.input);
 
             });
-            it('Testing method "append"');
-            it('Testing method "replace"');
+            it('Testing method "add"', function () {
+                child.add(container);
+                var $child = $(child.el);
+                $child.children().removeAttr('class');
+                expect($(instance.fragment).find('.childElement')).to.have.$class('childElement');
+                expect($(instance.fragment).find('.childElement')).to.have.$html('<span>Child Content</span>');
+            });
+
+            it('Testing method "append"', function () {
+                childContainer.append(child);
+                var $child = $(childContainer.el).children();
+                $child.removeAttr('class');
+                expect($(childContainer.el)).to.have.$html('<span>Child Content</span>');
+            });
+            it('Testing method "replace"', function () {
+                childContainer.replace(child);
+                var $child = $(childContainer.el).children();
+                $child.removeAttr('class');
+                expect($(childContainer.el)).to.have.$html('<span>Child Content</span>');
+            });
             it('Testing method "text"', function () {
                 var str = 'Some crazy Text';
                 var str2 = 'Some other Crazy';
@@ -37,9 +57,13 @@ define([
                 expect($container).not.to.contain.$text(str);
 
             });
-            it('Testing method "add"');
-            it('Testing method "detach"');
-            it('Testing method "attach"');
+            it('Testing method "detach" and "attach"', function () {
+                expect($container.find('.testElement').length).to.equal(1);
+                el.detach();
+                expect($container.find('.testElement').length).to.equal(0);
+                el.attach();
+                expect($container.find('.testElement').length).to.equal(1);
+            });
             it('Testing method "setAttribute"', function () {
                 el.setAttribute('data-test', 'test');
                 el.setAttribute({'data-testa': 'testa'});
@@ -104,24 +128,24 @@ define([
             });
             it('Testing method "on"', function (done) {
                 var a = 5;
-                var evt  = el.on('click', function(e){
+                var evt = el.on('click', function (e) {
                     a = 10
                     expect(a).to.equal(10);
                     evt.remove();
                     done()
                 });
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
             });
 
             it('Testing method "on" remove()', function (done) {
                 var a = 5;
-                var evt = el.on('click', function(e){
+                var evt = el.on('click', function (e) {
                     a += 5;
                     expect(a).to.equal(10);
                 });
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
                 evt.remove();
-                simulatedEvent(el.el, {type:'click'});
+                simulatedEvent(el.el, {type: 'click'});
                 setTimeout(function () {
                     expect(a).to.equal(10);
                     done();

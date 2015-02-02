@@ -131,6 +131,11 @@
             <div class="content"><div class='highlight'><pre>define([
     <span class="hljs-string">'./utils'</span>
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(utils)</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createPlaceholder</span><span class="hljs-params">(tag)</span></span>{
+        <span class="hljs-keyword">var</span> placeholder = <span class="hljs-built_in">document</span>.createElement(tag || <span class="hljs-string">'div'</span>);
+        placeholder.setAttribute(<span class="hljs-string">'style'</span>, <span class="hljs-string">'display:none;'</span>);
+        <span class="hljs-keyword">return</span> placeholder;
+    }
     <span class="hljs-keyword">var</span> dom = {</pre></div></div>
             
         </li>
@@ -151,7 +156,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
-            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child.id);
+            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child.id) || createPlaceholder(child.data.tag);
             child.el = child.run(parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
         },</pre></div></div>
             
@@ -177,17 +182,24 @@
             dom.append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
+            <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
+                el.placeholder = createPlaceholder(el.data.tag);
+            }
+
             <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.el.parentNode) {
                 el.el.parentNode.replaceChild(el.placeholder, el.el)
             }
         },
         attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
+            <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
+                el.placeholder = createPlaceholder(el.data.tag);
+            }
             <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.placeholder &amp;&amp; el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
         add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent, data)</span> </span>{
-            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id);
+            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id) || createPlaceholder(el.data.tag);
             el.el = el.run(fragment, <span class="hljs-literal">false</span>, parent, data);
         },</pre></div></div>
             
@@ -442,7 +454,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-                el.el.remove();
+            el.el.remove();
         },</pre></div></div>
             
         </li>
