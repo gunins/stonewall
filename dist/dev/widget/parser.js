@@ -35,7 +35,7 @@ define('widget/parser',[],function () {
                 ], function (template) {
                     template;
                     onLoad();
-                })
+                });
                 return;
             }
             req([

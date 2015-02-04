@@ -10,7 +10,7 @@ define(function () {
             var el = children[key];
             if (el.bind !== undefined) {
                 bindings[el.bind] = bindings[el.bind] || []
-                bindings[el.bind].push(el)
+                bindings[el.bind].push(el);
             }
         }.bind(this));
         return bindings;

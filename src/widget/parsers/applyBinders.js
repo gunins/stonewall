@@ -26,11 +26,11 @@ define([
                             binder.applyAttach();
 
                             if (this.nodes[key]) {
-                                var childBinder = new dom.Element(binder);
+                                var childBinder = binder.clone();
                                 this.nodes[key].call(this, childBinder, parent, data);
                             } else {
                                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                                    var childBinder = new dom.Element(binder);
+                                    var childBinder = binder.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
                                     if (this.elReady[childBinder.name] !== undefined) {
@@ -49,7 +49,8 @@ define([
                                         var hasParent = false,
                                             bindedData = [],
                                             addItem = function (item) {
-                                                var childBinder = new dom.Element(binder);
+
+                                                var childBinder = binder.clone();
 
                                                 if (!hasParent) {
                                                     childBinder.add(parent);
@@ -89,7 +90,7 @@ define([
                                     updateChildren.call(this);
 
                                 } else if (utils.isObject(data)) {
-                                    var childBinder = new dom.Element(binder);
+                                    var childBinder = binder.clone();
                                     childBinder.add(parent);
                                     if (this.elReady[childBinder.name]) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);

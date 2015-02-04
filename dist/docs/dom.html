@@ -131,11 +131,12 @@
             <div class="content"><div class='highlight'><pre>define([
     <span class="hljs-string">'./utils'</span>
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(utils)</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createPlaceholder</span><span class="hljs-params">(tag)</span></span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createPlaceholder</span><span class="hljs-params">(tag)</span> </span>{
         <span class="hljs-keyword">var</span> placeholder = <span class="hljs-built_in">document</span>.createElement(tag || <span class="hljs-string">'div'</span>);
         placeholder.setAttribute(<span class="hljs-string">'style'</span>, <span class="hljs-string">'display:none;'</span>);
         <span class="hljs-keyword">return</span> placeholder;
     }
+
     <span class="hljs-keyword">var</span> dom = {</pre></div></div>
             
         </li>
@@ -155,9 +156,9 @@
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
             child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child.id) || createPlaceholder(child.data.tag);
-            child.el = child.run(parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
+            child.el = child.run.call(child, parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
         },</pre></div></div>
             
         </li>
@@ -179,7 +180,7 @@
             
             <div class="content"><div class='highlight'><pre>        replace: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
             parent.el.innerHTML = <span class="hljs-string">''</span>;
-            dom.append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+            dom._append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
@@ -198,10 +199,7 @@
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
-        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent, data)</span> </span>{
-            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id) || createPlaceholder(el.data.tag);
-            el.el = el.run(fragment, <span class="hljs-literal">false</span>, parent, data);
-        },</pre></div></div>
+        add: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, fragment, parent, data)</span> </span>{</pre></div></div>
             
         </li>
         
@@ -211,6 +209,23 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>console.log(fragment, parent, data);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id) || createPlaceholder(el.data.tag);
+            el.el = el.run.call(el, fragment, <span class="hljs-literal">false</span>, parent, data);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Adding text in to node</p>
 <pre><code> @method text
@@ -228,11 +243,11 @@
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Setting Attribute in to node</p>
 <pre><code> @method setAttribute
@@ -257,11 +272,11 @@
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Removing Attribute from node</p>
 <pre><code> @method removeAttribute
@@ -279,11 +294,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Setting css style in to node</p>
 <pre><code> @method setStyle
@@ -308,11 +323,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Removing css style from node</p>
 <pre><code> @method removeAttribute
@@ -330,11 +345,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Adding class in to node</p>
 <pre><code> @method addClass
@@ -352,11 +367,11 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Remove class from node</p>
 <pre><code> @method removeClass
@@ -374,11 +389,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Setting, Getting value to input element</p>
 <pre><code> @method val
@@ -402,11 +417,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Adding DOM Event in to Element</p>
 <pre><code> @method on
@@ -441,11 +456,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Remove Dom Element from Dom</p>
 <pre><code> @method remove
@@ -460,11 +475,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Element</p>
 
@@ -476,11 +491,11 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <h2 id="widget-dom-element">widget/dom.Element</h2>
 <pre><code>@method Element
@@ -489,28 +504,39 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Element</span><span class="hljs-params">(node)</span> </span>{
-        <span class="hljs-keyword">var</span> obj = utils.extend({}, node);
-        utils.extend(<span class="hljs-keyword">this</span>, obj);
+        <span class="hljs-keyword">this</span>._node = node._node;
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.el &amp;&amp; node._node.el) {
+            <span class="hljs-keyword">this</span>.el = node._node.el;
+        }
 
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.id) {
+            <span class="hljs-keyword">this</span>.id = node._node.id;
+        }
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.name) {
+            <span class="hljs-keyword">this</span>.name = node._node.name;
+        }
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.bind &amp;&amp; !<span class="hljs-keyword">this</span>.bind) {
+            <span class="hljs-keyword">this</span>.bind = node._node.bind;
+        }
+
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.data) {
+            <span class="hljs-keyword">this</span>.data = node._node.data;
+        }
+
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.children &amp;&amp; !<span class="hljs-keyword">this</span>.children) {
+            <span class="hljs-keyword">this</span>.children = node._node.children;
+        }
+
+        <span class="hljs-keyword">this</span>.run = node._node.run.bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.applyAttach = node._node.applyAttach.bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.getParent = node._node.getParent.bind(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.setParent = node._node.setParent.bind(<span class="hljs-keyword">this</span>);
     }
 
-    utils.extend(Element.prototype, {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>Shortcut to - <code>dom.append</code></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
-            dom.append(<span class="hljs-keyword">this</span>, child)
+    utils.extend(Element.prototype, {
+        clone: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">var</span> node = utils.extend({}, <span class="hljs-keyword">this</span>);
+            <span class="hljs-keyword">return</span> node;
         },</pre></div></div>
             
         </li>
@@ -521,6 +547,23 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Shortcut to - <code>dom.append</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
+            dom._append(<span class="hljs-keyword">this</span>, child)
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.replace</code></p>
 
@@ -533,11 +576,11 @@
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.text</code></p>
 
@@ -550,11 +593,11 @@
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.add</code></p>
 
@@ -573,11 +616,11 @@
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.setAttribute</code></p>
 
@@ -590,11 +633,11 @@
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeAttribute</code></p>
 
@@ -607,11 +650,11 @@
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.setStyle</code></p>
 
@@ -624,11 +667,11 @@
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeStyle</code></p>
 
@@ -641,11 +684,11 @@
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.addClass</code></p>
 
@@ -658,11 +701,11 @@
         </li>
         
         
-        <li id="section-26">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeClass</code></p>
 
@@ -675,11 +718,11 @@
         </li>
         
         
-        <li id="section-27">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.val</code></p>
 
@@ -692,11 +735,11 @@
         </li>
         
         
-        <li id="section-28">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.on</code></p>
 
@@ -710,11 +753,11 @@
         </li>
         
         
-        <li id="section-29">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.remove</code></p>
 
@@ -723,8 +766,8 @@
             <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             dom.remove(<span class="hljs-keyword">this</span>);
         }
-
     });
+
     Element.extend = utils.fnExtend;
     <span class="hljs-keyword">return</span> dom;
 });</pre></div></div>

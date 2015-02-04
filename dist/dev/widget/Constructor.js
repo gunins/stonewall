@@ -5,11 +5,12 @@
 define('widget/dom',[
     './utils'
 ], function (utils) {
-    function createPlaceholder(tag){
+    function createPlaceholder(tag) {
         var placeholder = document.createElement(tag || 'div');
         placeholder.setAttribute('style', 'display:none;');
         return placeholder;
     }
+
     var dom = {
         // Method to attach to DOM
         //
@@ -17,9 +18,9 @@ define('widget/dom',[
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        append: function (parent, child, data) {
+        _append: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child.id) || createPlaceholder(child.data.tag);
-            child.el = child.run(parent.el, true, false, data);
+            child.el = child.run.call(child, parent.el, true, false, data);
         },
         // Replacing element in to DOM
         //
@@ -29,7 +30,7 @@ define('widget/dom',[
         //      @param {Object} data
         replace: function (parent, child, data) {
             parent.el.innerHTML = '';
-            dom.append.apply(this, arguments);
+            dom._append.apply(this, arguments);
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
@@ -49,8 +50,9 @@ define('widget/dom',[
             }
         },
         add: function (el, fragment, parent, data) {
+            //console.log(fragment, parent, data);
             el.placeholder = fragment.querySelector('#' + el.id) || createPlaceholder(el.data.tag);
-            el.el = el.run(fragment, false, parent, data);
+            el.el = el.run.call(el, fragment, false, parent, data);
         },
         // Adding text in to node
         //
@@ -189,19 +191,48 @@ define('widget/dom',[
         // Element
         Element: Element
     }
+
     // ## widget/dom.Element
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var obj = utils.extend({}, node);
-        utils.extend(this, obj);
+        this._node = node._node;
+        if (!this.el && node._node.el) {
+            this.el = node._node.el;
+        }
 
+        if (!this.id) {
+            this.id = node._node.id;
+        }
+        if (!this.name) {
+            this.name = node._node.name;
+        }
+        if (this._node.bind && !this.bind) {
+            this.bind = node._node.bind;
+        }
+
+        if (!this.data) {
+            this.data = node._node.data;
+        }
+
+        if (this._node.children && !this.children) {
+            this.children = node._node.children;
+        }
+
+        this.run = node._node.run.bind(this);
+        this.applyAttach = node._node.applyAttach.bind(this);
+        this.getParent = node._node.getParent.bind(this);
+        this.setParent = node._node.setParent.bind(this);
     }
 
     utils.extend(Element.prototype, {
+        clone: function () {
+            var node = utils.extend({}, this);
+            return node;
+        },
         // Shortcut to - `dom.append`
-        append: function (child) {
-            dom.append(this, child)
+        _append: function (child) {
+            dom._append(this, child)
         },
         // Shortcut to - `dom.replace`
         replace: function (child, data) {
@@ -258,8 +289,8 @@ define('widget/dom',[
         remove: function () {
             dom.remove(this);
         }
-
     });
+
     Element.extend = utils.fnExtend;
     return dom;
 });
@@ -329,9 +360,10 @@ define('widget/dom',[
     }
 
     function setElement(placeholder, keep, parent, data) {
-        var el = this.tmpEl((keep) ? placeholder : false, data),
-            attributes = this.data.attribs,
-            plFragment = applyFragment(this.template, this.data.tag);
+        var params = this._node,
+            el = params.tmpEl((keep) ? placeholder : false, data),
+            attributes = params.data.attribs,
+            plFragment = applyFragment(params.template, params.data.tag);
 
         if (!keep) {
             Object.keys(attributes).forEach(function (key) {
@@ -347,20 +379,20 @@ define('widget/dom',[
 
         if (!parent) {
             var parentNode = placeholder.parentNode;
-            this.setParent(parentNode);
-            if (this.parent !== null || this.parent !== undefined) {
-                this.parent.replaceChild(el, placeholder);
+            params.setParent(parentNode);
+            if (params.parent !== null || params.parent !== undefined) {
+                params.parent.replaceChild(el, placeholder);
             }
         } else {
-            this.setParent(parent);
-            if (this.parent !== null) {
-                this.parent.appendChild(el);
+            params.setParent(parent);
+            if (params.parent !== null) {
+                params.parent.appendChild(el);
             }
         }
 
-        this.el = el;
-        if (this.parse !== undefined) {
-            this.parse(el);
+        this._node.el = el;
+        if (params.parse !== undefined) {
+            params.parse(el);
         }
         return el;
 
@@ -369,31 +401,43 @@ define('widget/dom',[
     function setParams(node, children, obj) {
         var tagName = node.tagName,
             self = this;
-        utils.merge(self, {
+        var params = {
             id: node.id,
             template: node.template,
             noAttach: _decoders[tagName].noAttach || node.data.tplSet.noattach,
             applyAttach: function () {
-                delete this.noAttach;
+                delete this._node.noAttach;
             },
             setParent: function (parent) {
-                this.parent = parent;
+                this._node.parent = parent;
             }.bind(self),
             getParent: function () {
-                return this.parent;
+                return this._node.parent;
             }.bind(self),
             run: function (fragment, keep, parent, data) {
-                if (this.noAttach === undefined) {
-                    var placeholder = fragment.querySelector('#' + this.id) || fragment;
+                if (this._node.noAttach === undefined) {
+                    var placeholder = fragment.querySelector('#' + this._node.id) || fragment;
                     if (placeholder) {
                         return setElement.call(self, placeholder, keep, parent, data || obj);
                     }
                 }
             }
-        });
+        };
         if (children) {
-            this.children = children;
+            params.children = children;
         }
+        self._node = self._node || {};
+        utils.merge(self._node, params);
+        self.data = self._node.data;
+
+        self.run = function () {
+            return this._node.run.apply(this, arguments)
+        }.bind(this);
+
+        self.applyAttach = function () {
+            return this._node.applyAttach.apply(this, arguments)
+        }.bind(this);
+
     }
 
     function parseElements(root, obj) {
@@ -413,10 +457,9 @@ define('widget/dom',[
                 var data = _decoders[tagName].decode(node, children, runEls);
                 if (data) {
                     var name = data.name;
-
                     if (name !== undefined) {
                         context = context || {};
-                        context[name] = data;
+                        context[name] = {_node: data};
                         setParams.call(context[name], node, children, obj[name] || obj);
                     }
                 }
@@ -428,7 +471,7 @@ define('widget/dom',[
     };
     function runEls(children, fragment) {
         Object.keys(children).forEach(function (key) {
-            children[key].run(fragment);
+            children[key]._node.run.call(children[key], fragment);
         });
     }
 
@@ -1039,7 +1082,7 @@ define('widget/parsers/setBinders',[],function () {
             var el = children[key];
             if (el.bind !== undefined) {
                 bindings[el.bind] = bindings[el.bind] || []
-                bindings[el.bind].push(el)
+                bindings[el.bind].push(el);
             }
         }.bind(this));
         return bindings;
@@ -1080,12 +1123,26 @@ define('widget/parsers/setChildren',[
     //      @param {Object} elements
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
-            if (elements[key] instanceof  dom.Element !== true) {
+            //if (elements[key].data.type === 'cp') {
+            if (elements[key].data && elements[key].data.instance) {
+                //console.log(elements[key]);
+                /*       var children = elements[key].children;
+                 var data = elements[key].data;
+                 elements[key] = elements[key].data.instance;
+                 elements[key].children = children;
+                 elements[key].data = data;*/
+            }
+            //elements[key] = elements[key].data.instance;
+            //} else {
+            if (elements[key] instanceof  dom.Element !== true &&
+                (['pl', 'cp', 'bd', 'rt'].indexOf(elements[key].data.type) !== -1)) {
                 elements[key] = new dom.Element(elements[key]);
             }
+            //console.log(elements[key]);
             if (elements[key].children) {
                 elements[key].children = applyElement(elements[key].children);
             }
+            //}
         }.bind(this));
         return elements;
     }
@@ -1162,11 +1219,11 @@ define('widget/parsers/applyBinders',[
                             binder.applyAttach();
 
                             if (this.nodes[key]) {
-                                var childBinder = new dom.Element(binder);
+                                var childBinder = binder.clone();
                                 this.nodes[key].call(this, childBinder, parent, data);
                             } else {
                                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                                    var childBinder = new dom.Element(binder);
+                                    var childBinder = binder.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
                                     if (this.elReady[childBinder.name] !== undefined) {
@@ -1185,7 +1242,8 @@ define('widget/parsers/applyBinders',[
                                         var hasParent = false,
                                             bindedData = [],
                                             addItem = function (item) {
-                                                var childBinder = new dom.Element(binder);
+
+                                                var childBinder = binder.clone();
 
                                                 if (!hasParent) {
                                                     childBinder.add(parent);
@@ -1225,7 +1283,7 @@ define('widget/parsers/applyBinders',[
                                     updateChildren.call(this);
 
                                 } else if (utils.isObject(data)) {
-                                    var childBinder = new dom.Element(binder);
+                                    var childBinder = binder.clone();
                                     childBinder.add(parent);
                                     if (this.elReady[childBinder.name]) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);

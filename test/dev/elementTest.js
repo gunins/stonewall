@@ -34,8 +34,8 @@ define([
                 expect($(instance.fragment).find('.childElement')).to.have.$html('<span>Child Content</span>');
             });
 
-            it('Testing method "append"', function () {
-                childContainer.append(child);
+            it('Testing method "_append"', function () {
+                childContainer._append(child);
                 var $child = $(childContainer.el).children();
                 $child.removeAttr('class');
                 expect($(childContainer.el)).to.have.$html('<span>Child Content</span>');

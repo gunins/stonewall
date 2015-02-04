@@ -5,11 +5,12 @@
 define([
     './utils'
 ], function (utils) {
-    function createPlaceholder(tag){
+    function createPlaceholder(tag) {
         var placeholder = document.createElement(tag || 'div');
         placeholder.setAttribute('style', 'display:none;');
         return placeholder;
     }
+
     var dom = {
         // Method to attach to DOM
         //
@@ -17,9 +18,9 @@ define([
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        append: function (parent, child, data) {
+        _append: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child.id) || createPlaceholder(child.data.tag);
-            child.el = child.run(parent.el, true, false, data);
+            child.el = child.run.call(child, parent.el, true, false, data);
         },
         // Replacing element in to DOM
         //
@@ -29,7 +30,7 @@ define([
         //      @param {Object} data
         replace: function (parent, child, data) {
             parent.el.innerHTML = '';
-            dom.append.apply(this, arguments);
+            dom._append.apply(this, arguments);
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
@@ -49,8 +50,9 @@ define([
             }
         },
         add: function (el, fragment, parent, data) {
+            //console.log(fragment, parent, data);
             el.placeholder = fragment.querySelector('#' + el.id) || createPlaceholder(el.data.tag);
-            el.el = el.run(fragment, false, parent, data);
+            el.el = el.run.call(el, fragment, false, parent, data);
         },
         // Adding text in to node
         //
@@ -189,19 +191,48 @@ define([
         // Element
         Element: Element
     }
+
     // ## widget/dom.Element
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var obj = utils.extend({}, node);
-        utils.extend(this, obj);
+        this._node = node._node;
+        if (!this.el && node._node.el) {
+            this.el = node._node.el;
+        }
 
+        if (!this.id) {
+            this.id = node._node.id;
+        }
+        if (!this.name) {
+            this.name = node._node.name;
+        }
+        if (this._node.bind && !this.bind) {
+            this.bind = node._node.bind;
+        }
+
+        if (!this.data) {
+            this.data = node._node.data;
+        }
+
+        if (this._node.children && !this.children) {
+            this.children = node._node.children;
+        }
+
+        this.run = node._node.run.bind(this);
+        this.applyAttach = node._node.applyAttach.bind(this);
+        this.getParent = node._node.getParent.bind(this);
+        this.setParent = node._node.setParent.bind(this);
     }
 
     utils.extend(Element.prototype, {
+        clone: function () {
+            var node = utils.extend({}, this);
+            return node;
+        },
         // Shortcut to - `dom.append`
-        append: function (child) {
-            dom.append(this, child)
+        _append: function (child) {
+            dom._append(this, child)
         },
         // Shortcut to - `dom.replace`
         replace: function (child, data) {
@@ -258,8 +289,8 @@ define([
         remove: function () {
             dom.remove(this);
         }
-
     });
+
     Element.extend = utils.fnExtend;
     return dom;
 });

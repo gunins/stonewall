@@ -13,12 +13,26 @@ define([
     //      @param {Object} elements
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
-            if (elements[key] instanceof  dom.Element !== true) {
+            //if (elements[key].data.type === 'cp') {
+            if (elements[key].data && elements[key].data.instance) {
+                //console.log(elements[key]);
+                /*       var children = elements[key].children;
+                 var data = elements[key].data;
+                 elements[key] = elements[key].data.instance;
+                 elements[key].children = children;
+                 elements[key].data = data;*/
+            }
+            //elements[key] = elements[key].data.instance;
+            //} else {
+            if (elements[key] instanceof  dom.Element !== true &&
+                (['pl', 'cp', 'bd', 'rt'].indexOf(elements[key].data.type) !== -1)) {
                 elements[key] = new dom.Element(elements[key]);
             }
+            //console.log(elements[key]);
             if (elements[key].children) {
                 elements[key].children = applyElement(elements[key].children);
             }
+            //}
         }.bind(this));
         return elements;
     }

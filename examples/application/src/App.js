@@ -11,9 +11,7 @@ define([
     return App.extend({
         beforeInit: function (data, children) {
             this.context.eventBus.subscribe('searchvValue', function (value) {
-
             }.bind(this));
-
         },
         init: function () {
             model(data);
