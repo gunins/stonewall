@@ -19,8 +19,12 @@ define([
         //      @param {dom.Element} child
         //      @param {Object} data
         _append: function (parent, child, data) {
-            child.placeholder = parent.el.querySelector('#' + child.id) || createPlaceholder(child.data.tag);
+            child.placeholder = parent.el.querySelector('#' + child._node.id) ||
+                                createPlaceholder(child._node.data.tag);
             child.el = child.run.call(child, parent.el, true, false, data);
+            if (child._node.data.instance) {
+                utils.extend(child, child._node.data.instance);
+            }
         },
         // Replacing element in to DOM
         //
@@ -34,7 +38,7 @@ define([
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag);
             }
 
             if (el && el.el && el.el.parentNode) {
@@ -42,17 +46,17 @@ define([
             }
         },
         attach: function (el) {
-            if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el.data.tag);
-            }
             if (el && el.el && el.placeholder && el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el.id) || createPlaceholder(el.data.tag);
+            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag);
             el.el = el.run.call(el, fragment, false, parent, data);
+            if (el._node.data.instance) {
+                utils.extend(el, el._node.data.instance);
+            }
         },
         // Adding text in to node
         //
@@ -200,29 +204,23 @@ define([
         if (!this.el && node._node.el) {
             this.el = node._node.el;
         }
-
-        if (!this.id) {
-            this.id = node._node.id;
-        }
         if (!this.name) {
             this.name = node._node.name;
         }
         if (this._node.bind && !this.bind) {
             this.bind = node._node.bind;
         }
-
-        if (!this.data) {
-            this.data = node._node.data;
+        if (!this.dataset && node._node.data && node._node.data.dataset) {
+            this.dataset = node._node.data.dataset;
         }
-
         if (this._node.children && !this.children) {
             this.children = node._node.children;
         }
-
         this.run = node._node.run.bind(this);
         this.applyAttach = node._node.applyAttach.bind(this);
         this.getParent = node._node.getParent.bind(this);
         this.setParent = node._node.setParent.bind(this);
+
     }
 
     utils.extend(Element.prototype, {

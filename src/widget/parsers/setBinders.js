@@ -8,9 +8,9 @@ define(function () {
         Object.keys(children).forEach(function (key) {
             bindings = bindings || {};
             var el = children[key];
-            if (el.bind !== undefined) {
-                bindings[el.bind] = bindings[el.bind] || []
-                bindings[el.bind].push(el);
+            if (el._node.bind !== undefined) {
+                bindings[el._node.bind] = bindings[el._node.bind] || []
+                bindings[el._node.bind].push(el);
             }
         }.bind(this));
         return bindings;

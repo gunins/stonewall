@@ -157,8 +157,12 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
-            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child.id) || createPlaceholder(child.data.tag);
+            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child._node.id) ||
+                                createPlaceholder(child._node.data.tag);
             child.el = child.run.call(child, parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
+            <span class="hljs-keyword">if</span> (child._node.data.instance) {
+                utils.extend(child, child._node.data.instance);
+            }
         },</pre></div></div>
             
         </li>
@@ -184,7 +188,7 @@
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
-                el.placeholder = createPlaceholder(el.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag);
             }
 
             <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.el.parentNode) {
@@ -192,9 +196,6 @@
             }
         },
         attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
-                el.placeholder = createPlaceholder(el.data.tag);
-            }
             <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.placeholder &amp;&amp; el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
@@ -214,8 +215,11 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el.id) || createPlaceholder(el.data.tag);
+            <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el._node.id) || createPlaceholder(el._node.data.tag);
             el.el = el.run.call(el, fragment, <span class="hljs-literal">false</span>, parent, data);
+            <span class="hljs-keyword">if</span> (el._node.data.instance) {
+                utils.extend(el, el._node.data.instance);
+            }
         },</pre></div></div>
             
         </li>
@@ -508,29 +512,23 @@
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.el &amp;&amp; node._node.el) {
             <span class="hljs-keyword">this</span>.el = node._node.el;
         }
-
-        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.id) {
-            <span class="hljs-keyword">this</span>.id = node._node.id;
-        }
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.name) {
             <span class="hljs-keyword">this</span>.name = node._node.name;
         }
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.bind &amp;&amp; !<span class="hljs-keyword">this</span>.bind) {
             <span class="hljs-keyword">this</span>.bind = node._node.bind;
         }
-
-        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.data) {
-            <span class="hljs-keyword">this</span>.data = node._node.data;
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.dataset &amp;&amp; node._node.data &amp;&amp; node._node.data.dataset) {
+            <span class="hljs-keyword">this</span>.dataset = node._node.data.dataset;
         }
-
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.children &amp;&amp; !<span class="hljs-keyword">this</span>.children) {
             <span class="hljs-keyword">this</span>.children = node._node.children;
         }
-
         <span class="hljs-keyword">this</span>.run = node._node.run.bind(<span class="hljs-keyword">this</span>);
         <span class="hljs-keyword">this</span>.applyAttach = node._node.applyAttach.bind(<span class="hljs-keyword">this</span>);
         <span class="hljs-keyword">this</span>.getParent = node._node.getParent.bind(<span class="hljs-keyword">this</span>);
         <span class="hljs-keyword">this</span>.setParent = node._node.setParent.bind(<span class="hljs-keyword">this</span>);
+
     }
 
     utils.extend(Element.prototype, {

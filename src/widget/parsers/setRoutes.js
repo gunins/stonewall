@@ -1,11 +1,13 @@
 /**
  * Created by guntars on 11/11/14.
  */
-define(function () {
+define([
+    '../dom',
+], function (dom) {
 
     function destroyComponent(cp) {
-        if (cp.data.instance) {
-            delete cp.data.instance;
+        if (cp._node.data.instance) {
+            delete cp._node.data.instance;
         }
         if (cp.el) {
             cp.el.remove();
@@ -17,7 +19,7 @@ define(function () {
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
                 var cp = children[name];
-                cb.call(this, cp, cp.data.instance);
+                cb.call(this, cp, cp._node.data.instance);
             }.bind(this));
         }
     }
@@ -26,8 +28,8 @@ define(function () {
         var names = Object.keys(children);
         names.forEach(function (name) {
             var child = children[name];
-            var route = child.data.route;
-            if (route !== undefined && child.data.type !== 'cp') {
+            var route = child._node.data.route;
+            if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches = match(route, function (match) {
                     if (child.children !== undefined) {
                         matchRoute.call(this, child.children, match, parent);
@@ -46,7 +48,7 @@ define(function () {
                     }
 
                     applyToChildren.call(this, child.children, function (cp, instance) {
-                        var data = cp.data,
+                        var data = cp._node.data,
                             dataSet = data.dataset;
 
                         dataSet.params = params;
@@ -63,7 +65,8 @@ define(function () {
 
                     if (child.el === undefined) {
                         child.applyAttach();
-                        child.add(parent, false);
+
+                        dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
@@ -76,7 +79,7 @@ define(function () {
                                     routes.run();
                                 }.bind(this));
 
-                                instance._reRoute = function(){
+                                instance._reRoute = function () {
                                     instance._applyRoutes(matches);
                                 };
                             }
@@ -86,7 +89,7 @@ define(function () {
                         }
 
                     } else {
-                        child.attach();
+                        dom.attach(child);
                     }
                 }.bind(this));
                 matches.leave(function () {
@@ -95,7 +98,7 @@ define(function () {
                             instance.leave();
                         }
                     }.bind(this));
-                    child.detach();
+                    dom.detach(child);
                 }.bind(this));
 
                 matches.query(function (params) {
@@ -106,10 +109,10 @@ define(function () {
                     }.bind(this));
                 }.bind(this));
 
-            } else if (child.children !== undefined && child.data.type !== 'cp') {
+            } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
-            } else if (child.data.type === 'cp' && child.data.instance) {
-                var instance = child.data.instance;
+            } else if (child._node.data.type === 'cp' && child._node.data.instance) {
+                var instance = child._node.data.instance;
                 instance._match.call(instance, match);
             }
 

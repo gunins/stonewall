@@ -53,9 +53,7 @@ define([
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);
             this.el = template.fragment;
-
             this.children = utils.extend(setChildren.call(this, template.children, children), this.children);
-
             this.bindings = setBinders.call(this, this.children);
             this.routes = setRoutes.call(this, this.children);
 
@@ -165,12 +163,12 @@ define([
         setChildren: function (el, data) {
             var name = el.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
-                this.children[name].detach();
+                dom.detach(this.children[name]); //.detach();
             }
             el.applyAttach();
             this.children[name] = new dom.Element(el);
 
-            this.children[name].placeholder = this.el.querySelector('#' + el.id);
+            this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
             this.children[name].el = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
@@ -180,10 +178,11 @@ define([
             var events = this.events[name];
             applyEvents.call(this, this.children[name], events);
 
-            var instance = this.children[name].data.instance;
+            var instance = this.children[name]._node.data.instance;
             this.setRoutes(instance);
             this.rebind();
         }
+
     });
 
     Constructor.extend = utils.fnExtend;

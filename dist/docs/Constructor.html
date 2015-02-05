@@ -189,9 +189,7 @@ Basic Usage example</p>
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render(<span class="hljs-keyword">this</span>.data);
             <span class="hljs-keyword">this</span>.el = template.fragment;
-
             <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children), <span class="hljs-keyword">this</span>.children);
-
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.routes = setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
@@ -384,12 +382,12 @@ Usage Example</p>
         setChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
             <span class="hljs-keyword">var</span> name = el.name;
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[name].el !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">this</span>.children[name].detach();
+                dom.detach(<span class="hljs-keyword">this</span>.children[name]); <span class="hljs-comment">//.detach();</span>
             }
             el.applyAttach();
             <span class="hljs-keyword">this</span>.children[name] = <span class="hljs-keyword">new</span> dom.Element(el);
 
-            <span class="hljs-keyword">this</span>.children[name].placeholder = <span class="hljs-keyword">this</span>.el.querySelector(<span class="hljs-string">'#'</span> + el.id);
+            <span class="hljs-keyword">this</span>.children[name].placeholder = <span class="hljs-keyword">this</span>.el.querySelector(<span class="hljs-string">'#'</span> + el._node.id);
             <span class="hljs-keyword">this</span>.children[name].el = el.run(<span class="hljs-keyword">this</span>.el, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, data);
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[name].el !== <span class="hljs-literal">undefined</span>) {
@@ -399,10 +397,11 @@ Usage Example</p>
             <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[name];
             applyEvents.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children[name], events);
 
-            <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>.children[name].data.instance;
+            <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>.children[name]._node.data.instance;
             <span class="hljs-keyword">this</span>.setRoutes(instance);
             <span class="hljs-keyword">this</span>.rebind();
         }
+
     });
 
     Constructor.extend = utils.fnExtend;

@@ -26,17 +26,17 @@ define([
                             binder.applyAttach();
 
                             if (this.nodes[key]) {
-                                var childBinder = binder.clone();
+                                var childBinder = binder;
                                 this.nodes[key].call(this, childBinder, parent, data);
                             } else {
                                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                                    var childBinder = binder.clone();
+                                    var childBinder = binder; //.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
                                     if (this.elReady[childBinder.name] !== undefined) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
-                                    if (childBinder.data.tplSet.update === 'true') {
+                                    if (childBinder._node.data.tplSet.update === 'true') {
                                         watch(obj, key, function () {
                                             childBinder.text(obj[key]);
                                         }.bind(this));
@@ -50,7 +50,7 @@ define([
                                             bindedData = [],
                                             addItem = function (item) {
 
-                                                var childBinder = binder.clone();
+                                                var childBinder =utils.extend({}, binder);//.clone();
 
                                                 if (!hasParent) {
                                                     childBinder.add(parent);
@@ -69,7 +69,7 @@ define([
                                                 bindedData.push({binder: childBinder, data: item});
                                             };
                                         data.forEach(addItem.bind(this));
-                                        var update = binder.data.tplSet.update;
+                                        var update = binder._node.data.tplSet.update;
                                         if (update === 'true') {
                                             var methodNames = ['pop', 'shift', 'splice'];
                                             watch(obj, key, function (prop, action, newvalue, oldvalue) {
@@ -90,16 +90,18 @@ define([
                                     updateChildren.call(this);
 
                                 } else if (utils.isObject(data)) {
-                                    var childBinder = binder.clone();
-                                    childBinder.add(parent);
+                                    var childBinder = binder; //.clone();
+                                    dom.add(childBinder, parent);
+                                    //childBinder.add(parent);
                                     if (this.elReady[childBinder.name]) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
                                     applyEvents.call(this, childBinder, events, data);
-                                    if (binder.data.type === 'cp') {
-                                        childBinder.replace(binder, data);
+                                    if (binder._node.data.type === 'cp') {
+                                        dom.replace(childBinder, binder, data);
+                                        //childBinder.replace(binder, data);
                                     }
-                                    else if (!childBinder.data.tplSet.bind) {
+                                    else if (!childBinder._node.data.tplSet.bind) {
                                         applyBinders.call(this, data, childBinder);
                                     } else {
                                         applyAttribute.call(this, childBinder, data);

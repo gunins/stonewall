@@ -3,36 +3,30 @@
  */
 define([
     '../dom',
+    '../utils',
     './applyEvents',
     './setBinders',
     './deepBindings'
-], function (dom, applyEvents, setBinders, deepBindings) {
+], function (dom, utils, applyEvents, setBinders, deepBindings) {
     //Applying dom.Element to template elements.
     //
     //      @private applyElement
     //      @param {Object} elements
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
-            //if (elements[key].data.type === 'cp') {
-            if (elements[key].data && elements[key].data.instance) {
-                //console.log(elements[key]);
-                /*       var children = elements[key].children;
-                 var data = elements[key].data;
-                 elements[key] = elements[key].data.instance;
-                 elements[key].children = children;
-                 elements[key].data = data;*/
-            }
-            //elements[key] = elements[key].data.instance;
-            //} else {
+
             if (elements[key] instanceof  dom.Element !== true &&
-                (['pl', 'cp', 'bd', 'rt'].indexOf(elements[key].data.type) !== -1)) {
+                (['pl', 'bd', 'rt'].indexOf(elements[key]._node.data.type) !== -1)) {
                 elements[key] = new dom.Element(elements[key]);
+            } else if (['cp'].indexOf(elements[key]._node.data.type) !== -1) {
+                if (elements[key]._node.children && !elements[key].children) {
+                    elements[key].children = elements[key]._node.children;
+                }
+                if (!elements[key].name) {
+                    elements[key].name = elements[key]._node.name;
+                }
+
             }
-            //console.log(elements[key]);
-            if (elements[key].children) {
-                elements[key].children = applyElement(elements[key].children);
-            }
-            //}
         }.bind(this));
         return elements;
     }
@@ -64,7 +58,7 @@ define([
                     }
                 }
 
-            } else if (this.nodes[key] !== undefined && child.data.tplSet.noattach === 'true') {
+            } else if (this.nodes[key] !== undefined && child._node.data.tplSet.noattach === 'true') {
                 this.nodes[key].call(this, child);
             }
 

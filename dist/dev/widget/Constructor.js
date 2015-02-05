@@ -19,8 +19,12 @@ define('widget/dom',[
         //      @param {dom.Element} child
         //      @param {Object} data
         _append: function (parent, child, data) {
-            child.placeholder = parent.el.querySelector('#' + child.id) || createPlaceholder(child.data.tag);
+            child.placeholder = parent.el.querySelector('#' + child._node.id) ||
+                                createPlaceholder(child._node.data.tag);
             child.el = child.run.call(child, parent.el, true, false, data);
+            if (child._node.data.instance) {
+                utils.extend(child, child._node.data.instance);
+            }
         },
         // Replacing element in to DOM
         //
@@ -34,7 +38,7 @@ define('widget/dom',[
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag);
             }
 
             if (el && el.el && el.el.parentNode) {
@@ -42,17 +46,17 @@ define('widget/dom',[
             }
         },
         attach: function (el) {
-            if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el.data.tag);
-            }
             if (el && el.el && el.placeholder && el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el.id) || createPlaceholder(el.data.tag);
+            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag);
             el.el = el.run.call(el, fragment, false, parent, data);
+            if (el._node.data.instance) {
+                utils.extend(el, el._node.data.instance);
+            }
         },
         // Adding text in to node
         //
@@ -200,29 +204,23 @@ define('widget/dom',[
         if (!this.el && node._node.el) {
             this.el = node._node.el;
         }
-
-        if (!this.id) {
-            this.id = node._node.id;
-        }
         if (!this.name) {
             this.name = node._node.name;
         }
         if (this._node.bind && !this.bind) {
             this.bind = node._node.bind;
         }
-
-        if (!this.data) {
-            this.data = node._node.data;
+        if (!this.dataset && node._node.data && node._node.data.dataset) {
+            this.dataset = node._node.data.dataset;
         }
-
         if (this._node.children && !this.children) {
             this.children = node._node.children;
         }
-
         this.run = node._node.run.bind(this);
         this.applyAttach = node._node.applyAttach.bind(this);
         this.getParent = node._node.getParent.bind(this);
         this.setParent = node._node.setParent.bind(this);
+
     }
 
     utils.extend(Element.prototype, {
@@ -1005,8 +1003,8 @@ define('widget/parsers/applyAttribute',[
         callWatchers = WatchJS.callWatchers;
 
     function applyAttribute(childBinder, data) {
-        var bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update;
+        var bind = childBinder._node.data.tplSet.bind,
+            update = childBinder._node.data.tplSet.update;
         if (bind) {
             Object.keys(bind).forEach(function (bindItem) {
                 var key = bind[bindItem];
@@ -1080,9 +1078,9 @@ define('widget/parsers/setBinders',[],function () {
         Object.keys(children).forEach(function (key) {
             bindings = bindings || {};
             var el = children[key];
-            if (el.bind !== undefined) {
-                bindings[el.bind] = bindings[el.bind] || []
-                bindings[el.bind].push(el);
+            if (el._node.bind !== undefined) {
+                bindings[el._node.bind] = bindings[el._node.bind] || []
+                bindings[el._node.bind].push(el);
             }
         }.bind(this));
         return bindings;
@@ -1113,36 +1111,30 @@ define('widget/parsers/deepBindings',[
  */
 define('widget/parsers/setChildren',[
     '../dom',
+    '../utils',
     './applyEvents',
     './setBinders',
     './deepBindings'
-], function (dom, applyEvents, setBinders, deepBindings) {
+], function (dom, utils, applyEvents, setBinders, deepBindings) {
     //Applying dom.Element to template elements.
     //
     //      @private applyElement
     //      @param {Object} elements
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
-            //if (elements[key].data.type === 'cp') {
-            if (elements[key].data && elements[key].data.instance) {
-                //console.log(elements[key]);
-                /*       var children = elements[key].children;
-                 var data = elements[key].data;
-                 elements[key] = elements[key].data.instance;
-                 elements[key].children = children;
-                 elements[key].data = data;*/
-            }
-            //elements[key] = elements[key].data.instance;
-            //} else {
+
             if (elements[key] instanceof  dom.Element !== true &&
-                (['pl', 'cp', 'bd', 'rt'].indexOf(elements[key].data.type) !== -1)) {
+                (['pl', 'bd', 'rt'].indexOf(elements[key]._node.data.type) !== -1)) {
                 elements[key] = new dom.Element(elements[key]);
+            } else if (['cp'].indexOf(elements[key]._node.data.type) !== -1) {
+                if (elements[key]._node.children && !elements[key].children) {
+                    elements[key].children = elements[key]._node.children;
+                }
+                if (!elements[key].name) {
+                    elements[key].name = elements[key]._node.name;
+                }
+
             }
-            //console.log(elements[key]);
-            if (elements[key].children) {
-                elements[key].children = applyElement(elements[key].children);
-            }
-            //}
         }.bind(this));
         return elements;
     }
@@ -1174,7 +1166,7 @@ define('widget/parsers/setChildren',[
                     }
                 }
 
-            } else if (this.nodes[key] !== undefined && child.data.tplSet.noattach === 'true') {
+            } else if (this.nodes[key] !== undefined && child._node.data.tplSet.noattach === 'true') {
                 this.nodes[key].call(this, child);
             }
 
@@ -1219,17 +1211,17 @@ define('widget/parsers/applyBinders',[
                             binder.applyAttach();
 
                             if (this.nodes[key]) {
-                                var childBinder = binder.clone();
+                                var childBinder = binder;
                                 this.nodes[key].call(this, childBinder, parent, data);
                             } else {
                                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                                    var childBinder = binder.clone();
+                                    var childBinder = binder; //.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
                                     if (this.elReady[childBinder.name] !== undefined) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
-                                    if (childBinder.data.tplSet.update === 'true') {
+                                    if (childBinder._node.data.tplSet.update === 'true') {
                                         watch(obj, key, function () {
                                             childBinder.text(obj[key]);
                                         }.bind(this));
@@ -1243,7 +1235,7 @@ define('widget/parsers/applyBinders',[
                                             bindedData = [],
                                             addItem = function (item) {
 
-                                                var childBinder = binder.clone();
+                                                var childBinder =utils.extend({}, binder);//.clone();
 
                                                 if (!hasParent) {
                                                     childBinder.add(parent);
@@ -1262,7 +1254,7 @@ define('widget/parsers/applyBinders',[
                                                 bindedData.push({binder: childBinder, data: item});
                                             };
                                         data.forEach(addItem.bind(this));
-                                        var update = binder.data.tplSet.update;
+                                        var update = binder._node.data.tplSet.update;
                                         if (update === 'true') {
                                             var methodNames = ['pop', 'shift', 'splice'];
                                             watch(obj, key, function (prop, action, newvalue, oldvalue) {
@@ -1283,16 +1275,18 @@ define('widget/parsers/applyBinders',[
                                     updateChildren.call(this);
 
                                 } else if (utils.isObject(data)) {
-                                    var childBinder = binder.clone();
-                                    childBinder.add(parent);
+                                    var childBinder = binder; //.clone();
+                                    dom.add(childBinder, parent);
+                                    //childBinder.add(parent);
                                     if (this.elReady[childBinder.name]) {
                                         this.elReady[childBinder.name].call(this, childBinder, data);
                                     }
                                     applyEvents.call(this, childBinder, events, data);
-                                    if (binder.data.type === 'cp') {
-                                        childBinder.replace(binder, data);
+                                    if (binder._node.data.type === 'cp') {
+                                        dom.replace(childBinder, binder, data);
+                                        //childBinder.replace(binder, data);
                                     }
-                                    else if (!childBinder.data.tplSet.bind) {
+                                    else if (!childBinder._node.data.tplSet.bind) {
                                         applyBinders.call(this, data, childBinder);
                                     } else {
                                         applyAttribute.call(this, childBinder, data);
@@ -1318,11 +1312,13 @@ define('widget/parsers/applyBinders',[
 /**
  * Created by guntars on 11/11/14.
  */
-define('widget/parsers/setRoutes',[],function () {
+define('widget/parsers/setRoutes',[
+    '../dom',
+], function (dom) {
 
     function destroyComponent(cp) {
-        if (cp.data.instance) {
-            delete cp.data.instance;
+        if (cp._node.data.instance) {
+            delete cp._node.data.instance;
         }
         if (cp.el) {
             cp.el.remove();
@@ -1334,7 +1330,7 @@ define('widget/parsers/setRoutes',[],function () {
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
                 var cp = children[name];
-                cb.call(this, cp, cp.data.instance);
+                cb.call(this, cp, cp._node.data.instance);
             }.bind(this));
         }
     }
@@ -1343,8 +1339,8 @@ define('widget/parsers/setRoutes',[],function () {
         var names = Object.keys(children);
         names.forEach(function (name) {
             var child = children[name];
-            var route = child.data.route;
-            if (route !== undefined && child.data.type !== 'cp') {
+            var route = child._node.data.route;
+            if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches = match(route, function (match) {
                     if (child.children !== undefined) {
                         matchRoute.call(this, child.children, match, parent);
@@ -1363,7 +1359,7 @@ define('widget/parsers/setRoutes',[],function () {
                     }
 
                     applyToChildren.call(this, child.children, function (cp, instance) {
-                        var data = cp.data,
+                        var data = cp._node.data,
                             dataSet = data.dataset;
 
                         dataSet.params = params;
@@ -1380,7 +1376,8 @@ define('widget/parsers/setRoutes',[],function () {
 
                     if (child.el === undefined) {
                         child.applyAttach();
-                        child.add(parent, false);
+
+                        dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
@@ -1393,7 +1390,7 @@ define('widget/parsers/setRoutes',[],function () {
                                     routes.run();
                                 }.bind(this));
 
-                                instance._reRoute = function(){
+                                instance._reRoute = function () {
                                     instance._applyRoutes(matches);
                                 };
                             }
@@ -1403,7 +1400,7 @@ define('widget/parsers/setRoutes',[],function () {
                         }
 
                     } else {
-                        child.attach();
+                        dom.attach(child);
                     }
                 }.bind(this));
                 matches.leave(function () {
@@ -1412,7 +1409,7 @@ define('widget/parsers/setRoutes',[],function () {
                             instance.leave();
                         }
                     }.bind(this));
-                    child.detach();
+                    dom.detach(child);
                 }.bind(this));
 
                 matches.query(function (params) {
@@ -1423,10 +1420,10 @@ define('widget/parsers/setRoutes',[],function () {
                     }.bind(this));
                 }.bind(this));
 
-            } else if (child.children !== undefined && child.data.type !== 'cp') {
+            } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
-            } else if (child.data.type === 'cp' && child.data.instance) {
-                var instance = child.data.instance;
+            } else if (child._node.data.type === 'cp' && child._node.data.instance) {
+                var instance = child._node.data.instance;
                 instance._match.call(instance, match);
             }
 
@@ -1502,9 +1499,7 @@ define('widget/Constructor',[
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);
             this.el = template.fragment;
-
             this.children = utils.extend(setChildren.call(this, template.children, children), this.children);
-
             this.bindings = setBinders.call(this, this.children);
             this.routes = setRoutes.call(this, this.children);
 
@@ -1614,12 +1609,12 @@ define('widget/Constructor',[
         setChildren: function (el, data) {
             var name = el.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
-                this.children[name].detach();
+                dom.detach(this.children[name]); //.detach();
             }
             el.applyAttach();
             this.children[name] = new dom.Element(el);
 
-            this.children[name].placeholder = this.el.querySelector('#' + el.id);
+            this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
             this.children[name].el = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
@@ -1629,10 +1624,11 @@ define('widget/Constructor',[
             var events = this.events[name];
             applyEvents.call(this, this.children[name], events);
 
-            var instance = this.children[name].data.instance;
+            var instance = this.children[name]._node.data.instance;
             this.setRoutes(instance);
             this.rebind();
         }
+
     });
 
     Constructor.extend = utils.fnExtend;

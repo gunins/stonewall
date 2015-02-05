@@ -122,8 +122,8 @@ define([
         callWatchers = WatchJS.callWatchers;
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyAttribute</span><span class="hljs-params">(childBinder, data)</span> </span>{
-        <span class="hljs-keyword">var</span> bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update;
+        <span class="hljs-keyword">var</span> bind = childBinder._node.data.tplSet.bind,
+            update = childBinder._node.data.tplSet.update;
         <span class="hljs-keyword">if</span> (bind) {
             <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(bindItem)</span> </span>{
                 <span class="hljs-keyword">var</span> key = bind[bindItem];

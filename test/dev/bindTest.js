@@ -13,19 +13,19 @@ define([
                 {
                     test: {
                         value: 'Test Value',
-                        badge: 15
+                        badge: 1
                     }
                 },
                 {
                     test: {
                         value: 'Test Inner',
-                        badge: 14
+                        badge: 2
                     }
                 },
                 {
                     test: {
                         value: 'Test Value1',
-                        badge: 17
+                        badge: 3
                     }
                 }
             ]
@@ -65,7 +65,7 @@ define([
         data.val.list.push({
             test: {
                 value: 'Test Value New',
-                badge: 16
+                badge: 4
             }
         });
     };
@@ -73,7 +73,7 @@ define([
         data.val.list.push({
             test: {
                 value: 'Test Value New2',
-                badge: 18
+                badge: 5
             }
         });
     };
@@ -107,7 +107,7 @@ define([
                     testData.val.list[2], {
                         test: {
                             value: 'Test Value New',
-                            badge: 16
+                            badge: 4
                         }
                     }
                 ]);
@@ -121,13 +121,13 @@ define([
                     testData.val.list[2], {
                         test: {
                             value: 'Test Value New',
-                            badge: 16
+                            badge: 4
                         }
                     },
                     {
                         test: {
                             value: 'Test Value New2',
-                            badge: 18
+                            badge: 5
                         }
                     }
                 ]);
@@ -142,7 +142,7 @@ define([
                     {
                         test: {
                             value: 'Test Value New2',
-                            badge: 18
+                            badge: 5
                         }
                     }
                 ]);
