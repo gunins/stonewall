@@ -200,33 +200,34 @@ define('widget/dom',[
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        this._node = node._node;
-        if (!this.el && node._node.el) {
-            this.el = node._node.el;
+        var root = node._node;
+        this._node = root;
+        if (!this.el && root.el) {
+            this.el = root.el;
         }
         if (!this.name) {
-            this.name = node._node.name;
+            this.name = root.name;
         }
         if (this._node.bind && !this.bind) {
-            this.bind = node._node.bind;
+            this.bind = root.bind;
         }
-        if (!this.dataset && node._node.data && node._node.data.dataset) {
-            this.dataset = node._node.data.dataset;
+        if (!this.dataset && root.data && root.data.dataset) {
+            this.dataset = root.data.dataset;
         }
         if (this._node.children && !this.children) {
-            this.children = node._node.children;
+            this.children = root.children;
         }
-        this.run = node._node.run.bind(this);
-        this.applyAttach = node._node.applyAttach.bind(this);
-        this.getParent = node._node.getParent.bind(this);
-        this.setParent = node._node.setParent.bind(this);
+
+        this.run = root.run;
+        this.applyAttach = root.applyAttach;
+        this.getParent = root.getParent;
+        this.setParent = root.setParent;
 
     }
 
     utils.extend(Element.prototype, {
         clone: function () {
-            var node = utils.extend({}, this);
-            return node;
+            return utils.extend({}, this);
         },
         // Shortcut to - `dom.append`
         _append: function (child) {
@@ -426,7 +427,7 @@ define('widget/dom',[
         }
         self._node = self._node || {};
         utils.merge(self._node, params);
-        self.data = self._node.data;
+        //self.data = self._node.data;
 
         self.run = function () {
             return this._node.run.apply(this, arguments)
@@ -452,16 +453,22 @@ define('widget/dom',[
             }
             var tagName = node.tagName;
             if (tagName) {
-                var data = _decoders[tagName].decode(node, children, runEls);
-                if (data) {
-                    var name = data.name;
-                    if (name !== undefined) {
-                        context = context || {};
-                        context[name] = {_node: data};
-                        setParams.call(context[name], node, children, obj[name] || obj);
-                    }
+                var name = node.data.name;
+                if (name !== undefined) {
+                    context = context || {};
+                    context[name] = {}
+                    node.getInstance = function () {
+                        return context[name];
+                    };
                 }
+                var data = _decoders[tagName].decode(node, children);
+                if (data) {
+                    context[name]._node = data;
+                    setParams.call(context[name], node, children, obj[name] || obj);
+                }
+
             }
+
             children = false;
         }.bind(this));
 
@@ -1123,16 +1130,18 @@ define('widget/parsers/setChildren',[
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
 
-            if (elements[key] instanceof  dom.Element !== true &&
-                (['pl', 'bd', 'rt'].indexOf(elements[key]._node.data.type) !== -1)) {
-                elements[key] = new dom.Element(elements[key]);
-            } else if (['cp'].indexOf(elements[key]._node.data.type) !== -1) {
-                if (elements[key]._node.children && !elements[key].children) {
-                    elements[key].children = elements[key]._node.children;
+            var element = elements[key],
+                node = element._node;
+            if (element instanceof  dom.Element !== true &&
+                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1)) {
+                elements[key] = new dom.Element(element);
+            } else if (['cp'].indexOf(node.data.type) !== -1) {
+                if (node.children && !element.children) {
+                    element.children = node.children;
                 }
-                if (!elements[key].name) {
-                    elements[key].name = elements[key]._node.name;
-                }
+             /*   if (!element.name) {
+                    element.name = node.name;
+                }*/
 
             }
         }.bind(this));
@@ -1160,7 +1169,7 @@ define('widget/parsers/setChildren',[
                 if (this.nodes[key] !== undefined) {
                     this.nodes[key].call(this, child, parentChild);
                 } else if (child !== undefined) {
-                    child.replace(parentChild);
+                    dom.replace(child, parentChild);
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
                     }
@@ -1205,7 +1214,7 @@ define('widget/parsers/applyBinders',[
                 if (binders !== undefined && binders[key] !== undefined) {
 
                     var parseBinder = function (binder) {
-                        var events = this.events[binder.name];
+                        var events = this.events[binder._node.name];
                         if (binder !== undefined) {
                             var data = obj[key];
                             binder.applyAttach();
@@ -1218,8 +1227,8 @@ define('widget/parsers/applyBinders',[
                                     var childBinder = binder; //.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
-                                    if (this.elReady[childBinder.name] !== undefined) {
-                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    if (this.elReady[childBinder._node.name] !== undefined) {
+                                        this.elReady[childBinder._node.name].call(this, childBinder, data);
                                     }
                                     if (childBinder._node.data.tplSet.update === 'true') {
                                         watch(obj, key, function () {
@@ -1244,8 +1253,8 @@ define('widget/parsers/applyBinders',[
                                                     childBinder.add(parent, hasParent);
                                                 }
 
-                                                if (this.elReady[childBinder.name]) {
-                                                    this.elReady[childBinder.name].call(this, childBinder, item);
+                                                if (this.elReady[childBinder._node.name]) {
+                                                    this.elReady[childBinder._node.name].call(this, childBinder, item);
                                                 }
 
                                                 applyAttribute.call(this, childBinder, item);
@@ -1278,8 +1287,8 @@ define('widget/parsers/applyBinders',[
                                     var childBinder = binder; //.clone();
                                     dom.add(childBinder, parent);
                                     //childBinder.add(parent);
-                                    if (this.elReady[childBinder.name]) {
-                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    if (this.elReady[childBinder._node.name]) {
+                                        this.elReady[childBinder._node.name].call(this, childBinder, data);
                                     }
                                     applyEvents.call(this, childBinder, events, data);
                                     if (binder._node.data.type === 'cp') {
@@ -1482,7 +1491,8 @@ define('widget/Constructor',[
     //      @param {Object} data
     //      @param {Object} children
     //      @param {Object} dataSet
-    function Constructor(data, children, dataSet) {
+    function Constructor(data, children, dataSet, node) {
+
         this._routes = [];
         this.children = {};
         this.eventBus = new Mediator();
@@ -1513,6 +1523,10 @@ define('widget/Constructor',[
         }
 
         this.init.apply(this, arguments);
+        if (node && node.getInstance) {
+            node.getInstance().instance  = this;
+        }
+
     }
 
     utils.extend(Constructor.prototype, {
@@ -1607,7 +1621,7 @@ define('widget/Constructor',[
             this._reRoute();
         },
         setChildren: function (el, data) {
-            var name = el.name;
+            var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }

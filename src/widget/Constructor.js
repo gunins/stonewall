@@ -36,7 +36,8 @@ define([
     //      @param {Object} data
     //      @param {Object} children
     //      @param {Object} dataSet
-    function Constructor(data, children, dataSet) {
+    function Constructor(data, children, dataSet, node) {
+
         this._routes = [];
         this.children = {};
         this.eventBus = new Mediator();
@@ -67,6 +68,10 @@ define([
         }
 
         this.init.apply(this, arguments);
+        if (node && node.getInstance) {
+            node.getInstance().instance  = this;
+        }
+
     }
 
     utils.extend(Constructor.prototype, {
@@ -161,7 +166,7 @@ define([
             this._reRoute();
         },
         setChildren: function (el, data) {
-            var name = el.name;
+            var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }

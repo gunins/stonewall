@@ -172,7 +172,8 @@ Basic Usage example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span><span class="hljs-params">(data, children, dataSet)</span> </span>{
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span><span class="hljs-params">(data, children, dataSet, node)</span> </span>{
+
         <span class="hljs-keyword">this</span>._routes = [];
         <span class="hljs-keyword">this</span>.children = {};
         <span class="hljs-keyword">this</span>.eventBus = <span class="hljs-keyword">new</span> Mediator();
@@ -203,6 +204,10 @@ Basic Usage example</p>
         }
 
         <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+        <span class="hljs-keyword">if</span> (node &amp;&amp; node.getInstance) {
+            node.getInstance().instance  = <span class="hljs-keyword">this</span>;
+        }
+
     }
 
     utils.extend(Constructor.prototype, {</pre></div></div>
@@ -380,7 +385,7 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>._reRoute();
         },
         setChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
-            <span class="hljs-keyword">var</span> name = el.name;
+            <span class="hljs-keyword">var</span> name = el._node.name;
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[name].el !== <span class="hljs-literal">undefined</span>) {
                 dom.detach(<span class="hljs-keyword">this</span>.children[name]); <span class="hljs-comment">//.detach();</span>
             }

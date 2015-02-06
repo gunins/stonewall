@@ -200,33 +200,34 @@ define([
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        this._node = node._node;
-        if (!this.el && node._node.el) {
-            this.el = node._node.el;
+        var root = node._node;
+        this._node = root;
+        if (!this.el && root.el) {
+            this.el = root.el;
         }
         if (!this.name) {
-            this.name = node._node.name;
+            this.name = root.name;
         }
         if (this._node.bind && !this.bind) {
-            this.bind = node._node.bind;
+            this.bind = root.bind;
         }
-        if (!this.dataset && node._node.data && node._node.data.dataset) {
-            this.dataset = node._node.data.dataset;
+        if (!this.dataset && root.data && root.data.dataset) {
+            this.dataset = root.data.dataset;
         }
         if (this._node.children && !this.children) {
-            this.children = node._node.children;
+            this.children = root.children;
         }
-        this.run = node._node.run.bind(this);
-        this.applyAttach = node._node.applyAttach.bind(this);
-        this.getParent = node._node.getParent.bind(this);
-        this.setParent = node._node.setParent.bind(this);
+
+        this.run = root.run;
+        this.applyAttach = root.applyAttach;
+        this.getParent = root.getParent;
+        this.setParent = root.setParent;
 
     }
 
     utils.extend(Element.prototype, {
         clone: function () {
-            var node = utils.extend({}, this);
-            return node;
+            return utils.extend({}, this);
         },
         // Shortcut to - `dom.append`
         _append: function (child) {

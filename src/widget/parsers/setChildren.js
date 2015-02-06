@@ -15,16 +15,18 @@ define([
     function applyElement(elements) {
         Object.keys(elements).forEach(function (key) {
 
-            if (elements[key] instanceof  dom.Element !== true &&
-                (['pl', 'bd', 'rt'].indexOf(elements[key]._node.data.type) !== -1)) {
-                elements[key] = new dom.Element(elements[key]);
-            } else if (['cp'].indexOf(elements[key]._node.data.type) !== -1) {
-                if (elements[key]._node.children && !elements[key].children) {
-                    elements[key].children = elements[key]._node.children;
+            var element = elements[key],
+                node = element._node;
+            if (element instanceof  dom.Element !== true &&
+                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1)) {
+                elements[key] = new dom.Element(element);
+            } else if (['cp'].indexOf(node.data.type) !== -1) {
+                if (node.children && !element.children) {
+                    element.children = node.children;
                 }
-                if (!elements[key].name) {
-                    elements[key].name = elements[key]._node.name;
-                }
+             /*   if (!element.name) {
+                    element.name = node.name;
+                }*/
 
             }
         }.bind(this));
@@ -52,7 +54,7 @@ define([
                 if (this.nodes[key] !== undefined) {
                     this.nodes[key].call(this, child, parentChild);
                 } else if (child !== undefined) {
-                    child.replace(parentChild);
+                    dom.replace(child, parentChild);
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
                     }

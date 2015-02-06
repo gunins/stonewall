@@ -140,16 +140,18 @@ define([
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyElement</span><span class="hljs-params">(elements)</span> </span>{
         <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
 
-            <span class="hljs-keyword">if</span> (elements[key] <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span> &amp;&amp;
-                ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(elements[key]._node.data.type) !== -<span class="hljs-number">1</span>)) {
-                elements[key] = <span class="hljs-keyword">new</span> dom.Element(elements[key]);
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(elements[key]._node.data.type) !== -<span class="hljs-number">1</span>) {
-                <span class="hljs-keyword">if</span> (elements[key]._node.children &amp;&amp; !elements[key].children) {
-                    elements[key].children = elements[key]._node.children;
+            <span class="hljs-keyword">var</span> element = elements[key],
+                node = element._node;
+            <span class="hljs-keyword">if</span> (element <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span> &amp;&amp;
+                ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>)) {
+                elements[key] = <span class="hljs-keyword">new</span> dom.Element(element);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
+                    element.children = node.children;
                 }
-                <span class="hljs-keyword">if</span> (!elements[key].name) {
-                    elements[key].name = elements[key]._node.name;
-                }
+             <span class="hljs-comment">/*   if (!element.name) {
+                    element.name = node.name;
+                }*/</span>
 
             }
         }.bind(<span class="hljs-keyword">this</span>));
@@ -177,7 +179,7 @@ define([
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, parentChild);
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span>) {
-                    child.replace(parentChild);
+                    dom.replace(child, parentChild);
                     <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
                         child.children = parentChild.children
                     }

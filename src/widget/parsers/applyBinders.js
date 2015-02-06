@@ -20,7 +20,7 @@ define([
                 if (binders !== undefined && binders[key] !== undefined) {
 
                     var parseBinder = function (binder) {
-                        var events = this.events[binder.name];
+                        var events = this.events[binder._node.name];
                         if (binder !== undefined) {
                             var data = obj[key];
                             binder.applyAttach();
@@ -33,8 +33,8 @@ define([
                                     var childBinder = binder; //.clone();
                                     childBinder.add(parent);
                                     childBinder.text(data);
-                                    if (this.elReady[childBinder.name] !== undefined) {
-                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    if (this.elReady[childBinder._node.name] !== undefined) {
+                                        this.elReady[childBinder._node.name].call(this, childBinder, data);
                                     }
                                     if (childBinder._node.data.tplSet.update === 'true') {
                                         watch(obj, key, function () {
@@ -59,8 +59,8 @@ define([
                                                     childBinder.add(parent, hasParent);
                                                 }
 
-                                                if (this.elReady[childBinder.name]) {
-                                                    this.elReady[childBinder.name].call(this, childBinder, item);
+                                                if (this.elReady[childBinder._node.name]) {
+                                                    this.elReady[childBinder._node.name].call(this, childBinder, item);
                                                 }
 
                                                 applyAttribute.call(this, childBinder, item);
@@ -93,8 +93,8 @@ define([
                                     var childBinder = binder; //.clone();
                                     dom.add(childBinder, parent);
                                     //childBinder.add(parent);
-                                    if (this.elReady[childBinder.name]) {
-                                        this.elReady[childBinder.name].call(this, childBinder, data);
+                                    if (this.elReady[childBinder._node.name]) {
+                                        this.elReady[childBinder._node.name].call(this, childBinder, data);
                                     }
                                     applyEvents.call(this, childBinder, events, data);
                                     if (binder._node.data.type === 'cp') {
