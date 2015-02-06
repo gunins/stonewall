@@ -24,10 +24,6 @@ define([
                 if (node.children && !element.children) {
                     element.children = node.children;
                 }
-             /*   if (!element.name) {
-                    element.name = node.name;
-                }*/
-
             }
         }.bind(this));
         return elements;
@@ -64,7 +60,7 @@ define([
                 this.nodes[key].call(this, child);
             }
 
-            if (this.elReady[key] !== undefined && child.el !== undefined) {
+            if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
                 this.elReady[key].call(this, child);
             }
 

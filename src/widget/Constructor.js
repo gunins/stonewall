@@ -39,6 +39,7 @@ define([
     function Constructor(data, children, dataSet, node) {
 
         this._routes = [];
+        this._events = [];
         this.children = {};
         this.eventBus = new Mediator();
         this.context = context;
@@ -69,7 +70,8 @@ define([
 
         this.init.apply(this, arguments);
         if (node && node.getInstance) {
-            node.getInstance().instance  = this;
+            var instance = node.getInstance();
+            instance.instance  = this;
         }
 
     }

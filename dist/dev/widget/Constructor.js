@@ -427,7 +427,7 @@ define('widget/dom',[
         }
         self._node = self._node || {};
         utils.merge(self._node, params);
-        //self.data = self._node.data;
+        self.data = self._node.data;
 
         self.run = function () {
             return this._node.run.apply(this, arguments)
@@ -468,7 +468,6 @@ define('widget/dom',[
                 }
 
             }
-
             children = false;
         }.bind(this));
 
@@ -1068,7 +1067,7 @@ define('widget/parsers/applyEvents',[],function () {
     function applyEvents(element, events, data) {
         if (events !== undefined && element.el !== undefined) {
             events.forEach(function (event) {
-                element.on(event.name, event.action, this, data);
+                this._events.push(element.on(event.name, event.action, this, data));
             }.bind(this));
         }
     }
@@ -1139,10 +1138,6 @@ define('widget/parsers/setChildren',[
                 if (node.children && !element.children) {
                     element.children = node.children;
                 }
-             /*   if (!element.name) {
-                    element.name = node.name;
-                }*/
-
             }
         }.bind(this));
         return elements;
@@ -1179,7 +1174,7 @@ define('widget/parsers/setChildren',[
                 this.nodes[key].call(this, child);
             }
 
-            if (this.elReady[key] !== undefined && child.el !== undefined) {
+            if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
                 this.elReady[key].call(this, child);
             }
 
@@ -1326,7 +1321,19 @@ define('widget/parsers/setRoutes',[
 ], function (dom) {
 
     function destroyComponent(cp) {
-        if (cp._node.data.instance) {
+        var children = cp.children;
+        if(children!==undefined){
+           Object.keys(children).forEach(function (key) {
+               destroyComponent(children[key]);
+           });
+        }
+        var instance = cp._node.data.instance;
+        if (instance) {
+            if (instance._events !== undefined) {
+                instance._events.forEach(function (evt) {
+                    evt.remove();
+                });
+            }
             delete cp._node.data.instance;
         }
         if (cp.el) {
@@ -1494,6 +1501,7 @@ define('widget/Constructor',[
     function Constructor(data, children, dataSet, node) {
 
         this._routes = [];
+        this._events = [];
         this.children = {};
         this.eventBus = new Mediator();
         this.context = context;
@@ -1524,7 +1532,8 @@ define('widget/Constructor',[
 
         this.init.apply(this, arguments);
         if (node && node.getInstance) {
-            node.getInstance().instance  = this;
+            var instance = node.getInstance();
+            instance.instance  = this;
         }
 
     }

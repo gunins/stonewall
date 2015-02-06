@@ -9,7 +9,7 @@ define(function () {
     function applyEvents(element, events, data) {
         if (events !== undefined && element.el !== undefined) {
             events.forEach(function (event) {
-                element.on(event.name, event.action, this, data);
+                this._events.push(element.on(event.name, event.action, this, data));
             }.bind(this));
         }
     }

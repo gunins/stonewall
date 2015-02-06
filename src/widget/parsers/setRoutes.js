@@ -6,7 +6,19 @@ define([
 ], function (dom) {
 
     function destroyComponent(cp) {
-        if (cp._node.data.instance) {
+        var children = cp.children;
+        if(children!==undefined){
+           Object.keys(children).forEach(function (key) {
+               destroyComponent(children[key]);
+           });
+        }
+        var instance = cp._node.data.instance;
+        if (instance) {
+            if (instance._events !== undefined) {
+                instance._events.forEach(function (evt) {
+                    evt.remove();
+                });
+            }
             delete cp._node.data.instance;
         }
         if (cp.el) {
