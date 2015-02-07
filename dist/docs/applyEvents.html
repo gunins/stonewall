@@ -134,7 +134,7 @@
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyEvents</span><span class="hljs-params">(element, events, data)</span> </span>{
         <span class="hljs-keyword">if</span> (events !== <span class="hljs-literal">undefined</span> &amp;&amp; element.el !== <span class="hljs-literal">undefined</span>) {
             events.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
-                element.on(event.name, event.action, <span class="hljs-keyword">this</span>, data);
+                <span class="hljs-keyword">this</span>._events.push(element.on(event.name, event.action, <span class="hljs-keyword">this</span>, data));
             }.bind(<span class="hljs-keyword">this</span>));
         }
     }

@@ -149,10 +149,6 @@ define([
                 <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
                     element.children = node.children;
                 }
-             <span class="hljs-comment">/*   if (!element.name) {
-                    element.name = node.name;
-                }*/</span>
-
             }
         }.bind(<span class="hljs-keyword">this</span>));
         <span class="hljs-keyword">return</span> elements;
@@ -189,7 +185,7 @@ define([
                 <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child);
             }
 
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; child.el !== <span class="hljs-literal">undefined</span>) {
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; (child.el !== <span class="hljs-literal">undefined</span> || child.instance !== <span class="hljs-literal">undefined</span>)) {
                 <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, child);
             }
 

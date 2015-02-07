@@ -119,7 +119,19 @@ define([
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom)</span> </span>{
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroyComponent</span><span class="hljs-params">(cp)</span> </span>{
-        <span class="hljs-keyword">if</span> (cp._node.data.instance) {
+        <span class="hljs-keyword">var</span> children = cp.children;
+        <span class="hljs-keyword">if</span>(children!==<span class="hljs-literal">undefined</span>){
+           <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+               destroyComponent(children[key]);
+           });
+        }
+        <span class="hljs-keyword">var</span> instance = cp._node.data.instance;
+        <span class="hljs-keyword">if</span> (instance) {
+            <span class="hljs-keyword">if</span> (instance._events !== <span class="hljs-literal">undefined</span>) {
+                instance._events.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(evt)</span> </span>{
+                    evt.remove();
+                });
+            }
             <span class="hljs-keyword">delete</span> cp._node.data.instance;
         }
         <span class="hljs-keyword">if</span> (cp.el) {
