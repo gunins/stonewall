@@ -7,20 +7,18 @@ define([
 
     function destroyComponent(cp) {
         var children = cp.children;
-        if(children!==undefined){
-           Object.keys(children).forEach(function (key) {
-               destroyComponent(children[key]);
-           });
+        if (children !== undefined) {
+            Object.keys(children).forEach(function (key) {
+                destroyComponent(children[key]);
+            });
         }
         var instance = cp._node.data.instance;
         if (instance) {
-            if (instance._events !== undefined) {
-                instance._events.forEach(function (evt) {
-                    evt.remove();
-                });
-            }
-            delete cp._node.data.instance;
+            instance.destroy();
+        } else if (cp.remove !== undefined) {
+            cp.remove();
         }
+
         if (cp.el) {
             cp.el.remove();
             delete cp.el;

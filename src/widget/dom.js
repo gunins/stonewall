@@ -177,20 +177,28 @@ define([
             events.forEach(function (event) {
                 el.addEventListener(event, fn);
             });
-            return {
+            var evt = {
                 remove: function () {
                     events.forEach(function (event) {
                         el.removeEventListener(event, fn);
                     });
                 }
-            }
+            };
+            element._events.push(evt);
+            return evt
         },
         // Remove Dom Element from Dom
         //
         //      @method remove
         //      @param {dom.Element}
         remove: function (el) {
-            el.el.remove();
+            while (el._events.length > 0) {
+                el._events.remove();
+                el._events.shift();
+            }
+            if (el.el !== undefined) {
+                el.el.remove();
+            }
         },
         // Element
         Element: Element
@@ -201,6 +209,7 @@ define([
     //     @param {Object} node
     function Element(node) {
         var root = node._node;
+        this._events = [];
         this._node = root;
         if (!this.el && root.el) {
             this.el = root.el;
@@ -227,7 +236,9 @@ define([
 
     utils.extend(Element.prototype, {
         clone: function () {
-            return utils.extend({}, this);
+            var extend = utils.extend({}, this);
+            extend._events = [];
+            return extend;
         },
         // Shortcut to - `dom.append`
         _append: function (child) {

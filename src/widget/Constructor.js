@@ -71,7 +71,7 @@ define([
         this.init.apply(this, arguments);
         if (node && node.getInstance) {
             var instance = node.getInstance();
-            instance.instance  = this;
+            instance.instance = this;
         }
 
     }
@@ -138,10 +138,22 @@ define([
         //
         //      @method applyBinders
         applyBinders: applyBinders,
+        // Executes when Component is destroyed
+        //
+        //      @method applyBinders
+        onDestroy: function () {
+
+        },
         //Removing widget from Dom
         //
         //      @method destroy
         destroy: function () {
+            this.onDestroy();
+            this.eventBus.remove();
+            while (this._events.length > 0) {
+                this._events[0].remove();
+                this._events.shift();
+            }
             this.el.remove();
         },
         setRoutes: function (instance) {
@@ -189,7 +201,6 @@ define([
             this.setRoutes(instance);
             this.rebind();
         }
-
     });
 
     Constructor.extend = utils.fnExtend;

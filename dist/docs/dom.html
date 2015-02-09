@@ -448,13 +448,15 @@
             events.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
                 el.addEventListener(event, fn);
             });
-            <span class="hljs-keyword">return</span> {
+            <span class="hljs-keyword">var</span> evt = {
                 remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                     events.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
                         el.removeEventListener(event, fn);
                     });
                 }
-            }
+            };
+            element._events.push(evt);
+            <span class="hljs-keyword">return</span> evt
         },</pre></div></div>
             
         </li>
@@ -473,7 +475,13 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
-            el.el.remove();
+            <span class="hljs-keyword">while</span> (el._events.length &gt; <span class="hljs-number">0</span>) {
+                el._events.remove();
+                el._events.shift();
+            }
+            <span class="hljs-keyword">if</span> (el.el !== <span class="hljs-literal">undefined</span>) {
+                el.el.remove();
+            }
         },</pre></div></div>
             
         </li>
@@ -509,6 +517,7 @@
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Element</span><span class="hljs-params">(node)</span> </span>{
         <span class="hljs-keyword">var</span> root = node._node;
+        <span class="hljs-keyword">this</span>._events = [];
         <span class="hljs-keyword">this</span>._node = root;
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.el &amp;&amp; root.el) {
             <span class="hljs-keyword">this</span>.el = root.el;
@@ -535,7 +544,9 @@
 
     utils.extend(Element.prototype, {
         clone: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-            <span class="hljs-keyword">return</span> utils.extend({}, <span class="hljs-keyword">this</span>);
+            <span class="hljs-keyword">var</span> extend = utils.extend({}, <span class="hljs-keyword">this</span>);
+            extend._events = [];
+            <span class="hljs-keyword">return</span> extend;
         },</pre></div></div>
             
         </li>

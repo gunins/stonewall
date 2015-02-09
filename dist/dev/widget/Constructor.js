@@ -177,20 +177,28 @@ define('widget/dom',[
             events.forEach(function (event) {
                 el.addEventListener(event, fn);
             });
-            return {
+            var evt = {
                 remove: function () {
                     events.forEach(function (event) {
                         el.removeEventListener(event, fn);
                     });
                 }
-            }
+            };
+            element._events.push(evt);
+            return evt
         },
         // Remove Dom Element from Dom
         //
         //      @method remove
         //      @param {dom.Element}
         remove: function (el) {
-            el.el.remove();
+            while (el._events.length > 0) {
+                el._events.remove();
+                el._events.shift();
+            }
+            if (el.el !== undefined) {
+                el.el.remove();
+            }
         },
         // Element
         Element: Element
@@ -201,6 +209,7 @@ define('widget/dom',[
     //     @param {Object} node
     function Element(node) {
         var root = node._node;
+        this._events = [];
         this._node = root;
         if (!this.el && root.el) {
             this.el = root.el;
@@ -227,7 +236,9 @@ define('widget/dom',[
 
     utils.extend(Element.prototype, {
         clone: function () {
-            return utils.extend({}, this);
+            var extend = utils.extend({}, this);
+            extend._events = [];
+            return extend;
         },
         // Shortcut to - `dom.append`
         _append: function (child) {
@@ -1322,20 +1333,18 @@ define('widget/parsers/setRoutes',[
 
     function destroyComponent(cp) {
         var children = cp.children;
-        if(children!==undefined){
-           Object.keys(children).forEach(function (key) {
-               destroyComponent(children[key]);
-           });
+        if (children !== undefined) {
+            Object.keys(children).forEach(function (key) {
+                destroyComponent(children[key]);
+            });
         }
         var instance = cp._node.data.instance;
         if (instance) {
-            if (instance._events !== undefined) {
-                instance._events.forEach(function (evt) {
-                    evt.remove();
-                });
-            }
-            delete cp._node.data.instance;
+            instance.destroy();
+        } else if (cp.remove !== undefined) {
+            cp.remove();
         }
+
         if (cp.el) {
             cp.el.remove();
             delete cp.el;
@@ -1533,7 +1542,7 @@ define('widget/Constructor',[
         this.init.apply(this, arguments);
         if (node && node.getInstance) {
             var instance = node.getInstance();
-            instance.instance  = this;
+            instance.instance = this;
         }
 
     }
@@ -1600,10 +1609,22 @@ define('widget/Constructor',[
         //
         //      @method applyBinders
         applyBinders: applyBinders,
+        // Executes when Component is destroyed
+        //
+        //      @method applyBinders
+        onDestroy: function () {
+
+        },
         //Removing widget from Dom
         //
         //      @method destroy
         destroy: function () {
+            this.onDestroy();
+            this.eventBus.remove();
+            while (this._events.length > 0) {
+                this._events[0].remove();
+                this._events.shift();
+            }
             this.el.remove();
         },
         setRoutes: function (instance) {
@@ -1651,7 +1672,6 @@ define('widget/Constructor',[
             this.setRoutes(instance);
             this.rebind();
         }
-
     });
 
     Constructor.extend = utils.fnExtend;

@@ -207,7 +207,7 @@ Basic Usage example</p>
         <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         <span class="hljs-keyword">if</span> (node &amp;&amp; node.getInstance) {
             <span class="hljs-keyword">var</span> instance = node.getInstance();
-            instance.instance  = <span class="hljs-keyword">this</span>;
+            instance.instance = <span class="hljs-keyword">this</span>;
         }
 
     }
@@ -355,12 +355,36 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
+              <p>Executes when Component is destroyed</p>
+<pre><code> @method applyBinders
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        onDestroy: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
               <p>Removing widget from Dom</p>
 <pre><code> @method destroy
 </code></pre>
             </div>
             
             <div class="content"><div class='highlight'><pre>        destroy: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">this</span>.onDestroy();
+            <span class="hljs-keyword">this</span>.eventBus.remove();
+            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._events.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>._events[<span class="hljs-number">0</span>].remove();
+                <span class="hljs-keyword">this</span>._events.shift();
+            }
             <span class="hljs-keyword">this</span>.el.remove();
         },
         setRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(instance)</span> </span>{
@@ -408,7 +432,6 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.setRoutes(instance);
             <span class="hljs-keyword">this</span>.rebind();
         }
-
     });
 
     Constructor.extend = utils.fnExtend;
