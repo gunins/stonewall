@@ -36,6 +36,15 @@ define([
 
     function changeValues() {
         setTimeout(function () {
+            data.val.newitem = {
+                value:'Delay Value'
+            };
+        }, 1000);
+        setTimeout(function () {
+            data.val.newitem.value = 'New Delay Value'
+        }, 2000);
+
+        setTimeout(function () {
             data.val.list.splice(0, 1);
         }, 2000);
         setTimeout(function () {

@@ -83,11 +83,6 @@ define([
     };
 
     describe('Basic Data Binding Production Tests', function () {
-        describe('Testing app rendered structure', function () {
-            it('data in context defined and available', function () {
-                expect(app.context.data).to.deep.equal(testData);
-            });
-        });
         describe('Checking if DOM Elements are binded to list, and update correctly', function () {
             it('List data are rendered correctly when Initialised', function () {
                 var list = $template.find('.bindedlist');
