@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="src/watch.js"></script>
+<script>
+    (function (window) {
+        var obj = {
+            a: 'a'
+        }
+        var f = function () {
+            console.log(obj.a);
+            unwatch(obj, 'a', f);
+        };
+        watch(obj, 'a', f);
+
+       /* watch(obj, 'a', function () {
+            console.log('vasja', obj.a);
+        });*/
+
+        setTimeout(function () {
+            obj.a = 'b';
+        }, 100)
+        setTimeout(function () {
+            obj.a = 'c';
+        }, 200);
+
+    }(window))
+</script>
+</body>
+</html>

@@ -129,7 +129,7 @@ define([
                             unwatch(obj, binderKey, fn);
                         }
                     }.bind(this);
-                    watch(obj, binderKey, fn);
+                    watch(obj, binderKey, fn, 0);
                 }
             }.bind(this));
         }
