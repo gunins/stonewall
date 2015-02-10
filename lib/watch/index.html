@@ -15,15 +15,17 @@
             console.log(obj.a);
             unwatch(obj, 'a', f);
         };
-        watch(obj, 'a', f);
 
-       /* watch(obj, 'a', function () {
+        watch(obj, 'a', function () {
             console.log('vasja', obj.a);
-        });*/
+        });
+
+        watch(obj, 'a', f, 0);
 
         setTimeout(function () {
             obj.a = 'b';
         }, 100)
+
         setTimeout(function () {
             obj.a = 'c';
         }, 200);
