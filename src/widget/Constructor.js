@@ -160,7 +160,7 @@ define([
         //      @method attach
         attach: function () {
             if (this._placeholder && this._parent) {
-                this._placeholder.parentNode.replaceChild(this.el, this._placeholder)
+                this._parent.replaceChild(this.el, this._placeholder)
             }
         },
         // Executes when Component is destroyed
