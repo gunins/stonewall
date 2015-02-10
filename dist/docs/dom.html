@@ -217,9 +217,7 @@
             
             <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el._node.id) || createPlaceholder(el._node.data.tag);
             el.el = el.run.call(el, fragment, <span class="hljs-literal">false</span>, parent, data);
-            <span class="hljs-keyword">if</span> (el._node.data.instance) {
-                utils.extend(el, el._node.data.instance);
-            }
+
         },</pre></div></div>
             
         </li>

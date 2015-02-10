@@ -41,6 +41,7 @@ define([
         this._routes = [];
         this._events = [];
         this.children = {};
+        //this._node = node;
         this.eventBus = new Mediator();
         this.context = context;
         if (data.appContext !== undefined) {
@@ -138,6 +139,30 @@ define([
         //
         //      @method applyBinders
         applyBinders: applyBinders,
+        // Remove from parentNode
+        //
+        //      @method detach
+        detach: function () {
+            if (!this._placeholder) {
+                this._placeholder = document.createElement(this.el.tagName);
+            }
+            if(!this._parent){
+                this._parent = this.el.parentNode;
+            }
+
+            if (this.el && this._parent) {
+                this._parent.replaceChild(this._placeholder, this.el)
+            }
+
+        },
+        // Add to parentNode
+        //
+        //      @method attach
+        attach: function () {
+            if (this._placeholder && this._parent) {
+                this._placeholder.parentNode.replaceChild(this.el, this._placeholder)
+            }
+        },
         // Executes when Component is destroyed
         //
         //      @method applyBinders
