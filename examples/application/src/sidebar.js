@@ -4,8 +4,6 @@ define([
 ], function (template, Constructor) {
     return Constructor.extend({
         template: template,
-        init: function () {
-        },
         match:function(match){
             var links = this.data.group.links;
             match('/:link').to(function (link, param) {

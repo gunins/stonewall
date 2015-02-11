@@ -1491,6 +1491,7 @@ define('widget/parsers/setRoutes',[
 //          return Widget;
 //      });
 define('widget/Constructor',[
+    'require',
     './dom',
     './utils',
     './mediator',
@@ -1501,7 +1502,7 @@ define('widget/Constructor',[
     './parsers/setBinders',
     './parsers/setRoutes',
     './parsers/applyEvents'
-], function (dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
+], function (require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
     
     var context = {};
 
@@ -1610,6 +1611,24 @@ define('widget/Constructor',[
         //      in template binders)
         beforeInit: function (data, children, dataSet) {
         },
+        // Load external css
+        //
+        //      @method loadCss
+        loadCss: function (url) {
+            this.context._cssReady = this.context._cssReady || [];
+            if (this.context._cssReady.indexOf(url) === -1) {
+                this.context._cssReady.push(url);
+                var linkRef = document.createElement("link"),
+                    fileName = url;
+                linkRef.setAttribute("rel", "stylesheet")
+                linkRef.setAttribute("type", "text/css")
+                linkRef.setAttribute("href", fileName)
+                if (typeof linkRef != "undefined") {
+                    document.getElementsByTagName("head")[0].appendChild(linkRef);
+                }
+            }
+
+        },
         // Applying Binders manually, if use nodes function
         //
         //      @method applyBinders
@@ -1621,7 +1640,7 @@ define('widget/Constructor',[
             if (!this._placeholder) {
                 this._placeholder = document.createElement(this.el.tagName);
             }
-            if(!this._parent){
+            if (!this._parent) {
                 this._parent = this.el.parentNode;
             }
 

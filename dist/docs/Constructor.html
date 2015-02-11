@@ -141,6 +141,7 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>define([
+    <span class="hljs-string">'require'</span>,
     <span class="hljs-string">'./dom'</span>,
     <span class="hljs-string">'./utils'</span>,
     <span class="hljs-string">'./mediator'</span>,
@@ -151,7 +152,7 @@ Basic Usage example</p>
     <span class="hljs-string">'./parsers/setBinders'</span>,
     <span class="hljs-string">'./parsers/setRoutes'</span>,
     <span class="hljs-string">'./parsers/applyEvents'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents)</span> </span>{
+], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents)</span> </span>{
 <span class="hljs-pi">    'use strict'</span>;
     <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
@@ -353,12 +354,26 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Applying Binders manually, if use nodes function</p>
-<pre><code> @method applyBinders
+              <p>Load external css</p>
+<pre><code> @method loadCss
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        applyBinders: applyBinders,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        loadCss: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(url)</span> </span>{
+            <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === -<span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">this</span>.context._cssReady.push(url);
+                <span class="hljs-keyword">var</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>),
+                    fileName = url;
+                linkRef.setAttribute(<span class="hljs-string">"rel"</span>, <span class="hljs-string">"stylesheet"</span>)
+                linkRef.setAttribute(<span class="hljs-string">"type"</span>, <span class="hljs-string">"text/css"</span>)
+                linkRef.setAttribute(<span class="hljs-string">"href"</span>, fileName)
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> linkRef != <span class="hljs-string">"undefined"</span>) {
+                    <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"head"</span>)[<span class="hljs-number">0</span>].appendChild(linkRef);
+                }
+            }
+
+        },</pre></div></div>
             
         </li>
         
@@ -369,6 +384,22 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
+              <p>Applying Binders manually, if use nodes function</p>
+<pre><code> @method applyBinders
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        applyBinders: applyBinders,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
               <p>Remove from parentNode</p>
 <pre><code> @method detach
 </code></pre>
@@ -378,7 +409,7 @@ Usage Example</p>
             <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._placeholder) {
                 <span class="hljs-keyword">this</span>._placeholder = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-keyword">this</span>.el.tagName);
             }
-            <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">this</span>._parent){
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._parent) {
                 <span class="hljs-keyword">this</span>._parent = <span class="hljs-keyword">this</span>.el.parentNode;
             }
 
@@ -391,11 +422,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Add to parentNode</p>
 <pre><code> @method attach
@@ -404,18 +435,18 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        attach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._placeholder &amp;&amp; <span class="hljs-keyword">this</span>._parent) {
-                <span class="hljs-keyword">this</span>._placeholder.parentNode.replaceChild(<span class="hljs-keyword">this</span>.el, <span class="hljs-keyword">this</span>._placeholder)
+                <span class="hljs-keyword">this</span>._parent.replaceChild(<span class="hljs-keyword">this</span>.el, <span class="hljs-keyword">this</span>._placeholder)
             }
         },</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Executes when Component is destroyed</p>
 <pre><code> @method applyBinders
@@ -429,11 +460,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Removing widget from Dom</p>
 <pre><code> @method destroy
