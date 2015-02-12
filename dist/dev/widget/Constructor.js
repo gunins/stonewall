@@ -1611,18 +1611,17 @@ define('widget/Constructor',[
         //      in template binders)
         beforeInit: function (data, children, dataSet) {
         },
-        // Load external css
+        // Load external css style for third party modules.
         //
         //      @method loadCss
         loadCss: function (url) {
             this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
                 this.context._cssReady.push(url);
-                var linkRef = document.createElement("link"),
-                    fileName = url;
+                var linkRef = document.createElement("link");
                 linkRef.setAttribute("rel", "stylesheet")
                 linkRef.setAttribute("type", "text/css")
-                linkRef.setAttribute("href", fileName)
+                linkRef.setAttribute("href", url)
                 if (typeof linkRef != "undefined") {
                     document.getElementsByTagName("head")[0].appendChild(linkRef);
                 }

@@ -354,7 +354,7 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Load external css</p>
+              <p>Load external css style for third party modules.</p>
 <pre><code> @method loadCss
 </code></pre>
             </div>
@@ -363,11 +363,10 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === -<span class="hljs-number">1</span>) {
                 <span class="hljs-keyword">this</span>.context._cssReady.push(url);
-                <span class="hljs-keyword">var</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>),
-                    fileName = url;
+                <span class="hljs-keyword">var</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>);
                 linkRef.setAttribute(<span class="hljs-string">"rel"</span>, <span class="hljs-string">"stylesheet"</span>)
                 linkRef.setAttribute(<span class="hljs-string">"type"</span>, <span class="hljs-string">"text/css"</span>)
-                linkRef.setAttribute(<span class="hljs-string">"href"</span>, fileName)
+                linkRef.setAttribute(<span class="hljs-string">"href"</span>, url)
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> linkRef != <span class="hljs-string">"undefined"</span>) {
                     <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">"head"</span>)[<span class="hljs-number">0</span>].appendChild(linkRef);
                 }

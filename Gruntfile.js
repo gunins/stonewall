@@ -37,7 +37,9 @@ module.exports = function (grunt) {
         'widget': '../../../src/widget',
         'watch': '../../../lib/watch/src/watch',
         'd3': '../../../bower_components/d3/d3',
-        'router': '../../../bower_components/urlmanager/dist/prod/router'
+        'router': '../../../bower_components/urlmanager/dist/prod/router',
+        'three':'../../../bower_components/three.js/three'
+
     };
     var stubModules = ['templating/parser', 'widget/parser'];
 
@@ -147,6 +149,21 @@ module.exports = function (grunt) {
                     dir: "examples/basicBind/target",
                     paths: appPaths,
                     name: 'BasicBind'
+
+                }
+            },
+            webGL: {
+                options: {
+                    baseUrl: 'examples/webgl/src',
+                    removeCombined: true,
+                    optimize: 'none',
+                    templateCoders: coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules: stubModules,
+                    exclude: coders.exclude,
+                    dir: "examples/webgl/target",
+                    paths: appPaths,
+                    name: 'WebGL'
 
                 }
             },
