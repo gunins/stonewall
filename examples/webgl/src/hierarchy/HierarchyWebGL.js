@@ -112,7 +112,7 @@ define(['./../utils/amdThree'], function (three) {
 
         //
 
-        window.addEventListener('resize', this.onWindowResize.bind(this), false);
+        this.onWindowResize();
         this.animate();
         this.onDocumentMouseMove();
     }
@@ -152,19 +152,21 @@ define(['./../utils/amdThree'], function (three) {
         },
 
         onWindowResize: function () {
-            this.width = this.container.clientWidth;
-            this.height = this.container.clientHeight;
+            window.addEventListener('resize', function () {
 
-            this.windowHalfX = this.width / 2;
-            this.windowHalfY = this.height / 2;
+                this.width = this.container.clientWidth;
+                this.height = this.container.clientHeight;
 
-            this.diff = this.width / this.height;
+                this.windowHalfX = this.width / 2;
+                this.windowHalfY = this.height / 2;
 
-            this.camera.aspect = this.diff;
-            this.camera.updateProjectionMatrix();
+                this.diff = this.width / this.height;
 
-            this.renderer.setSize(this.width, this.height);
+                this.camera.aspect = this.diff;
+                this.camera.updateProjectionMatrix();
 
+                this.renderer.setSize(this.width, this.height);
+            }.bind(this), false);
         },
 
         onDocumentMouseMove: function () {

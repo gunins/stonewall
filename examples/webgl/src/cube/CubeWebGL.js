@@ -15,6 +15,7 @@ define(['require', './../utils/amdThree'], function (require, three) {
         setRenderer: function () {
             this.renderer = new three.WebGLRenderer();
             this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.setClearColor(0xffffff);
             this.renderer.setSize(this.parent.clientWidth, this.parent.clientHeight);
             this.parent.appendChild(this.renderer.domElement);
         },
