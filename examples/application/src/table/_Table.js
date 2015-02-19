@@ -1,5 +1,5 @@
 define([
-    'templating/parser!./table/_table.html',
+    'templating/parser!./_table.html',
     'widget/Constructor',
     'watch'
 ], function (template, Constructor, WatchJS) {
