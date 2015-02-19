@@ -2,8 +2,15 @@
  * Base structure
  */
 /* Move down content because we have a fixed navbar that is 50px tall */
+html {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
 body {
-  padding-top: 50px;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 body > div {
   opacity: 0;
