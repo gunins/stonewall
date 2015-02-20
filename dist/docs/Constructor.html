@@ -200,8 +200,11 @@ Basic Usage example</p>
         <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
 
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
-            <span class="hljs-keyword">var</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [];
-            <span class="hljs-keyword">this</span>.data = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data[data.bind];
+            <span class="hljs-keyword">var</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [],
+                contextData = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data[data.bind];
+            <span class="hljs-keyword">if</span> (contextData) {
+                <span class="hljs-keyword">this</span>.data = contextData;
+            }
 
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render(<span class="hljs-keyword">this</span>.data);

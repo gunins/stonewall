@@ -51,8 +51,11 @@ define([
         this.beforeInit.apply(this, arguments);
 
         if (this.template) {
-            var keys = (dataSet) ? Object.keys(dataSet) : [];
-            this.data = (keys.length > 0) ? dataSet : this.context.data[data.bind];
+            var keys = (dataSet) ? Object.keys(dataSet) : [],
+                contextData = (keys.length > 0) ? dataSet : this.context.data[data.bind];
+            if (contextData) {
+                this.data = contextData;
+            }
 
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);

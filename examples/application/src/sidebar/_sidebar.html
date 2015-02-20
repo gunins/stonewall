@@ -4,33 +4,34 @@
 
             &.active {
                 animation: animation 1s;
+                @keyframes animation {
+                    0% {
+                        transform: rotateX(0deg);
+                    }
+                    50% {
+                        transform: rotateX(180deg);
+                    }
+                    100% {
+                        transform: rotateX(0deg);
+                    }
+                }
+
                 -webkit-animation: animation 1s;
+                @-webkit-keyframes animation {
+                    0% {
+                        transform: rotateX(0deg);
+                    }
+                    50% {
+                        transform: rotateX(180deg);
+                    }
+                    100% {
+                        transform: rotateX(0deg);
+                    }
+                }
 
             }
         }
 
-        @keyframes animation {
-            0% {
-                transform: rotateX(0deg);
-            }
-            50% {
-                transform: rotateX(180deg);
-            }
-            100% {
-                transform: rotateX(0deg);
-            }
-        }
-        @-webkit-keyframes animation {
-            0% {
-                transform: rotateX(0deg);
-            }
-            50% {
-                transform: rotateX(180deg);
-            }
-            100% {
-                transform: rotateX(0deg);
-            }
-        }
     </style-less>
     <bd-group tp-tag="ul" class="nav nav-sidebar">
         <bd-links tp-bind-class="class" tp-update="true" tp-tag="li">
