@@ -127,41 +127,59 @@ define([
         <span class="hljs-keyword">if</span> (bind) {
             <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(bindItem)</span> </span>{
                 <span class="hljs-keyword">var</span> key = bind[bindItem];
-                <span class="hljs-keyword">if</span> (data[key] !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'class'</span>) {
-                        childBinder.addClass(data[key]);
-                        <span class="hljs-keyword">var</span> currClass = data[key];
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.removeClass(currClass);
-                                childBinder.addClass(data[key]);
-                                currClass = data[key];
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
-                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'checked'</span>) {
-                        childBinder.el.checked = data[key];
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.el.checked = data[key];
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
-                    } <span class="hljs-keyword">else</span> {
-                        childBinder.setAttribute(bindItem, data[key]);
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                                childBinder.setAttribute(bindItem, data[key]);
-                            }.bind(<span class="hljs-keyword">this</span>));
+                <span class="hljs-keyword">var</span> dataItem = data[key];
+                <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'class'</span>) {
+                    <span class="hljs-keyword">var</span> currClass;
+
+                    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addClass</span><span class="hljs-params">(className)</span> </span>{
+                        <span class="hljs-keyword">if</span> (className !== <span class="hljs-literal">undefined</span> &amp;&amp; className !== <span class="hljs-string">''</span>) {
+                            childBinder.addClass(className);
+                            <span class="hljs-keyword">return</span> className;
+                        } <span class="hljs-keyword">else</span> {
+                            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
                         }
                     }
-                }
-                <span class="hljs-keyword">if</span> (data.text !== <span class="hljs-literal">undefined</span>) {
-                    childBinder.text(data.text);
+
+                    currClass = addClass(dataItem)
+
                     <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                        watch(data, <span class="hljs-string">'text'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                            childBinder.text(data.text);
+                        watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                            <span class="hljs-keyword">if</span> (currClass) {
+                                childBinder.removeClass(currClass);
+                            }
+                            currClass = addClass(data[key]);
+                        }.bind(<span class="hljs-keyword">this</span>));
+                    }
+
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'checked'</span>) {
+                    <span class="hljs-keyword">if</span> (dataItem !== <span class="hljs-literal">undefined</span>) {
+                        childBinder.el.checked = dataItem;
+                    }
+                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                        watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                            childBinder.el.checked = data[key];
+                        }.bind(<span class="hljs-keyword">this</span>));
+                    }
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">if</span> (dataItem !== <span class="hljs-literal">undefined</span>) {
+                        childBinder.setAttribute(bindItem, dataItem);
+                    }
+                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                        watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                            childBinder.setAttribute(bindItem, data[key]);
                         }.bind(<span class="hljs-keyword">this</span>));
                     }
                 }
+
+                <span class="hljs-keyword">if</span> (data.text !== <span class="hljs-literal">undefined</span>) {
+                    childBinder.text(data.text);
+                }
+                <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                    watch(data, <span class="hljs-string">'text'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                        childBinder.text(data.text);
+                    }.bind(<span class="hljs-keyword">this</span>));
+                }
+
             });
         }
 

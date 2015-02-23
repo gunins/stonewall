@@ -14,41 +14,59 @@ define([
         if (bind) {
             Object.keys(bind).forEach(function (bindItem) {
                 var key = bind[bindItem];
-                if (data[key] !== undefined) {
-                    if (bindItem === 'class') {
-                        childBinder.addClass(data[key]);
-                        var currClass = data[key];
-                        if (update === 'true') {
-                            watch(data, key, function () {
-                                childBinder.removeClass(currClass);
-                                childBinder.addClass(data[key]);
-                                currClass = data[key];
-                            }.bind(this));
-                        }
-                    } else if (bindItem === 'checked') {
-                        childBinder.el.checked = data[key];
-                        if (update === 'true') {
-                            watch(data, key, function () {
-                                childBinder.el.checked = data[key];
-                            }.bind(this));
-                        }
-                    } else {
-                        childBinder.setAttribute(bindItem, data[key]);
-                        if (update === 'true') {
-                            watch(data, key, function () {
-                                childBinder.setAttribute(bindItem, data[key]);
-                            }.bind(this));
+                var dataItem = data[key];
+                if (bindItem === 'class') {
+                    var currClass;
+
+                    function addClass(className) {
+                        if (className !== undefined && className !== '') {
+                            childBinder.addClass(className);
+                            return className;
+                        } else {
+                            return false;
                         }
                     }
-                }
-                if (data.text !== undefined) {
-                    childBinder.text(data.text);
+
+                    currClass = addClass(dataItem)
+
                     if (update === 'true') {
-                        watch(data, 'text', function () {
-                            childBinder.text(data.text);
+                        watch(data, key, function () {
+                            if (currClass) {
+                                childBinder.removeClass(currClass);
+                            }
+                            currClass = addClass(data[key]);
+                        }.bind(this));
+                    }
+
+                } else if (bindItem === 'checked') {
+                    if (dataItem !== undefined) {
+                        childBinder.el.checked = dataItem;
+                    }
+                    if (update === 'true') {
+                        watch(data, key, function () {
+                            childBinder.el.checked = data[key];
+                        }.bind(this));
+                    }
+                } else {
+                    if (dataItem !== undefined) {
+                        childBinder.setAttribute(bindItem, dataItem);
+                    }
+                    if (update === 'true') {
+                        watch(data, key, function () {
+                            childBinder.setAttribute(bindItem, data[key]);
                         }.bind(this));
                     }
                 }
+
+                if (data.text !== undefined) {
+                    childBinder.text(data.text);
+                }
+                if (update === 'true') {
+                    watch(data, 'text', function () {
+                        childBinder.text(data.text);
+                    }.bind(this));
+                }
+
             });
         }
 
