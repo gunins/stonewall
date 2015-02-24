@@ -158,9 +158,12 @@
             
             <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
             child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child._node.id) ||
-                                createPlaceholder(child._node.data.tag);
-            child.el = child.run.call(child, parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
-            <span class="hljs-keyword">if</span> (child._node.data.instance) {
+                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            <span class="hljs-keyword">if</span> (child.run !== <span class="hljs-literal">undefined</span>) {
+                child.el = child.run.call(child, parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
+            }
+
+            <span class="hljs-keyword">if</span> (child._node.data &amp;&amp; child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },</pre></div></div>
@@ -188,7 +191,7 @@
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
-                el.placeholder = createPlaceholder(el._node.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag || el.el.tagName);
             }
 
             <span class="hljs-keyword">if</span> (el &amp;&amp; el.el &amp;&amp; el.el.parentNode) {
@@ -215,7 +218,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el._node.id) || createPlaceholder(el._node.data.tag);
+            <div class="content"><div class='highlight'><pre>            el.placeholder = fragment.querySelector(<span class="hljs-string">'#'</span> + el._node.id) || createPlaceholder(el._node.data.tag || el.el.tagName);
             el.el = el.run.call(el, fragment, <span class="hljs-literal">false</span>, parent, data);
 
         },</pre></div></div>

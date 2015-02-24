@@ -17,8 +17,9 @@ define([
 
             var element = elements[key],
                 node = element._node;
+
             if (element instanceof  dom.Element !== true &&
-                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1)) {
+                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1||element.name===undefined)) {
                 elements[key] = new dom.Element(element);
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {

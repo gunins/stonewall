@@ -20,9 +20,12 @@ define('widget/dom',[
         //      @param {Object} data
         _append: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child._node.id) ||
-                                createPlaceholder(child._node.data.tag);
-            child.el = child.run.call(child, parent.el, true, false, data);
-            if (child._node.data.instance) {
+                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            if (child.run !== undefined) {
+                child.el = child.run.call(child, parent.el, true, false, data);
+            }
+
+            if (child._node.data && child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },
@@ -38,7 +41,7 @@ define('widget/dom',[
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el._node.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag || el.el.tagName);
             }
 
             if (el && el.el && el.el.parentNode) {
@@ -52,7 +55,7 @@ define('widget/dom',[
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag);
+            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag || el.el.tagName);
             el.el = el.run.call(el, fragment, false, parent, data);
 
         },
@@ -455,14 +458,16 @@ define('widget/dom',[
         var context = false,
             children = false;
         root.children.forEach(function (node) {
+            var name = node.data.name;
             if (node.children &&
                 node.children.length > 0) {
-                var contextData = (obj[node.data.name]) ? obj[node.data.name] : obj;
+                var contextData = (obj[name]) ? obj[name] : obj;
                 children = parseElements.call(this, node, contextData);
             }
             var tagName = node.tagName;
+
             if (tagName) {
-                var name = node.data.name;
+                var name = name;
                 if (name !== undefined) {
                     context = context || {};
                     context[name] = {}
@@ -476,15 +481,24 @@ define('widget/dom',[
                     setParams.call(context[name], node, children, obj[name] || obj);
                 }
 
+            } else if (name) {
+                context = context || {};
+                context[name] = {}
+                context[name]._node = node;
             }
             children = false;
         }.bind(this));
-
         return context;
     };
     function runEls(children, fragment) {
         Object.keys(children).forEach(function (key) {
-            children[key]._node.run.call(children[key], fragment);
+            if (children[key]._node.run !== undefined) {
+                children[key]._node.run.call(children[key], fragment);
+            }
+            if (children[key]._node.el === undefined && children[key]._node.template === undefined) {
+                children[key]._node.el = fragment.querySelector('#' + children[key]._node.id);
+                children[key]._node.el.removeAttribute('id');
+            }
         });
     }
 
@@ -1151,8 +1165,9 @@ define('widget/parsers/setChildren',[
 
             var element = elements[key],
                 node = element._node;
+
             if (element instanceof  dom.Element !== true &&
-                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1)) {
+                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1||element.name===undefined)) {
                 elements[key] = new dom.Element(element);
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {

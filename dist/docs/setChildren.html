@@ -142,8 +142,9 @@ define([
 
             <span class="hljs-keyword">var</span> element = elements[key],
                 node = element._node;
+
             <span class="hljs-keyword">if</span> (element <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span> &amp;&amp;
-                ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>)) {
+                ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>||element.name===<span class="hljs-literal">undefined</span>)) {
                 elements[key] = <span class="hljs-keyword">new</span> dom.Element(element);
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
                 <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {

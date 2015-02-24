@@ -20,9 +20,12 @@ define([
         //      @param {Object} data
         _append: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child._node.id) ||
-                                createPlaceholder(child._node.data.tag);
-            child.el = child.run.call(child, parent.el, true, false, data);
-            if (child._node.data.instance) {
+                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            if (child.run !== undefined) {
+                child.el = child.run.call(child, parent.el, true, false, data);
+            }
+
+            if (child._node.data && child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },
@@ -38,7 +41,7 @@ define([
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
-                el.placeholder = createPlaceholder(el._node.data.tag);
+                el.placeholder = createPlaceholder(el._node.data.tag || el.el.tagName);
             }
 
             if (el && el.el && el.el.parentNode) {
@@ -52,7 +55,7 @@ define([
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag);
+            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag || el.el.tagName);
             el.el = el.run.call(el, fragment, false, parent, data);
 
         },
