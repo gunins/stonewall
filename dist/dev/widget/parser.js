@@ -29,22 +29,17 @@ define('widget/parser',[],function () {
         version: "0.1.0",
         load: function (moduleName, req, onLoad, config) {
             moduleName = (getName(moduleName) !== undefined) ? moduleName : moduleName + '.html';
-            if (config.isBuild) {
-                req([
+            define('widget/parser!' + moduleName,
+                [
                     'templating/parser!' + moduleName,
-                ], function (template) {
-                    template;
-                    onLoad();
+                    'widget/Constructor'
+                ], function (template, Constructor) {
+                    var Widget = Constructor.extend({
+                        template: template
+                    });
+                    return Widget;
                 });
-                return;
-            }
-            req([
-                'templating/parser!' + moduleName,
-                'widget/Constructor'
-            ], function (template, Constructor) {
-                var Widget = Constructor.extend({
-                    template: template
-                });
+            req(['widget/parser!' + moduleName], function (Widget) {
                 onLoad(Widget);
             });
         },
