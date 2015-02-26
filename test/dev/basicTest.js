@@ -54,6 +54,11 @@ define([
                     expect(el).to.have.$css('color', 'rgb(45, 85, 246)');
                 });
 
+                it('Check if image are rendered correctly and attribute', function () {
+                    var el = $template.find('img');
+                    expect(el).to.have.$attr('src', 'images/board.png');
+                });
+
                 it('Check if Header are rendered correctly, css are applied, and content taked from Container', function () {
                     var el = $template.find('h4');
                     expect(el).to.have.$html('Header From Parent Container');

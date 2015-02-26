@@ -60,7 +60,7 @@ define([
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);
             this.el = template.fragment;
-            this.children = utils.extend(setChildren.call(this, template.children, children), this.children);
+            this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
             this.routes = setRoutes.call(this, this.children);
 

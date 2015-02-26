@@ -60,6 +60,11 @@ define([
                     expect(el).to.have.$css('color', 'rgb(255, 255, 255)');
                 });
 
+                it('Check if image are rendered correctly and attribute', function () {
+                    var el = $template.find('img');
+                    expect(el).to.have.$attr('src', 'images/board.png');
+                });
+
                 it('Check if Binder are rendered correctly, css are applied, and content taked from App data', function () {
                     var el = $template.find('.binded');
                     expect(el).to.have.$html('Binded Item From App');

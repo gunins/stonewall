@@ -1160,15 +1160,24 @@ define('widget/parsers/setChildren',[
     //
     //      @private applyElement
     //      @param {Object} elements
-    function applyElement(elements) {
+    function applyElement(elements, data) {
         Object.keys(elements).forEach(function (key) {
 
             var element = elements[key],
                 node = element._node;
-
             if (element instanceof  dom.Element !== true &&
-                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1||element.name===undefined)) {
+                (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1 || element.name === undefined)) {
                 elements[key] = new dom.Element(element);
+
+                if (node.data.type === 'pl' && node.data.tplSet.bind !== undefined) {
+                    var bind = node.data.tplSet.bind;
+                    Object.keys(bind).forEach(function (attr) {
+                        if (data[bind[attr]] !== undefined) {
+                            elements[key].setAttribute(attr, data[bind[attr]]);
+                        }
+                    }.bind(this));
+                }
+
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
                     element.children = node.children;
@@ -1178,13 +1187,13 @@ define('widget/parsers/setChildren',[
         return elements;
     }
 
-    function setChildren(elements, parentChildren) {
-        parentChildren = (parentChildren) ? applyElement(parentChildren) : {};
-        elements = (elements) ? applyElement(elements) : {};
+    function setChildren(elements, parentChildren, data) {
+        parentChildren = (parentChildren) ? applyElement(parentChildren, data) : {};
+        elements = (elements) ? applyElement(elements, data) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
-                children = setChildren.call(this, children, parentChildren.children);
+                children = setChildren.call(this, children, parentChildren.children, data);
                 elements[key].bindings = setBinders(children);
             }
 
@@ -1568,7 +1577,7 @@ define('widget/Constructor',[
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);
             this.el = template.fragment;
-            this.children = utils.extend(setChildren.call(this, template.children, children), this.children);
+            this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
             this.routes = setRoutes.call(this, this.children);
 

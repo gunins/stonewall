@@ -209,7 +209,7 @@ Basic Usage example</p>
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render(<span class="hljs-keyword">this</span>.data);
             <span class="hljs-keyword">this</span>.el = template.fragment;
-            <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children), <span class="hljs-keyword">this</span>.children);
+            <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children, data), <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.routes = setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
