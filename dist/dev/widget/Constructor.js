@@ -1285,14 +1285,14 @@ define('widget/parsers/applyBinders',[
                                     childBinder.add(parent, hasParent);
                                 }
 
-                                if (this.elReady[childBinder._node.name]) {
-                                    this.elReady[childBinder._node.name].call(this, childBinder, item);
-                                }
-
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
                                 applyEvents.call(this, childBinder, events, item);
                                 bindedData.push({binder: childBinder, data: item});
+
+                                if (this.elReady[childBinder._node.name]) {
+                                    this.elReady[childBinder._node.name].call(this, childBinder, item);
+                                }
                             };
                         data.forEach(addItem.bind(this));
                         var update = binder._node.data.tplSet.update;
@@ -1319,9 +1319,7 @@ define('widget/parsers/applyBinders',[
                     var childBinder = binder; //.clone();
                     dom.add(childBinder, parent);
                     //childBinder.add(parent);
-                    if (this.elReady[childBinder._node.name]) {
-                        this.elReady[childBinder._node.name].call(this, childBinder, data);
-                    }
+
                     applyEvents.call(this, childBinder, events, data);
                     if (binder._node.data.type === 'cp') {
                         dom.replace(childBinder, binder, data);
@@ -1331,6 +1329,9 @@ define('widget/parsers/applyBinders',[
                         applyBinders.call(this, data, childBinder);
                     } else {
                         applyAttribute.call(this, childBinder, data);
+                    }
+                    if (this.elReady[childBinder._node.name]) {
+                        this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
                 }
             }

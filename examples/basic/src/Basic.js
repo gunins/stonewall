@@ -3,7 +3,7 @@
  */
 define([
     'widget/App',
-    'widget/parser!container/Container'
+    'widget/parser!./container/Container'
 ], function (App, Container) {
     'use strict';
 

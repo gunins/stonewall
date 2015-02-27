@@ -165,14 +165,14 @@ define([
                                     childBinder.add(parent, hasParent);
                                 }
 
-                                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
-                                    <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                }
-
                                 applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, item);
                                 applyBinders.call(<span class="hljs-keyword">this</span>, item, childBinder);
                                 applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, item);
                                 bindedData.push({binder: childBinder, data: item});
+
+                                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
+                                    <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, item);
+                                }
                             };
                         data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
                         <span class="hljs-keyword">var</span> update = binder._node.data.tplSet.update;
@@ -212,9 +212,7 @@ define([
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
-                        <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
-                    }
+            <div class="content"><div class='highlight'><pre>
                     applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
                     <span class="hljs-keyword">if</span> (binder._node.data.type === <span class="hljs-string">'cp'</span>) {
                         dom.replace(childBinder, binder, data);</pre></div></div>
@@ -237,6 +235,9 @@ define([
                         applyBinders.call(<span class="hljs-keyword">this</span>, data, childBinder);
                     } <span class="hljs-keyword">else</span> {
                         applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, data);
+                    }
+                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
+                        <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
                     }
                 }
             }

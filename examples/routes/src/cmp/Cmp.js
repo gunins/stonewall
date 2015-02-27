@@ -27,6 +27,11 @@ define([
         init: function (data) {
             console.log('init'); //, this.el, data);
         },
+        match: function (match) {
+            match('/:id').to(function (id) {
+                console.log('custom', id);
+            })
+        },
         to: function (id) {
             this.children.showid.text((typeof id !== 'object')?id:'Link id not dynamic');
             console.log('to', id); //, this.el, id);
