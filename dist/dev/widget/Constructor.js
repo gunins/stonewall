@@ -1173,7 +1173,11 @@ define('widget/parsers/setChildren',[
                     var bind = node.data.tplSet.bind;
                     Object.keys(bind).forEach(function (attr) {
                         if (data[bind[attr]] !== undefined) {
-                            elements[key].setAttribute(attr, data[bind[attr]]);
+                            if (attr !== 'class') {
+                                elements[key].setAttribute(attr, data[bind[attr]]);
+                            }else{
+                                elements[key].addClass(data[bind[attr]]);
+                            }
                         }
                     }.bind(this));
                 }
