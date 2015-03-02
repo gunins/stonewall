@@ -506,7 +506,7 @@ define('widget/App',[
         this.beforeInit.apply(this, arguments);
         if (this.AppContainer !== undefined) {
             this.appContainer = new this.AppContainer({
-                appContext: this.context,
+                appContext: this.context
             });
             if (this.appContainer._match !== undefined) {
                 router.match(this.appContainer._match.bind(this.appContainer));

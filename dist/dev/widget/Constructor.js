@@ -491,15 +491,17 @@ define('widget/dom',[
         return context;
     };
     function runEls(children, fragment) {
-        Object.keys(children).forEach(function (key) {
-            if (children[key]._node.run !== undefined) {
-                children[key]._node.run.call(children[key], fragment);
-            }
-            if (children[key]._node.el === undefined && children[key]._node.template === undefined) {
-                children[key]._node.el = fragment.querySelector('#' + children[key]._node.id);
-                children[key]._node.el.removeAttribute('id');
-            }
-        });
+        if (children) {
+            Object.keys(children).forEach(function (key) {
+                if (children[key]._node.run !== undefined) {
+                    children[key]._node.run.call(children[key], fragment);
+                }
+                if (children[key]._node.el === undefined && children[key]._node.template === undefined) {
+                    children[key]._node.el = fragment.querySelector('#' + children[key]._node.id);
+                    children[key]._node.el.removeAttribute('id');
+                }
+            });
+        }
     }
 
     /**

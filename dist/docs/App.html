@@ -195,7 +195,7 @@ Usage Example</p>
         <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
             <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer({
-                appContext: <span class="hljs-keyword">this</span>.context,
+                appContext: <span class="hljs-keyword">this</span>.context
             });
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) {
                 router.match(<span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer));
