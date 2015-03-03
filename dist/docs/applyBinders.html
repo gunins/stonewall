@@ -123,8 +123,22 @@ define([
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, WatchJS, applyEvents, applyAttribute)</span> </span>{
     <span class="hljs-keyword">var</span> watch = WatchJS.watch,
         unwatch = WatchJS.unwatch,
-        callWatchers = WatchJS.callWatchers;
+        callWatchers = WatchJS.callWatchers;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO: This is necessary for Safari and FF, but possible memory leak, need check later.</p>
 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBinder</span><span class="hljs-params">(objKey, obj, parent, binder)</span> </span>{
         <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[binder._node.name];
         <span class="hljs-keyword">if</span> (binder !== <span class="hljs-literal">undefined</span>) {
@@ -132,7 +146,7 @@ define([
             binder.applyAttach();
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[objKey]) {
-                <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);
+                <span class="hljs-keyword">var</span> childBinder = binder;
                 <span class="hljs-keyword">this</span>.nodes[objKey].call(<span class="hljs-keyword">this</span>, childBinder, parent, data);
             } <span class="hljs-keyword">else</span> {
                 <span class="hljs-keyword">if</span> (!utils.isArray(data) &amp;&amp; !utils.isObject(data)) {
@@ -180,7 +194,12 @@ define([
                             <span class="hljs-keyword">var</span> methodNames = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>];
                             watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(prop, action, newvalue, oldvalue)</span> </span>{
                                 <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; action === <span class="hljs-string">'push'</span>) {
-                                    addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>]);
+                                    <span class="hljs-keyword">var</span> filter = bindedData.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> </span>{
+                                        <span class="hljs-keyword">return</span> item.data === newvalue[<span class="hljs-number">0</span>];
+                                    });
+                                    <span class="hljs-keyword">if</span> (filter.length === <span class="hljs-number">0</span>) {
+                                        addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>]);
+                                    }
                                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (methodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
                                     bindedData.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(binder, index)</span> </span>{
                                         <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === -<span class="hljs-number">1</span>) {
@@ -202,11 +221,11 @@ define([
         </li>
         
         
-        <li id="section-2">
+        <li id="section-3">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p>childBinder.add(parent);</p>
 
@@ -220,11 +239,11 @@ define([
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>childBinder.replace(binder, data);</p>
 
@@ -257,11 +276,11 @@ define([
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>TODO: Investigate, why not always an Array</p>
 
