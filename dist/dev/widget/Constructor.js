@@ -1250,6 +1250,7 @@ define('widget/parsers/applyBinders',[
     var watch = WatchJS.watch,
         unwatch = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
+    //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
     function parseBinder(objKey, obj, parent, binder) {
         var events = this.events[binder._node.name];
@@ -1258,7 +1259,7 @@ define('widget/parsers/applyBinders',[
             binder.applyAttach();
 
             if (this.nodes[objKey]) {
-                var childBinder = utils.extend({}, binder);
+                var childBinder = binder;
                 this.nodes[objKey].call(this, childBinder, parent, data);
             } else {
                 if (!utils.isArray(data) && !utils.isObject(data)) {
@@ -1306,7 +1307,12 @@ define('widget/parsers/applyBinders',[
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
                                 if (oldvalue === undefined && action === 'push') {
-                                    addItem.call(this, newvalue[0]);
+                                    var filter = bindedData.filter(function (item) {
+                                        return item.data === newvalue[0];
+                                    });
+                                    if (filter.length === 0) {
+                                        addItem.call(this, newvalue[0]);
+                                    }
                                 } else if (methodNames.indexOf(action) !== -1) {
                                     bindedData.forEach(function (binder, index) {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
