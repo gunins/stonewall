@@ -1258,7 +1258,7 @@ define('widget/parsers/applyBinders',[
             binder.applyAttach();
 
             if (this.nodes[objKey]) {
-                var childBinder = binder;
+                var childBinder = utils.extend({}, binder);
                 this.nodes[objKey].call(this, childBinder, parent, data);
             } else {
                 if (!utils.isArray(data) && !utils.isObject(data)) {
@@ -1322,7 +1322,7 @@ define('widget/parsers/applyBinders',[
                     updateChildren.call(this);
 
                 } else if (utils.isObject(data)) {
-                    var childBinder = binder; //.clone();
+                    var childBinder = utils.extend({}, binder); //.clone();
                     dom.add(childBinder, parent);
                     //childBinder.add(parent);
 

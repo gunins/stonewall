@@ -70,7 +70,9 @@
                     window.mochaPhantomJS.run();
                 }
                 else {
+                    setTimeout(function () {
                     mocha.run();
+                    }, 200);
                 }
             }
         });

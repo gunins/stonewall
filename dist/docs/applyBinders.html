@@ -132,7 +132,7 @@ define([
             binder.applyAttach();
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[objKey]) {
-                <span class="hljs-keyword">var</span> childBinder = binder;
+                <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);
                 <span class="hljs-keyword">this</span>.nodes[objKey].call(<span class="hljs-keyword">this</span>, childBinder, parent, data);
             } <span class="hljs-keyword">else</span> {
                 <span class="hljs-keyword">if</span> (!utils.isArray(data) &amp;&amp; !utils.isObject(data)) {
@@ -196,7 +196,7 @@ define([
                     updateChildren.call(<span class="hljs-keyword">this</span>);
 
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isObject(data)) {
-                    <span class="hljs-keyword">var</span> childBinder = binder; <span class="hljs-comment">//.clone();</span>
+                    <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder); <span class="hljs-comment">//.clone();</span>
                     dom.add(childBinder, parent);</pre></div></div>
             
         </li>

@@ -451,11 +451,11 @@ define('widget/utils',[],function () {
         // Extend a given object with all the properties in passed-in object(s).
         extend: extend,
         // Check if it's String
-        isString:isString,
+        isString: isString,
         // Check if I't Object
-        isObject:isObject,
+        isObject: isObject,
         // Check if it's Array
-        isArray:isArray
+        isArray: isArray
     };
 });
 /**

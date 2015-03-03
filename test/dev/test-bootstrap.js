@@ -76,7 +76,9 @@
                     window.mochaPhantomJS.run();
                 }
                 else {
-                    mocha.run();
+                    setTimeout(function () {
+                        mocha.run();
+                    }, 200)
                 }
             }
         });
