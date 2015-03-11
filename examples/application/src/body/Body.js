@@ -5,6 +5,8 @@ define([
 ], function (template, Constructor, data) {
     return Constructor.extend({
         template: template,
+        init: function () {
+        },
         match: function (match) {
             match('/:tab').to(function (tab, param) {
                 this.data.tabs.forEach(function (item) {
