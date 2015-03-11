@@ -484,7 +484,10 @@ define('widget/dom',[
             } else if (name) {
                 context = context || {};
                 context[name] = {}
-                context[name]._node = node;
+                context[name]._node = {
+                    id: node.id,
+                    data: node.data
+                }
             }
             children = false;
         }.bind(this));
