@@ -1270,6 +1270,7 @@ define('widget/parsers/setChildren',[
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
                     element.children = node.children;
+                    element.instance = node.data.instance;
                 }
             }
         }.bind(this));

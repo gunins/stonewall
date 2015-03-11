@@ -162,6 +162,7 @@ define([
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
                 <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
                     element.children = node.children;
+                    element.instance = node.data.instance;
                 }
             }
         }.bind(<span class="hljs-keyword">this</span>));
