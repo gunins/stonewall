@@ -55,7 +55,8 @@ define([
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag || el.el.tagName);
+            el.placeholder = fragment.querySelector('#' + el._node.id) ||
+                             createPlaceholder(el._node.data.tag || el.el.tagName);
             el.el = el.run.call(el, fragment, false, parent, data);
 
         },
@@ -86,6 +87,19 @@ define([
                 }
             }
         },
+        // Getting Attribute in to node
+        //
+        //      @method getAttribute
+        //      @prop {dom.Element} node
+        //      @prop {String||Object} prop
+        //      @return {String} value
+        getAttribute: function (node, prop, value) {
+            if (node && node.el) {
+                    return node.el.getAttribute(prop);
+            }else{
+                return undefined;
+            }
+        },
         // Removing Attribute from node
         //
         //      @method removeAttribute
@@ -113,6 +127,21 @@ define([
                 }
             }
         },
+        // Getting css style from node
+        //
+        //      @method getStyle
+        //      @prop {dom.Element} node
+        //      @prop {String} prop
+        //      @return {String} value
+        getStyle: function (node, prop, value) {
+            if (node && node.el) {
+                if (node.el !== undefined && node.el.style !== undefined) {
+                    return node.el.style[prop] = value;
+                } else {
+                    return undefined;
+                }
+            }
+        },
         // Removing css style from node
         //
         //      @method removeAttribute
@@ -131,6 +160,19 @@ define([
         addClass: function (node, className) {
             if (node && node.el) {
                 node.el.classList.add(className);
+            }
+        },
+        // checking if className exists in node
+        //
+        //      @method hasClass
+        //      @param {dom.Element} node
+        //      @param {String} className
+        //      @return boolean
+        hasClass: function (node, className) {
+            if (node && node.el) {
+                return node.el.classList.contains(className);
+            }else{
+                return false;
             }
         },
         // Remove class from node
@@ -267,6 +309,10 @@ define([
         setAttribute: function (prop, value) {
             dom.setAttribute(this, prop, value);
         },
+        // Shortcut to - `dom.getAttribute`
+        getAttribute: function (prop) {
+            dom.getAttribute(this, prop);
+        },
         // Shortcut to - `dom.removeAttribute`
         removeAttribute: function (prop) {
             dom.removeAttribute(this, prop);
@@ -275,12 +321,20 @@ define([
         setStyle: function (prop, value) {
             dom.setStyle(this, prop, value);
         },
+         // Shortcut to - `dom.getStyle`
+        getStyle: function (prop) {
+            dom.setStyle(this, prop);
+        },
         // Shortcut to - `dom.removeStyle`
         removeStyle: function (prop) {
             dom.removeStyle(this, prop);
         },
         // Shortcut to - `dom.addClass`
         addClass: function (className) {
+            dom.addClass(this, className);
+        },
+        // Shortcut to - `dom.hasClass`
+        hasClass: function (className) {
             dom.addClass(this, className);
         },
         // Shortcut to - `dom.removeClass`
