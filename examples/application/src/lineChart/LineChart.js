@@ -12,8 +12,10 @@ define([
         nodes: {
             content: function (el, parent, data) {
                 el.add(parent);
-                var chart = new Chart();
-                chart.start(el, data);
+                el.onDOMAttached().then(function () {
+                    var chart = new Chart();
+                    chart.start(el, data);
+                })
             }
         }
     })

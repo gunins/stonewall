@@ -93,10 +93,10 @@ define([
         //      @prop {dom.Element} node
         //      @prop {String||Object} prop
         //      @return {String} value
-        getAttribute: function (node, prop, value) {
+        getAttribute: function (node, prop) {
             if (node && node.el) {
-                    return node.el.getAttribute(prop);
-            }else{
+                return node.el.getAttribute(prop);
+            } else {
                 return undefined;
             }
         },
@@ -133,10 +133,10 @@ define([
         //      @prop {dom.Element} node
         //      @prop {String} prop
         //      @return {String} value
-        getStyle: function (node, prop, value) {
+        getStyle: function (node, prop) {
             if (node && node.el) {
                 if (node.el !== undefined && node.el.style !== undefined) {
-                    return node.el.style[prop] = value;
+                    return node.el.style[prop];
                 } else {
                     return undefined;
                 }
@@ -171,7 +171,7 @@ define([
         hasClass: function (node, className) {
             if (node && node.el) {
                 return node.el.classList.contains(className);
-            }else{
+            } else {
                 return false;
             }
         },
@@ -243,6 +243,28 @@ define([
                 el.el.remove();
             }
         },
+        // executes when element attached to Dom
+        //
+        //      @method onDOMAttached
+        //      @param {dom.Element}
+        //      @param {function} cb
+        //      @param {function} context
+        onDOMAttached: function (el) {
+            return {
+                then: function (cb, context) {
+                    if (el.el !== undefined) {
+                        var step = function () {
+                            if (!document.body.contains(el.el)) {
+                                window.requestAnimationFrame(step);
+                            } else {
+                                cb.apply(this, Array.prototype.slice.call(arguments, 0));
+                            }
+                        }.bind(context || this);
+                        window.requestAnimationFrame(step);
+                    }
+                }
+            }
+        },
         // Element
         Element: Element
     }
@@ -311,7 +333,7 @@ define([
         },
         // Shortcut to - `dom.getAttribute`
         getAttribute: function (prop) {
-            dom.getAttribute(this, prop);
+          return  dom.getAttribute(this, prop);
         },
         // Shortcut to - `dom.removeAttribute`
         removeAttribute: function (prop) {
@@ -321,9 +343,9 @@ define([
         setStyle: function (prop, value) {
             dom.setStyle(this, prop, value);
         },
-         // Shortcut to - `dom.getStyle`
+        // Shortcut to - `dom.getStyle`
         getStyle: function (prop) {
-            dom.setStyle(this, prop);
+           return dom.getStyle(this, prop);
         },
         // Shortcut to - `dom.removeStyle`
         removeStyle: function (prop) {
@@ -335,7 +357,7 @@ define([
         },
         // Shortcut to - `dom.hasClass`
         hasClass: function (className) {
-            dom.addClass(this, className);
+           return dom.hasClass(this, className);
         },
         // Shortcut to - `dom.removeClass`
         removeClass: function (className) {
@@ -349,6 +371,10 @@ define([
         on: function (event, cb, context) {
             var args = Array.prototype.slice.call(arguments, 0);
             return dom.on.apply(false, [this].concat(args));
+        },
+        // Shortcut to - `dom.onDOMAttached`
+        onDOMAttached: function () {
+            return dom.onDOMAttached(this);
         },
         // Shortcut to - `dom.remove`
         remove: function () {

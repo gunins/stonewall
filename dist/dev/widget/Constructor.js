@@ -55,7 +55,8 @@ define('widget/dom',[
         },
         add: function (el, fragment, parent, data) {
             //console.log(fragment, parent, data);
-            el.placeholder = fragment.querySelector('#' + el._node.id) || createPlaceholder(el._node.data.tag || el.el.tagName);
+            el.placeholder = fragment.querySelector('#' + el._node.id) ||
+                             createPlaceholder(el._node.data.tag || el.el.tagName);
             el.el = el.run.call(el, fragment, false, parent, data);
 
         },
@@ -86,6 +87,19 @@ define('widget/dom',[
                 }
             }
         },
+        // Getting Attribute in to node
+        //
+        //      @method getAttribute
+        //      @prop {dom.Element} node
+        //      @prop {String||Object} prop
+        //      @return {String} value
+        getAttribute: function (node, prop) {
+            if (node && node.el) {
+                return node.el.getAttribute(prop);
+            } else {
+                return undefined;
+            }
+        },
         // Removing Attribute from node
         //
         //      @method removeAttribute
@@ -113,6 +127,21 @@ define('widget/dom',[
                 }
             }
         },
+        // Getting css style from node
+        //
+        //      @method getStyle
+        //      @prop {dom.Element} node
+        //      @prop {String} prop
+        //      @return {String} value
+        getStyle: function (node, prop) {
+            if (node && node.el) {
+                if (node.el !== undefined && node.el.style !== undefined) {
+                    return node.el.style[prop];
+                } else {
+                    return undefined;
+                }
+            }
+        },
         // Removing css style from node
         //
         //      @method removeAttribute
@@ -131,6 +160,19 @@ define('widget/dom',[
         addClass: function (node, className) {
             if (node && node.el) {
                 node.el.classList.add(className);
+            }
+        },
+        // checking if className exists in node
+        //
+        //      @method hasClass
+        //      @param {dom.Element} node
+        //      @param {String} className
+        //      @return boolean
+        hasClass: function (node, className) {
+            if (node && node.el) {
+                return node.el.classList.contains(className);
+            } else {
+                return false;
             }
         },
         // Remove class from node
@@ -201,6 +243,28 @@ define('widget/dom',[
                 el.el.remove();
             }
         },
+        // executes when element attached to Dom
+        //
+        //      @method onDOMAttached
+        //      @param {dom.Element}
+        //      @param {function} cb
+        //      @param {function} context
+        onDOMAttached: function (el) {
+            return {
+                then: function (cb, context) {
+                    if (el.el !== undefined) {
+                        var step = function () {
+                            if (!document.body.contains(el.el)) {
+                                window.requestAnimationFrame(step);
+                            } else {
+                                cb.apply(this, Array.prototype.slice.call(arguments, 0));
+                            }
+                        }.bind(context || this);
+                        window.requestAnimationFrame(step);
+                    }
+                }
+            }
+        },
         // Element
         Element: Element
     }
@@ -267,6 +331,10 @@ define('widget/dom',[
         setAttribute: function (prop, value) {
             dom.setAttribute(this, prop, value);
         },
+        // Shortcut to - `dom.getAttribute`
+        getAttribute: function (prop) {
+          return  dom.getAttribute(this, prop);
+        },
         // Shortcut to - `dom.removeAttribute`
         removeAttribute: function (prop) {
             dom.removeAttribute(this, prop);
@@ -275,6 +343,10 @@ define('widget/dom',[
         setStyle: function (prop, value) {
             dom.setStyle(this, prop, value);
         },
+        // Shortcut to - `dom.getStyle`
+        getStyle: function (prop) {
+           return dom.getStyle(this, prop);
+        },
         // Shortcut to - `dom.removeStyle`
         removeStyle: function (prop) {
             dom.removeStyle(this, prop);
@@ -282,6 +354,10 @@ define('widget/dom',[
         // Shortcut to - `dom.addClass`
         addClass: function (className) {
             dom.addClass(this, className);
+        },
+        // Shortcut to - `dom.hasClass`
+        hasClass: function (className) {
+           return dom.hasClass(this, className);
         },
         // Shortcut to - `dom.removeClass`
         removeClass: function (className) {
@@ -295,6 +371,10 @@ define('widget/dom',[
         on: function (event, cb, context) {
             var args = Array.prototype.slice.call(arguments, 0);
             return dom.on.apply(false, [this].concat(args));
+        },
+        // Shortcut to - `dom.onDOMAttached`
+        onDOMAttached: function () {
+            return dom.onDOMAttached(this);
         },
         // Shortcut to - `dom.remove`
         remove: function () {

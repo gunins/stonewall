@@ -47,11 +47,7 @@ define([
 
     Chart.prototype.start = function (node, data) {
         this.el = node.el;
-
-        setTimeout(function () {
-            this.draw(data)
-        }.bind(this), 100);
-
+        this.draw(data)
     }
     Chart.prototype.draw = function (data) {
 

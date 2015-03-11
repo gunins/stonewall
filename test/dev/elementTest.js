@@ -70,6 +70,12 @@ define([
                 expect($(el.el)).to.have.$attr('data-test', 'test');
                 expect($(el.el)).to.have.$attr('data-testa', 'testa');
             });
+            it('Testing method "getAttribute"', function () {
+                $(el.el).attr('title', 'test');
+                el.setAttribute('data-test', 'testa');
+                expect(el.getAttribute('title')).to.equal('test');
+                expect(el.getAttribute('data-test')).to.equal('testa');
+            });
             it('Testing method "removeAttribute"', function () {
                 el.setAttribute('data-test', 'test');
                 el.setAttribute('data-testa', 'testa');
@@ -85,13 +91,20 @@ define([
 
             });
             it('Testing method "setStyle"', function () {
-
                 el.setStyle('margin-left', '10px');
                 el.setStyle({'margin-right': '15px'});
                 expect($(el.el)).to.have.$css('margin-left', '10px');
                 expect($(el.el)).to.have.$css('margin-right', '15px');
 
             });
+            it('Testing method "getStyle"', function () {
+                $(el.el).css('margin-left', '10px');
+                el.setStyle({'margin-right': '15px'});
+                expect(el.getStyle('margin-left')).to.equal('10px');
+                expect(el.getStyle('margin-right')).to.equal('15px');
+
+            });
+
             it('Testing method "removeStyle"', function () {
 
                 el.setStyle({'margin-right': '15px'});
@@ -111,6 +124,11 @@ define([
             it('Testing method "addClass"', function () {
                 el.addClass('testClass');
                 expect($(el.el)).to.have.$class('testClass');
+            });
+            it('Testing method "hasClass"', function () {
+                $(el.el).addClass('testClass');
+                expect(el.hasClass('testClass')).to.be.true;
+                expect(el.hasClass('testClassB')).to.be.false;
             });
             it('Testing method "removeClass"', function () {
                 el.addClass('testClass');
@@ -156,6 +174,19 @@ define([
                 expect($container.find('.testElement').length).to.equal(1);
                 el.remove();
                 expect($container.find('.testElement').length).to.equal(0);
+
+            });
+            it('Testing method "onDOMAttached"', function (done) {
+
+                el.onDOMAttached().then(function () {
+                    expect(document.body.contains(el.el)).to.be.true;
+                    done();
+                });
+                expect(document.body.contains(el.el)).to.be.false;
+
+                setTimeout(function () {
+                    $(el.el).appendTo('body');
+                }, 200);
 
             });
         });

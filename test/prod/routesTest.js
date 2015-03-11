@@ -18,7 +18,6 @@ define([
 
     var $template = $container.children();
     var panel = $template.find('.panel:last .panel-body');
-    console.log(panel[0]);
     describe('Routes Tests Dev environment', function () {
         describe('Routes #/levela tests', function () {
 
