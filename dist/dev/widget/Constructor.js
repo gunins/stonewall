@@ -1275,6 +1275,7 @@ define('widget/parsers/setChildren',[
                 if (node.children && !element.children) {
                     element.children = node.children;
                     element.instance = node.data.instance;
+                    element.eventBus = node.data.instance.eventBus;
                 }
             }
         }.bind(this));

@@ -163,6 +163,7 @@ define([
                 <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
                     element.children = node.children;
                     element.instance = node.data.instance;
+                    element.eventBus = node.data.instance.eventBus;
                 }
             }
         }.bind(<span class="hljs-keyword">this</span>));
