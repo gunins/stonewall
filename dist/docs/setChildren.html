@@ -142,29 +142,26 @@ define([
 
             <span class="hljs-keyword">var</span> element = elements[key],
                 node = element._node;
-            <span class="hljs-keyword">if</span> (element <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span> &amp;&amp;
-                ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span> || element.name === <span class="hljs-literal">undefined</span>)) {
+            <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
+                <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
+                    element.children = node.children;
+                }
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (element <span class="hljs-keyword">instanceof</span>  dom.Element !== <span class="hljs-literal">true</span> &amp;&amp;
+                       ([<span class="hljs-string">'pl'</span>, <span class="hljs-string">'bd'</span>, <span class="hljs-string">'rt'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span> || node.data.type === <span class="hljs-literal">undefined</span>)) {
                 elements[key] = <span class="hljs-keyword">new</span> dom.Element(element);
-
                 <span class="hljs-keyword">if</span> (node.data.type === <span class="hljs-string">'pl'</span> &amp;&amp; node.data.tplSet.bind !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">var</span> bind = node.data.tplSet.bind;
                     <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(attr)</span> </span>{
                         <span class="hljs-keyword">if</span> (data[bind[attr]] !== <span class="hljs-literal">undefined</span>) {
                             <span class="hljs-keyword">if</span> (attr !== <span class="hljs-string">'class'</span>) {
                                 elements[key].setAttribute(attr, data[bind[attr]]);
-                            }<span class="hljs-keyword">else</span>{
+                            } <span class="hljs-keyword">else</span> {
                                 elements[key].addClass(data[bind[attr]]);
                             }
                         }
                     }.bind(<span class="hljs-keyword">this</span>));
                 }
 
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
-                <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
-                    element.children = node.children;
-                    element.instance = node.data.instance;
-                    element.eventBus = node.data.instance.eventBus;
-                }
             }
         }.bind(<span class="hljs-keyword">this</span>));
         <span class="hljs-keyword">return</span> elements;

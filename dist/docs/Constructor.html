@@ -226,6 +226,7 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (node &amp;&amp; node.getInstance) {
             <span class="hljs-keyword">var</span> instance = node.getInstance();
             instance.instance = <span class="hljs-keyword">this</span>;
+            instance.eventBus = <span class="hljs-keyword">this</span>.eventBus;
         }
 
     }

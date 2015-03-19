@@ -77,6 +77,7 @@ define([
         if (node && node.getInstance) {
             var instance = node.getInstance();
             instance.instance = this;
+            instance.eventBus = this.eventBus;
         }
 
     }
