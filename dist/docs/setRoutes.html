@@ -178,10 +178,11 @@ define([
 
                         <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
                             dataSet.link = args;
-                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
-                                instance.to.apply(instance, args.concat(params));
+                        }
 
-                            }
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
+                            instance.to.apply(instance, args.concat(params));
+
                         }
 
                     });

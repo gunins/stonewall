@@ -1536,10 +1536,11 @@ define('widget/parsers/setRoutes',[
 
                         if (args.length > 0) {
                             dataSet.link = args;
-                            if (instance && instance.to) {
-                                instance.to.apply(instance, args.concat(params));
+                        }
 
-                            }
+                        if (instance && instance.to) {
+                            instance.to.apply(instance, args.concat(params));
+
                         }
 
                     });
