@@ -253,11 +253,15 @@ define([
             return {
                 then: function (cb, context) {
                     if (el.el !== undefined) {
+                        var attached = false;
                         var step = function () {
-                            if (!document.body.contains(el.el)) {
-                                window.requestAnimationFrame(step);
-                            } else {
+                            if (attached) {
                                 cb.apply(this, Array.prototype.slice.call(arguments, 0));
+                            } else {
+                                window.requestAnimationFrame(step);
+                                if (document.body.contains(el.el)) {
+                                    attached = true;
+                                }
                             }
                         }.bind(context || this);
                         window.requestAnimationFrame(step);
