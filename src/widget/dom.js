@@ -264,12 +264,12 @@ define([
                             attached = true;
                         }
                     }
-                }.bind(context || this);
-                window.requestAnimationFrame(step);
+                }.bind(this);
             }
             return {
                 then: function (cb, context) {
                     handlers.push(cb.bind(context || this));
+                    window.requestAnimationFrame(step);
                 }.bind(this)
             }
         },

@@ -595,12 +595,12 @@
                             attached = <span class="hljs-literal">true</span>;
                         }
                     }
-                }.bind(context || <span class="hljs-keyword">this</span>);
-                <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
+                }.bind(<span class="hljs-keyword">this</span>);
             }
             <span class="hljs-keyword">return</span> {
                 then: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cb, context)</span> </span>{
                     handlers.push(cb.bind(context || <span class="hljs-keyword">this</span>));
+                    <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
                 }.bind(<span class="hljs-keyword">this</span>)
             }
         },</pre></div></div>
