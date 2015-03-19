@@ -250,23 +250,27 @@ define('widget/dom',[
         //      @param {function} cb
         //      @param {function} context
         onDOMAttached: function (el) {
+            var handlers = [];
+            if (el.el !== undefined) {
+                var attached = false;
+                var step = function () {
+                    if (attached) {
+                        handlers.forEach(function (handler) {
+                            handler();
+                        }.bind(this));
+                    } else {
+                        window.requestAnimationFrame(step);
+                        if (document.body.contains(el.el)) {
+                            attached = true;
+                        }
+                    }
+                }.bind(context || this);
+                window.requestAnimationFrame(step);
+            }
             return {
                 then: function (cb, context) {
-                    if (el.el !== undefined) {
-                        var attached = false;
-                        var step = function () {
-                            if (attached) {
-                                cb.apply(this, Array.prototype.slice.call(arguments, 0));
-                            } else {
-                                window.requestAnimationFrame(step);
-                                if (document.body.contains(el.el)) {
-                                    attached = true;
-                                }
-                            }
-                        }.bind(context || this);
-                        window.requestAnimationFrame(step);
-                    }
-                }
+                    handlers.push(cb.bind(context || this));
+                }.bind(this)
             }
         },
         // Element
@@ -337,7 +341,7 @@ define('widget/dom',[
         },
         // Shortcut to - `dom.getAttribute`
         getAttribute: function (prop) {
-          return  dom.getAttribute(this, prop);
+            return dom.getAttribute(this, prop);
         },
         // Shortcut to - `dom.removeAttribute`
         removeAttribute: function (prop) {
@@ -349,7 +353,7 @@ define('widget/dom',[
         },
         // Shortcut to - `dom.getStyle`
         getStyle: function (prop) {
-           return dom.getStyle(this, prop);
+            return dom.getStyle(this, prop);
         },
         // Shortcut to - `dom.removeStyle`
         removeStyle: function (prop) {
@@ -361,7 +365,7 @@ define('widget/dom',[
         },
         // Shortcut to - `dom.hasClass`
         hasClass: function (className) {
-           return dom.hasClass(this, className);
+            return dom.hasClass(this, className);
         },
         // Shortcut to - `dom.removeClass`
         removeClass: function (className) {
