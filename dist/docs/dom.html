@@ -584,11 +584,15 @@
             <span class="hljs-keyword">return</span> {
                 then: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cb, context)</span> </span>{
                     <span class="hljs-keyword">if</span> (el.el !== <span class="hljs-literal">undefined</span>) {
+                        <span class="hljs-keyword">var</span> attached = <span class="hljs-literal">false</span>;
                         <span class="hljs-keyword">var</span> step = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-                            <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">document</span>.body.contains(el.el)) {
-                                <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
-                            } <span class="hljs-keyword">else</span> {
+                            <span class="hljs-keyword">if</span> (attached) {
                                 cb.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">Array</span>.prototype.slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>));
+                            } <span class="hljs-keyword">else</span> {
+                                <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
+                                <span class="hljs-keyword">if</span> (<span class="hljs-built_in">document</span>.body.contains(el.el)) {
+                                    attached = <span class="hljs-literal">true</span>;
+                                }
                             }
                         }.bind(context || <span class="hljs-keyword">this</span>);
                         <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
