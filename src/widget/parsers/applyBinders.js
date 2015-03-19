@@ -128,17 +128,19 @@ define([
                     }
                 }
             }.bind(this));
-            Object.keys(binders).forEach(function (binderKey) {
-                if (obj[binderKey] === undefined) {
-                    var fn = function (prop, action, newvalue, oldvalue) {
-                        if (newvalue !== undefined && oldvalue === undefined) {
-                            binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj, parent));
-                            unwatch(obj, binderKey, fn);
-                        }
-                    }.bind(this);
-                    watch(obj, binderKey, fn, 0);
-                }
-            }.bind(this));
+            if (binders) {
+                Object.keys(binders).forEach(function (binderKey) {
+                    if (obj[binderKey] === undefined) {
+                        var fn = function (prop, action, newvalue, oldvalue) {
+                            if (newvalue !== undefined && oldvalue === undefined) {
+                                binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj, parent));
+                                unwatch(obj, binderKey, fn);
+                            }
+                        }.bind(this);
+                        watch(obj, binderKey, fn, 0);
+                    }
+                }.bind(this));
+            }
         }
     }
 
