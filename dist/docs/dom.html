@@ -583,12 +583,15 @@
             <div class="content"><div class='highlight'><pre>        onDOMAttached: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">var</span> handlers = [];
             <span class="hljs-keyword">if</span> (el.el !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">var</span> attached = <span class="hljs-literal">false</span>;
+                <span class="hljs-keyword">var</span> attached = <span class="hljs-literal">false</span>,
+                    handler;
                 <span class="hljs-keyword">var</span> step = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                     <span class="hljs-keyword">if</span> (attached) {
-                        handlers.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(handler)</span> </span>{
+                        <span class="hljs-keyword">while</span> (handlers.length &gt; <span class="hljs-number">0</span>) {
+                            handler = handlers[<span class="hljs-number">0</span>];
                             handler();
-                        }.bind(<span class="hljs-keyword">this</span>));
+                            handlers.shift()
+                        }
                     } <span class="hljs-keyword">else</span> {
                         <span class="hljs-built_in">window</span>.requestAnimationFrame(step);
                         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">document</span>.body.contains(el.el)) {

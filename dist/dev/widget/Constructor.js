@@ -252,12 +252,15 @@ define('widget/dom',[
         onDOMAttached: function (el) {
             var handlers = [];
             if (el.el !== undefined) {
-                var attached = false;
+                var attached = false,
+                    handler;
                 var step = function () {
                     if (attached) {
-                        handlers.forEach(function (handler) {
+                        while (handlers.length > 0) {
+                            handler = handlers[0];
                             handler();
-                        }.bind(this));
+                            handlers.shift()
+                        }
                     } else {
                         window.requestAnimationFrame(step);
                         if (document.body.contains(el.el)) {
