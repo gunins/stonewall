@@ -125,7 +125,7 @@ define([
                 destroyComponent(children[key]);
             });
         }
-        <span class="hljs-keyword">var</span> instance = cp._node.data.instance;
+        <span class="hljs-keyword">var</span> instance = cp.instance;
         <span class="hljs-keyword">if</span> (instance) {
             instance.destroy();
         } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cp.remove !== <span class="hljs-literal">undefined</span>) {
@@ -142,7 +142,7 @@ define([
         <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
             <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> </span>{
                 <span class="hljs-keyword">var</span> cp = children[name];
-                cb.call(<span class="hljs-keyword">this</span>, cp, cp._node.data.instance);
+                cb.call(<span class="hljs-keyword">this</span>, cp, cp.instance);
             }.bind(<span class="hljs-keyword">this</span>));
         }
     }
@@ -151,7 +151,7 @@ define([
         <span class="hljs-keyword">var</span> names = <span class="hljs-built_in">Object</span>.keys(children);
         names.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> </span>{
             <span class="hljs-keyword">var</span> child = children[name];
-            <span class="hljs-keyword">var</span> route = child._node.data.route;
+            <span class="hljs-keyword">var</span> route = (child._node !== <span class="hljs-literal">undefined</span>) ? child._node.data.route : <span class="hljs-literal">undefined</span>;
             <span class="hljs-keyword">if</span> (route !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.type !== <span class="hljs-string">'cp'</span>) {
                 <span class="hljs-keyword">var</span> matches = match(route, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(match)</span> </span>{
                     <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span>) {
@@ -193,16 +193,17 @@ define([
                         dom.add(child, parent, <span class="hljs-literal">false</span>);
 
                         applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cp, instance)</span> </span>{
+
                             <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
 
                             <span class="hljs-keyword">if</span> (!cp.el &amp;&amp; instance &amp;&amp; instance._match) {
+
                                 matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routes)</span> </span>{
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(<span class="hljs-keyword">this</span>));
-
                                 instance._reRoute = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                                     instance._applyRoutes(matches);
                                 };
@@ -235,11 +236,10 @@ define([
 
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.type !== <span class="hljs-string">'cp'</span>) {
                 matchRoute.call(<span class="hljs-keyword">this</span>, child.children, match, parent);
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child._node.data.type === <span class="hljs-string">'cp'</span> &amp;&amp; child._node.data.instance) {
-                <span class="hljs-keyword">var</span> instance = child._node.data.instance;
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.instance !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">var</span> instance = child.instance;
                 instance._match.call(instance, match);
             }
-
         }.bind(<span class="hljs-keyword">this</span>));
     }
 

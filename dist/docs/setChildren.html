@@ -194,7 +194,9 @@ define([
                     }
                 }
 
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.tplSet.noattach === <span class="hljs-string">'true'</span>) {
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span> &amp;&amp;
+                       child._node.data.tplSet.noattach === <span class="hljs-string">'true'</span> &amp;&amp;
+                       child._node.data.dataset.bind === <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child);
             }
 

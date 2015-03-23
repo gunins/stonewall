@@ -121,7 +121,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
         <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
             bindings = bindings || {};
             <span class="hljs-keyword">var</span> el = children[key];
-            <span class="hljs-keyword">if</span> (el._node.bind !== <span class="hljs-literal">undefined</span>) {
+            <span class="hljs-keyword">if</span> (el._node &amp;&amp; el._node.bind !== <span class="hljs-literal">undefined</span>) {
                 bindings[el._node.bind] = bindings[el._node.bind] || []
                 bindings[el._node.bind].push(el);
             }

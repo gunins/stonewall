@@ -156,7 +156,7 @@
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        _after: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
             child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child._node.id) ||
                                 createPlaceholder(child._node.data.tag || el.el.tagName);
             <span class="hljs-keyword">if</span> (child.run !== <span class="hljs-literal">undefined</span>) {
@@ -187,7 +187,78 @@
             
             <div class="content"><div class='highlight'><pre>        replace: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
             parent.el.innerHTML = <span class="hljs-string">''</span>;
-            dom._append.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+            dom._after.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Insert element to the end of parent childs</p>
+<pre><code> @method append
+ @param {dom.Element} parent
+ @param {dom.Element} child
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child)</span> </span>{
+            <span class="hljs-keyword">if</span> (parent.el !== <span class="hljs-literal">undefined</span> &amp;&amp; child.el !== <span class="hljs-literal">undefined</span>) {
+                parent.el.appendChild(child.el);
+            }
+
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Insert element to the beginning of parent childs</p>
+<pre><code> @method prepend
+ @param {dom.Element} parent
+ @param {dom.Element} child
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        prepend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child)</span> </span>{
+            dom.insertBefore(parent, child, <span class="hljs-number">0</span>);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Insert element to the before of specific, child by index</p>
+<pre><code> @method insertBefore
+ @param {dom.Element} parent
+ @param {dom.Element} child
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        insertBefore: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, index)</span> </span>{
+            <span class="hljs-keyword">var</span> parentEl = parent.el;
+            <span class="hljs-keyword">var</span> childEl = child.el;
+            <span class="hljs-keyword">if</span> (parentEl !== <span class="hljs-literal">undefined</span> &amp;&amp; childEl !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">if</span> (parentEl.childNodes[index] !== <span class="hljs-literal">undefined</span>) {
+                    parentEl.insertBefore(childEl, parentEl.childNodes[index]);
+                } <span class="hljs-keyword">else</span> {
+                    parentEl.appendChild(childEl);
+                }
+            }
         },
         detach: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">if</span> (el.placeholder <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">false</span>) {
@@ -208,11 +279,11 @@
         </li>
         
         
-        <li id="section-5">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>console.log(fragment, parent, data);</p>
 
@@ -227,11 +298,11 @@
         </li>
         
         
-        <li id="section-6">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Adding text in to node</p>
 <pre><code> @method text
@@ -249,11 +320,11 @@
         </li>
         
         
-        <li id="section-7">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Setting Attribute in to node</p>
 <pre><code> @method setAttribute
@@ -278,11 +349,11 @@
         </li>
         
         
-        <li id="section-8">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Getting Attribute in to node</p>
 <pre><code> @method getAttribute
@@ -303,11 +374,11 @@
         </li>
         
         
-        <li id="section-9">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Removing Attribute from node</p>
 <pre><code> @method removeAttribute
@@ -325,11 +396,11 @@
         </li>
         
         
-        <li id="section-10">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Setting css style in to node</p>
 <pre><code> @method setStyle
@@ -354,11 +425,11 @@
         </li>
         
         
-        <li id="section-11">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Getting css style from node</p>
 <pre><code> @method getStyle
@@ -381,11 +452,11 @@
         </li>
         
         
-        <li id="section-12">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Removing css style from node</p>
 <pre><code> @method removeAttribute
@@ -403,11 +474,11 @@
         </li>
         
         
-        <li id="section-13">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Adding class in to node</p>
 <pre><code> @method addClass
@@ -425,11 +496,11 @@
         </li>
         
         
-        <li id="section-14">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>checking if className exists in node</p>
 <pre><code> @method hasClass
@@ -450,11 +521,11 @@
         </li>
         
         
-        <li id="section-15">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Remove class from node</p>
 <pre><code> @method removeClass
@@ -472,11 +543,11 @@
         </li>
         
         
-        <li id="section-16">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Setting, Getting value to input element</p>
 <pre><code> @method val
@@ -500,11 +571,11 @@
         </li>
         
         
-        <li id="section-17">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Adding DOM Event in to Element</p>
 <pre><code> @method on
@@ -541,11 +612,11 @@
         </li>
         
         
-        <li id="section-18">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Remove Dom Element from Dom</p>
 <pre><code> @method remove
@@ -566,11 +637,11 @@
         </li>
         
         
-        <li id="section-19">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>executes when element attached to Dom</p>
 <pre><code> @method onDOMAttached
@@ -611,11 +682,11 @@
         </li>
         
         
-        <li id="section-20">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Element</p>
 
@@ -627,11 +698,11 @@
         </li>
         
         
-        <li id="section-21">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <h2 id="widget-dom-element">widget/dom.Element</h2>
 <pre><code>@method Element
@@ -676,28 +747,28 @@
         </li>
         
         
-        <li id="section-22">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.append</code></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        _append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
-            dom._append(<span class="hljs-keyword">this</span>, child)
+            <div class="content"><div class='highlight'><pre>        _after: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
+            dom._after(<span class="hljs-keyword">this</span>, child)
         },</pre></div></div>
             
         </li>
         
         
-        <li id="section-23">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.replace</code></p>
 
@@ -710,11 +781,62 @@
         </li>
         
         
-        <li id="section-24">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Shortcut to - <code>dom.prepend</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        prepend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
+            dom.prepend(<span class="hljs-keyword">this</span>, child);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Shortcut to - <code>dom.insertBefore</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        insertBefore: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child, index)</span> </span>{
+            dom.insertBefore(<span class="hljs-keyword">this</span>, child, index);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Shortcut to - <code>dom.append</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        append: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> </span>{
+            dom.append(<span class="hljs-keyword">this</span>, child);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.text</code></p>
 
@@ -727,11 +849,11 @@
         </li>
         
         
-        <li id="section-25">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.add</code></p>
 
@@ -750,11 +872,11 @@
         </li>
         
         
-        <li id="section-26">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.setAttribute</code></p>
 
@@ -767,11 +889,11 @@
         </li>
         
         
-        <li id="section-27">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.getAttribute</code></p>
 
@@ -784,11 +906,11 @@
         </li>
         
         
-        <li id="section-28">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeAttribute</code></p>
 
@@ -801,11 +923,11 @@
         </li>
         
         
-        <li id="section-29">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.setStyle</code></p>
 
@@ -818,11 +940,11 @@
         </li>
         
         
-        <li id="section-30">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.getStyle</code></p>
 
@@ -835,11 +957,11 @@
         </li>
         
         
-        <li id="section-31">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeStyle</code></p>
 
@@ -852,11 +974,11 @@
         </li>
         
         
-        <li id="section-32">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.addClass</code></p>
 
@@ -869,11 +991,11 @@
         </li>
         
         
-        <li id="section-33">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.hasClass</code></p>
 
@@ -886,11 +1008,11 @@
         </li>
         
         
-        <li id="section-34">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.removeClass</code></p>
 
@@ -903,11 +1025,11 @@
         </li>
         
         
-        <li id="section-35">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.val</code></p>
 
@@ -920,11 +1042,11 @@
         </li>
         
         
-        <li id="section-36">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.on</code></p>
 
@@ -938,11 +1060,11 @@
         </li>
         
         
-        <li id="section-37">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.onDOMAttached</code></p>
 
@@ -955,11 +1077,11 @@
         </li>
         
         
-        <li id="section-38">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>Shortcut to - <code>dom.remove</code></p>
 

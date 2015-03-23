@@ -18,7 +18,7 @@ define('widget/dom',[
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        _append: function (parent, child, data) {
+        _after: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child._node.id) ||
                                 createPlaceholder(child._node.data.tag || el.el.tagName);
             if (child.run !== undefined) {
@@ -37,7 +37,42 @@ define('widget/dom',[
         //      @param {Object} data
         replace: function (parent, child, data) {
             parent.el.innerHTML = '';
-            dom._append.apply(this, arguments);
+            dom._after.apply(this, arguments);
+        },
+        // Insert element to the end of parent childs
+        //
+        //      @method append
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        append: function (parent, child) {
+            if (parent.el !== undefined && child.el !== undefined) {
+                parent.el.appendChild(child.el);
+            }
+
+        },
+        // Insert element to the beginning of parent childs
+        //
+        //      @method prepend
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        prepend: function (parent, child) {
+            dom.insertBefore(parent, child, 0);
+        },
+        // Insert element to the before of specific, child by index
+        //
+        //      @method insertBefore
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        insertBefore: function (parent, child, index) {
+            var parentEl = parent.el;
+            var childEl = child.el;
+            if (parentEl !== undefined && childEl !== undefined) {
+                if (parentEl.childNodes[index] !== undefined) {
+                    parentEl.insertBefore(childEl, parentEl.childNodes[index]);
+                } else {
+                    parentEl.appendChild(childEl);
+                }
+            }
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
@@ -317,12 +352,24 @@ define('widget/dom',[
             return extend;
         },
         // Shortcut to - `dom.append`
-        _append: function (child) {
-            dom._append(this, child)
+        _after: function (child) {
+            dom._after(this, child)
         },
         // Shortcut to - `dom.replace`
         replace: function (child, data) {
             dom.replace(this, child, data);
+        },
+        // Shortcut to - `dom.prepend`
+        prepend: function (child) {
+            dom.prepend(this, child);
+        },
+        // Shortcut to - `dom.insertBefore`
+        insertBefore: function (child, index) {
+            dom.insertBefore(this, child, index);
+        },
+        // Shortcut to - `dom.append`
+        append: function (child) {
+            dom.append(this, child);
         },
         // Shortcut to - `dom.text`
         text: function (text) {
@@ -1214,7 +1261,7 @@ define('widget/parsers/setBinders',[],function () {
         Object.keys(children).forEach(function (key) {
             bindings = bindings || {};
             var el = children[key];
-            if (el._node.bind !== undefined) {
+            if (el._node && el._node.bind !== undefined) {
                 bindings[el._node.bind] = bindings[el._node.bind] || []
                 bindings[el._node.bind].push(el);
             }
@@ -1313,7 +1360,9 @@ define('widget/parsers/setChildren',[
                     }
                 }
 
-            } else if (this.nodes[key] !== undefined && child._node.data.tplSet.noattach === 'true') {
+            } else if (this.nodes[key] !== undefined &&
+                       child._node.data.tplSet.noattach === 'true' &&
+                       child._node.data.dataset.bind === undefined) {
                 this.nodes[key].call(this, child);
             }
 
@@ -1492,7 +1541,7 @@ define('widget/parsers/setRoutes',[
                 destroyComponent(children[key]);
             });
         }
-        var instance = cp._node.data.instance;
+        var instance = cp.instance;
         if (instance) {
             instance.destroy();
         } else if (cp.remove !== undefined) {
@@ -1509,7 +1558,7 @@ define('widget/parsers/setRoutes',[
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
                 var cp = children[name];
-                cb.call(this, cp, cp._node.data.instance);
+                cb.call(this, cp, cp.instance);
             }.bind(this));
         }
     }
@@ -1518,7 +1567,7 @@ define('widget/parsers/setRoutes',[
         var names = Object.keys(children);
         names.forEach(function (name) {
             var child = children[name];
-            var route = child._node.data.route;
+            var route = (child._node !== undefined) ? child._node.data.route : undefined;
             if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches = match(route, function (match) {
                     if (child.children !== undefined) {
@@ -1560,16 +1609,17 @@ define('widget/parsers/setRoutes',[
                         dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
+
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
 
                             if (!cp.el && instance && instance._match) {
+
                                 matches.setRoutes(function (routes) {
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(this));
-
                                 instance._reRoute = function () {
                                     instance._applyRoutes(matches);
                                 };
@@ -1602,11 +1652,10 @@ define('widget/parsers/setRoutes',[
 
             } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
-            } else if (child._node.data.type === 'cp' && child._node.data.instance) {
-                var instance = child._node.data.instance;
+            } else if (child.instance !== undefined) {
+                var instance = child.instance;
                 instance._match.call(instance, match);
             }
-
         }.bind(this));
     }
 
@@ -1678,9 +1727,10 @@ define('widget/Constructor',[
 
         if (this.template) {
             var keys = (dataSet) ? Object.keys(dataSet) : [],
-                contextData = (keys.length > 0) ? dataSet : this.context.data[data.bind];
+                contextData = (keys.length > 0) ? dataSet : this.context.data;
+
             if (contextData) {
-                this.data = contextData;
+                this.data = contextData[data.bind] || contextData;
             }
 
             var decoder = new Decoder(this.template),
@@ -1853,6 +1903,7 @@ define('widget/Constructor',[
             this._reRoute();
         },
         setChildren: function (el, data) {
+            console.log(data);
             var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
@@ -1873,6 +1924,25 @@ define('widget/Constructor',[
             var instance = this.children[name]._node.data.instance;
             this.setRoutes(instance);
             this.rebind();
+        },
+        addComponent: function (name, Component, container, data, dataSet) {
+            if (this.children[name] !== undefined) {
+                throw ('Component using name:' + name + '! already defined.')
+            }
+            data = data || {};
+            data.appContext = this.context;
+
+            var instance = new Component(data, {}, dataSet);
+            dom.append(container, instance);
+            this.children[name] = {
+                instance: instance,
+                eventBus: instance.eventBus,
+                el: instance.el,
+                name: name
+            };
+            this.setRoutes(instance);
+            this.rebind();
+
         }
     });
 
