@@ -1819,6 +1819,7 @@ define('widget/Constructor',[
         // Load external css style for third party modules.
         //
         //      @method loadCss
+        //      @param {string} url
         loadCss: function (url) {
             this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
@@ -1902,14 +1903,20 @@ define('widget/Constructor',[
         rebind: function () {
             this._reRoute();
         },
+        // Adding Childrens manually after initialization.
+        //  @method setChildren
+        //  @param {Element} el
+        //  @param {Object} data
         setChildren: function (el, data) {
-            console.log(data);
             var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }
             el.applyAttach();
-            this.children[name] = new dom.Element(el);
+
+            if (el._node.data.type!=='cp') {
+                this.children[name] = new dom.Element(el);
+            }
 
             this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
             this.children[name].el = el.run(this.el, false, false, data);
@@ -1925,6 +1932,13 @@ define('widget/Constructor',[
             this.setRoutes(instance);
             this.rebind();
         },
+        // Adding Dynamic components
+        // @method addComponent
+        // @param {String} name
+        // @param {Constructor} Component
+        // @param {Element} container
+        // @param {Object} data (data attributes)
+        // @param {Object} dataSet (Model for bindings)
         addComponent: function (name, Component, container, data, dataSet) {
             if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')

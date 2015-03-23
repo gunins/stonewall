@@ -361,6 +361,7 @@ Usage Example</p>
               </div>
               <p>Load external css style for third party modules.</p>
 <pre><code> @method loadCss
+ @param {string} url
 </code></pre>
             </div>
             
@@ -506,15 +507,34 @@ Usage Example</p>
         },
         rebind: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             <span class="hljs-keyword">this</span>._reRoute();
-        },
-        setChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
-            <span class="hljs-built_in">console</span>.log(data);
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Adding Childrens manually after initialization.
+ @method setChildren
+ @param {Element} el
+ @param {Object} data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        setChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
             <span class="hljs-keyword">var</span> name = el._node.name;
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[name].el !== <span class="hljs-literal">undefined</span>) {
                 dom.detach(<span class="hljs-keyword">this</span>.children[name]); <span class="hljs-comment">//.detach();</span>
             }
             el.applyAttach();
-            <span class="hljs-keyword">this</span>.children[name] = <span class="hljs-keyword">new</span> dom.Element(el);
+
+            <span class="hljs-keyword">if</span> (el._node.data.type!==<span class="hljs-string">'cp'</span>) {
+                <span class="hljs-keyword">this</span>.children[name] = <span class="hljs-keyword">new</span> dom.Element(el);
+            }
 
             <span class="hljs-keyword">this</span>.children[name].placeholder = <span class="hljs-keyword">this</span>.el.querySelector(<span class="hljs-string">'#'</span> + el._node.id);
             <span class="hljs-keyword">this</span>.children[name].el = el.run(<span class="hljs-keyword">this</span>.el, <span class="hljs-literal">false</span>, <span class="hljs-literal">false</span>, data);
@@ -529,8 +549,28 @@ Usage Example</p>
             <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>.children[name]._node.data.instance;
             <span class="hljs-keyword">this</span>.setRoutes(instance);
             <span class="hljs-keyword">this</span>.rebind();
-        },
-        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, Component, container, data, dataSet)</span> </span>{
+        },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Adding Dynamic components
+@method addComponent
+@param {String} name
+@param {Constructor} Component
+@param {Element} container
+@param {Object} data (data attributes)
+@param {Object} dataSet (Model for bindings)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, Component, container, data, dataSet)</span> </span>{
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">throw</span> (<span class="hljs-string">'Component using name:'</span> + name + <span class="hljs-string">'! already defined.'</span>)
             }
