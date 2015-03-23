@@ -52,9 +52,10 @@ define([
 
         if (this.template) {
             var keys = (dataSet) ? Object.keys(dataSet) : [],
-                contextData = (keys.length > 0) ? dataSet : this.context.data[data.bind];
+                contextData = (keys.length > 0) ? dataSet : this.context.data;
+
             if (contextData) {
-                this.data = contextData;
+                this.data = contextData[data.bind] || contextData;
             }
 
             var decoder = new Decoder(this.template),
@@ -143,6 +144,7 @@ define([
         // Load external css style for third party modules.
         //
         //      @method loadCss
+        //      @param {string} url
         loadCss: function (url) {
             this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
@@ -226,13 +228,20 @@ define([
         rebind: function () {
             this._reRoute();
         },
+        // Adding Childrens manually after initialization.
+        //  @method setChildren
+        //  @param {Element} el
+        //  @param {Object} data
         setChildren: function (el, data) {
             var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }
             el.applyAttach();
-            this.children[name] = new dom.Element(el);
+
+            if (el._node.data.type!=='cp') {
+                this.children[name] = new dom.Element(el);
+            }
 
             this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
             this.children[name].el = el.run(this.el, false, false, data);
@@ -247,6 +256,32 @@ define([
             var instance = this.children[name]._node.data.instance;
             this.setRoutes(instance);
             this.rebind();
+        },
+        // Adding Dynamic components
+        // @method addComponent
+        // @param {String} name
+        // @param {Constructor} Component
+        // @param {Element} container
+        // @param {Object} data (data attributes)
+        // @param {Object} dataSet (Model for bindings)
+        addComponent: function (name, Component, container, data, dataSet) {
+            if (this.children[name] !== undefined) {
+                throw ('Component using name:' + name + '! already defined.')
+            }
+            data = data || {};
+            data.appContext = this.context;
+
+            var instance = new Component(data, {}, dataSet);
+            dom.append(container, instance);
+            this.children[name] = {
+                instance: instance,
+                eventBus: instance.eventBus,
+                el: instance.el,
+                name: name
+            };
+            this.setRoutes(instance);
+            this.rebind();
+
         }
     });
 

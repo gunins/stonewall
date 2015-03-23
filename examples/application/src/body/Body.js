@@ -1,8 +1,8 @@
 define([
     'templating/parser!./_body.html',
     'widget/Constructor',
-    '../resultData'
-], function (template, Constructor, data) {
+    'results/Results'
+], function (template, Constructor, Results) {
     return Constructor.extend({
         template: template,
         init: function () {
@@ -23,9 +23,9 @@ define([
             }.bind(this));
 
         },
-        nodes: {
-            results: function (el, parent, data) {
-                this.setChildren(el, data);
+        elReady: {
+            resultsholder: function (placeholder) {
+                this.addComponent('results', Results, placeholder, {bind: 'results'}, this.data);
             }
         }
     });

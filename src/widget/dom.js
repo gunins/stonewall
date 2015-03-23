@@ -18,7 +18,7 @@ define([
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        _append: function (parent, child, data) {
+        _after: function (parent, child, data) {
             child.placeholder = parent.el.querySelector('#' + child._node.id) ||
                                 createPlaceholder(child._node.data.tag || el.el.tagName);
             if (child.run !== undefined) {
@@ -37,7 +37,42 @@ define([
         //      @param {Object} data
         replace: function (parent, child, data) {
             parent.el.innerHTML = '';
-            dom._append.apply(this, arguments);
+            dom._after.apply(this, arguments);
+        },
+        // Insert element to the end of parent childs
+        //
+        //      @method append
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        append: function (parent, child) {
+            if (parent.el !== undefined && child.el !== undefined) {
+                parent.el.appendChild(child.el);
+            }
+
+        },
+        // Insert element to the beginning of parent childs
+        //
+        //      @method prepend
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        prepend: function (parent, child) {
+            dom.insertBefore(parent, child, 0);
+        },
+        // Insert element to the before of specific, child by index
+        //
+        //      @method insertBefore
+        //      @param {dom.Element} parent
+        //      @param {dom.Element} child
+        insertBefore: function (parent, child, index) {
+            var parentEl = parent.el;
+            var childEl = child.el;
+            if (parentEl !== undefined && childEl !== undefined) {
+                if (parentEl.childNodes[index] !== undefined) {
+                    parentEl.insertBefore(childEl, parentEl.childNodes[index]);
+                } else {
+                    parentEl.appendChild(childEl);
+                }
+            }
         },
         detach: function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
@@ -317,12 +352,24 @@ define([
             return extend;
         },
         // Shortcut to - `dom.append`
-        _append: function (child) {
-            dom._append(this, child)
+        _after: function (child) {
+            dom._after(this, child)
         },
         // Shortcut to - `dom.replace`
         replace: function (child, data) {
             dom.replace(this, child, data);
+        },
+        // Shortcut to - `dom.prepend`
+        prepend: function (child) {
+            dom.prepend(this, child);
+        },
+        // Shortcut to - `dom.insertBefore`
+        insertBefore: function (child, index) {
+            dom.insertBefore(this, child, index);
+        },
+        // Shortcut to - `dom.append`
+        append: function (child) {
+            dom.append(this, child);
         },
         // Shortcut to - `dom.text`
         text: function (text) {

@@ -8,7 +8,7 @@ define(function () {
         Object.keys(children).forEach(function (key) {
             bindings = bindings || {};
             var el = children[key];
-            if (el._node.bind !== undefined) {
+            if (el._node && el._node.bind !== undefined) {
                 bindings[el._node.bind] = bindings[el._node.bind] || []
                 bindings[el._node.bind].push(el);
             }

@@ -34,11 +34,26 @@ define([
                 expect($(instance.fragment).find('.childElement')).to.have.$html('<span>Child Content</span>');
             });
 
-            it('Testing method "_append"', function () {
-                childContainer._append(child);
+            it('Testing method "_after"', function () {
+                childContainer._after(child);
                 var $child = $(childContainer.el).children();
                 $child.removeAttr('class');
                 expect($(childContainer.el)).to.have.$html('<span>Child Content</span>');
+            });
+            it('Testing method "append"', function () {
+                var el = new dom.Element({name: 'testName', _node: {el: document.createElement('span')}});
+                el.text('Test append Content');
+                childContainer.append(el);
+                expect($(childContainer.el).children().last()).to.have.$html('Test append Content');
+                expect($(childContainer.el).children().first()).to.have.$html('Child Content');
+            });
+            it('Testing method "prepend"', function () {
+                var el = new dom.Element({name: 'testName', _node: {el: document.createElement('span')}});
+                el.text('Test prepend Content');
+                childContainer.prepend(el);
+                expect($(childContainer.el).children().first()).to.have.$html('Test prepend Content');
+                expect($(childContainer.el).children().eq(1)).to.have.$html('Child Content');
+
             });
             it('Testing method "replace"', function () {
                 childContainer.replace(child);

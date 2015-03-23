@@ -69,7 +69,9 @@ define([
                     }
                 }
 
-            } else if (this.nodes[key] !== undefined && child._node.data.tplSet.noattach === 'true') {
+            } else if (this.nodes[key] !== undefined &&
+                       child._node.data.tplSet.noattach === 'true' &&
+                       child._node.data.dataset.bind === undefined) {
                 this.nodes[key].call(this, child);
             }
 

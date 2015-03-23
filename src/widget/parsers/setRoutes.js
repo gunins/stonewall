@@ -12,7 +12,7 @@ define([
                 destroyComponent(children[key]);
             });
         }
-        var instance = cp._node.data.instance;
+        var instance = cp.instance;
         if (instance) {
             instance.destroy();
         } else if (cp.remove !== undefined) {
@@ -29,7 +29,7 @@ define([
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
                 var cp = children[name];
-                cb.call(this, cp, cp._node.data.instance);
+                cb.call(this, cp, cp.instance);
             }.bind(this));
         }
     }
@@ -38,7 +38,7 @@ define([
         var names = Object.keys(children);
         names.forEach(function (name) {
             var child = children[name];
-            var route = child._node.data.route;
+            var route = (child._node !== undefined) ? child._node.data.route : undefined;
             if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches = match(route, function (match) {
                     if (child.children !== undefined) {
@@ -80,16 +80,17 @@ define([
                         dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
+
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
 
                             if (!cp.el && instance && instance._match) {
+
                                 matches.setRoutes(function (routes) {
                                     instance._match.call(instance, routes.match.bind(routes));
                                     routes.run();
                                 }.bind(this));
-
                                 instance._reRoute = function () {
                                     instance._applyRoutes(matches);
                                 };
@@ -122,11 +123,10 @@ define([
 
             } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
-            } else if (child._node.data.type === 'cp' && child._node.data.instance) {
-                var instance = child._node.data.instance;
+            } else if (child.instance !== undefined) {
+                var instance = child.instance;
                 instance._match.call(instance, match);
             }
-
         }.bind(this));
     }
 
