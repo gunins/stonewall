@@ -17,7 +17,8 @@ define([
 
             var element = elements[key],
                 node = element._node;
-            if (['cp'].indexOf(node.data.type) !== -1) {
+            if (typeof element == 'string') {
+            } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
                     element.children = node.children;
                 }
@@ -43,8 +44,8 @@ define([
     }
 
     function setChildren(elements, parentChildren, data) {
-        parentChildren = (parentChildren) ? applyElement(parentChildren, data) : {};
-        elements = (elements) ? applyElement(elements, data) : {};
+        parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, data) : {};
+        elements = (elements) ? applyElement.call(this, elements, data) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
@@ -63,7 +64,12 @@ define([
                 if (this.nodes[key] !== undefined) {
                     this.nodes[key].call(this, child, parentChild);
                 } else if (child !== undefined) {
-                    dom.replace(child, parentChild);
+                    if (typeof parentChild == 'string') {
+                        dom.text(child, parentChild);
+                    }
+                    else {
+                        dom.replace(child, parentChild);
+                    }
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
                     }

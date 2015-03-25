@@ -48,6 +48,9 @@ define([
         if (data.appContext !== undefined) {
             utils.extend(this.context, data.appContext);
         }
+        if (data.name !== undefined) {
+            this.name = data.name;
+        }
         this.beforeInit.apply(this, arguments);
 
         if (this.template) {
@@ -63,7 +66,7 @@ define([
             this.el = template.fragment;
             this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
-            this.routes = setRoutes.call(this, this.children);
+            setRoutes.call(this, this.children);
 
             if (this.data) {
                 this.applyBinders(this.data, this);
@@ -224,6 +227,7 @@ define([
             matches.rebind();
         },
         _reRoute: function () {
+            this._routes.splice(0, this._routes.length);
         },
         rebind: function () {
             this._reRoute();
@@ -239,7 +243,7 @@ define([
             }
             el.applyAttach();
 
-            if (el._node.data.type!=='cp') {
+            if (el._node.data.type !== 'cp') {
                 this.children[name] = new dom.Element(el);
             }
 
@@ -263,25 +267,50 @@ define([
         // @param {Constructor} Component
         // @param {Element} container
         // @param {Object} data (data attributes)
+        // @param {Object} children
         // @param {Object} dataSet (Model for bindings)
-        addComponent: function (name, Component, container, data, dataSet) {
-            if (this.children[name] !== undefined) {
+        addComponent: function (Component, options) {
+            var name = options.name;
+            var container = options.container;
+
+            if (name === undefined) {
+                throw ('you have to define data.name for component.')
+            } else if (container === undefined) {
+                throw ('You have to define container for component.')
+            } else if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')
             }
-            data = data || {};
-            data.appContext = this.context;
+            var component = this.setComponent(Component, options);
 
-            var instance = new Component(data, {}, dataSet);
-            dom.append(container, instance);
-            this.children[name] = {
-                instance: instance,
-                eventBus: instance.eventBus,
-                el: instance.el,
-                name: name
-            };
-            this.setRoutes(instance);
+            component.run(options.container);
+            this.children[name] = component;
+            this.setRoutes(component.instance);
             this.rebind();
-
+        },
+        setComponent: function (Component, options) {
+            var instance = {
+                name: options.name,
+                _node: {
+                    data: {
+                        tag: 'div',
+                        type: 'cp'
+                    }
+                },
+                run: function (container) {
+                    options.appContext = this.context;
+                    var cp = new Component(options, options.children, options.data);
+                    instance.instance = cp;
+                    instance.eventBus = cp.eventBus;
+                    instance.children = instance._node.children = cp.children;
+                    if (container instanceof HTMLElement === true) {
+                        container.parentNode.replaceChild(cp.el, container);
+                    } else if (container.el !== undefined) {
+                        dom.append(container, cp);
+                    }
+                    return cp.el;
+                }.bind(this)
+            }
+            return instance;
         }
     });
 

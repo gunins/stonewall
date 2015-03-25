@@ -19,13 +19,18 @@ define([
         //      @param {dom.Element} child
         //      @param {Object} data
         _after: function (parent, child, data) {
-            child.placeholder = parent.el.querySelector('#' + child._node.id) ||
-                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            if (child._node !== undefined) {
+                child.placeholder = parent.el.querySelector('#' + child._node.id) ||
+                                    createPlaceholder(child._node.data.tag || child.el.tagName);
+            } else {
+                child.placeholder = createPlaceholder(child.el.tagName);
+            }
+
             if (child.run !== undefined) {
                 child.el = child.run.call(child, parent.el, true, false, data);
             }
 
-            if (child._node.data && child._node.data.instance) {
+            if (child._node && child._node.data && child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },

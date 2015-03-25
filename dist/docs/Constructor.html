@@ -197,6 +197,9 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (data.appContext !== <span class="hljs-literal">undefined</span>) {
             utils.extend(<span class="hljs-keyword">this</span>.context, data.appContext);
         }
+        <span class="hljs-keyword">if</span> (data.name !== <span class="hljs-literal">undefined</span>) {
+            <span class="hljs-keyword">this</span>.name = data.name;
+        }
         <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
 
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
@@ -212,7 +215,7 @@ Basic Usage example</p>
             <span class="hljs-keyword">this</span>.el = template.fragment;
             <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children, data), <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
-            <span class="hljs-keyword">this</span>.routes = setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
+            setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.data) {
                 <span class="hljs-keyword">this</span>.applyBinders(<span class="hljs-keyword">this</span>.data, <span class="hljs-keyword">this</span>);
@@ -504,6 +507,7 @@ Usage Example</p>
             matches.rebind();
         },
         _reRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">this</span>._routes.splice(<span class="hljs-number">0</span>, <span class="hljs-keyword">this</span>._routes.length);
         },
         rebind: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
             <span class="hljs-keyword">this</span>._reRoute();
@@ -532,7 +536,7 @@ Usage Example</p>
             }
             el.applyAttach();
 
-            <span class="hljs-keyword">if</span> (el._node.data.type!==<span class="hljs-string">'cp'</span>) {
+            <span class="hljs-keyword">if</span> (el._node.data.type !== <span class="hljs-string">'cp'</span>) {
                 <span class="hljs-keyword">this</span>.children[name] = <span class="hljs-keyword">new</span> dom.Element(el);
             }
 
@@ -566,28 +570,53 @@ Usage Example</p>
 @param {Constructor} Component
 @param {Element} container
 @param {Object} data (data attributes)
+@param {Object} children
 @param {Object} dataSet (Model for bindings)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, Component, container, data, dataSet)</span> </span>{
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span>) {
+            <div class="content"><div class='highlight'><pre>        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Component, options)</span> </span>{
+            <span class="hljs-keyword">var</span> name = options.name;
+            <span class="hljs-keyword">var</span> container = options.container;
+
+            <span class="hljs-keyword">if</span> (name === <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">throw</span> (<span class="hljs-string">'you have to define data.name for component.'</span>)
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (container === <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">throw</span> (<span class="hljs-string">'You have to define container for component.'</span>)
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">throw</span> (<span class="hljs-string">'Component using name:'</span> + name + <span class="hljs-string">'! already defined.'</span>)
             }
-            data = data || {};
-            data.appContext = <span class="hljs-keyword">this</span>.context;
+            <span class="hljs-keyword">var</span> component = <span class="hljs-keyword">this</span>.setComponent(Component, options);
 
-            <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">new</span> Component(data, {}, dataSet);
-            dom.append(container, instance);
-            <span class="hljs-keyword">this</span>.children[name] = {
-                instance: instance,
-                eventBus: instance.eventBus,
-                el: instance.el,
-                name: name
-            };
-            <span class="hljs-keyword">this</span>.setRoutes(instance);
+            component.run(options.container);
+            <span class="hljs-keyword">this</span>.children[name] = component;
+            <span class="hljs-keyword">this</span>.setRoutes(component.instance);
             <span class="hljs-keyword">this</span>.rebind();
-
+        },
+        setComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Component, options)</span> </span>{
+            <span class="hljs-keyword">var</span> instance = {
+                name: options.name,
+                _node: {
+                    data: {
+                        tag: <span class="hljs-string">'div'</span>,
+                        type: <span class="hljs-string">'cp'</span>
+                    }
+                },
+                run: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(container)</span> </span>{
+                    options.appContext = <span class="hljs-keyword">this</span>.context;
+                    <span class="hljs-keyword">var</span> cp = <span class="hljs-keyword">new</span> Component(options, options.children, options.data);
+                    instance.instance = cp;
+                    instance.eventBus = cp.eventBus;
+                    instance.children = instance._node.children = cp.children;
+                    <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
+                        container.parentNode.replaceChild(cp.el, container);
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (container.el !== <span class="hljs-literal">undefined</span>) {
+                        dom.append(container, cp);
+                    }
+                    <span class="hljs-keyword">return</span> cp.el;
+                }.bind(<span class="hljs-keyword">this</span>)
+            }
+            <span class="hljs-keyword">return</span> instance;
         }
     });
 

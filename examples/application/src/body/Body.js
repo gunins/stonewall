@@ -24,8 +24,14 @@ define([
 
         },
         elReady: {
-            resultsholder: function (placeholder) {
-                this.addComponent('results', Results, placeholder, {bind: 'results'}, this.data);
+            resultsholder: function (container) {
+                    this.addComponent(Results, {
+                        name: 'results',
+                        bind: 'results',
+                        data: this.data,
+                        container: container
+                    });
+
             }
         }
     });

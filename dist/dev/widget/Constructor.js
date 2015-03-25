@@ -19,13 +19,18 @@ define('widget/dom',[
         //      @param {dom.Element} child
         //      @param {Object} data
         _after: function (parent, child, data) {
-            child.placeholder = parent.el.querySelector('#' + child._node.id) ||
-                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            if (child._node !== undefined) {
+                child.placeholder = parent.el.querySelector('#' + child._node.id) ||
+                                    createPlaceholder(child._node.data.tag || child.el.tagName);
+            } else {
+                child.placeholder = createPlaceholder(child.el.tagName);
+            }
+
             if (child.run !== undefined) {
                 child.el = child.run.call(child, parent.el, true, false, data);
             }
 
-            if (child._node.data && child._node.data.instance) {
+            if (child._node && child._node.data && child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },
@@ -1308,7 +1313,8 @@ define('widget/parsers/setChildren',[
 
             var element = elements[key],
                 node = element._node;
-            if (['cp'].indexOf(node.data.type) !== -1) {
+            if (typeof element == 'string') {
+            } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
                     element.children = node.children;
                 }
@@ -1334,8 +1340,8 @@ define('widget/parsers/setChildren',[
     }
 
     function setChildren(elements, parentChildren, data) {
-        parentChildren = (parentChildren) ? applyElement(parentChildren, data) : {};
-        elements = (elements) ? applyElement(elements, data) : {};
+        parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, data) : {};
+        elements = (elements) ? applyElement.call(this, elements, data) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
@@ -1354,7 +1360,12 @@ define('widget/parsers/setChildren',[
                 if (this.nodes[key] !== undefined) {
                     this.nodes[key].call(this, child, parentChild);
                 } else if (child !== undefined) {
-                    dom.replace(child, parentChild);
+                    if (typeof parentChild == 'string') {
+                        dom.text(child, parentChild);
+                    }
+                    else {
+                        dom.replace(child, parentChild);
+                    }
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
                     }
@@ -1723,6 +1734,9 @@ define('widget/Constructor',[
         if (data.appContext !== undefined) {
             utils.extend(this.context, data.appContext);
         }
+        if (data.name !== undefined) {
+            this.name = data.name;
+        }
         this.beforeInit.apply(this, arguments);
 
         if (this.template) {
@@ -1738,7 +1752,7 @@ define('widget/Constructor',[
             this.el = template.fragment;
             this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
-            this.routes = setRoutes.call(this, this.children);
+            setRoutes.call(this, this.children);
 
             if (this.data) {
                 this.applyBinders(this.data, this);
@@ -1899,6 +1913,7 @@ define('widget/Constructor',[
             matches.rebind();
         },
         _reRoute: function () {
+            this._routes.splice(0, this._routes.length);
         },
         rebind: function () {
             this._reRoute();
@@ -1914,7 +1929,7 @@ define('widget/Constructor',[
             }
             el.applyAttach();
 
-            if (el._node.data.type!=='cp') {
+            if (el._node.data.type !== 'cp') {
                 this.children[name] = new dom.Element(el);
             }
 
@@ -1938,25 +1953,50 @@ define('widget/Constructor',[
         // @param {Constructor} Component
         // @param {Element} container
         // @param {Object} data (data attributes)
+        // @param {Object} children
         // @param {Object} dataSet (Model for bindings)
-        addComponent: function (name, Component, container, data, dataSet) {
-            if (this.children[name] !== undefined) {
+        addComponent: function (Component, options) {
+            var name = options.name;
+            var container = options.container;
+
+            if (name === undefined) {
+                throw ('you have to define data.name for component.')
+            } else if (container === undefined) {
+                throw ('You have to define container for component.')
+            } else if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')
             }
-            data = data || {};
-            data.appContext = this.context;
+            var component = this.setComponent(Component, options);
 
-            var instance = new Component(data, {}, dataSet);
-            dom.append(container, instance);
-            this.children[name] = {
-                instance: instance,
-                eventBus: instance.eventBus,
-                el: instance.el,
-                name: name
-            };
-            this.setRoutes(instance);
+            component.run(options.container);
+            this.children[name] = component;
+            this.setRoutes(component.instance);
             this.rebind();
-
+        },
+        setComponent: function (Component, options) {
+            var instance = {
+                name: options.name,
+                _node: {
+                    data: {
+                        tag: 'div',
+                        type: 'cp'
+                    }
+                },
+                run: function (container) {
+                    options.appContext = this.context;
+                    var cp = new Component(options, options.children, options.data);
+                    instance.instance = cp;
+                    instance.eventBus = cp.eventBus;
+                    instance.children = instance._node.children = cp.children;
+                    if (container instanceof HTMLElement === true) {
+                        container.parentNode.replaceChild(cp.el, container);
+                    } else if (container.el !== undefined) {
+                        dom.append(container, cp);
+                    }
+                    return cp.el;
+                }.bind(this)
+            }
+            return instance;
         }
     });
 

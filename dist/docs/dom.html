@@ -157,13 +157,18 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>        _after: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parent, child, data)</span> </span>{
-            child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child._node.id) ||
-                                createPlaceholder(child._node.data.tag || el.el.tagName);
+            <span class="hljs-keyword">if</span> (child._node !== <span class="hljs-literal">undefined</span>) {
+                child.placeholder = parent.el.querySelector(<span class="hljs-string">'#'</span> + child._node.id) ||
+                                    createPlaceholder(child._node.data.tag || child.el.tagName);
+            } <span class="hljs-keyword">else</span> {
+                child.placeholder = createPlaceholder(child.el.tagName);
+            }
+
             <span class="hljs-keyword">if</span> (child.run !== <span class="hljs-literal">undefined</span>) {
                 child.el = child.run.call(child, parent.el, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>, data);
             }
 
-            <span class="hljs-keyword">if</span> (child._node.data &amp;&amp; child._node.data.instance) {
+            <span class="hljs-keyword">if</span> (child._node &amp;&amp; child._node.data &amp;&amp; child._node.data.instance) {
                 utils.extend(child, child._node.data.instance);
             }
         },</pre></div></div>
