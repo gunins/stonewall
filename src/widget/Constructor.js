@@ -286,6 +286,7 @@ define([
             this.children[name] = component;
             this.setRoutes(component.instance);
             this.rebind();
+            return component;
         },
         setComponent: function (Component, options) {
             var instance = {

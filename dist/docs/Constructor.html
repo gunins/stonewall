@@ -592,6 +592,7 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.children[name] = component;
             <span class="hljs-keyword">this</span>.setRoutes(component.instance);
             <span class="hljs-keyword">this</span>.rebind();
+            <span class="hljs-keyword">return</span> component;
         },
         setComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Component, options)</span> </span>{
             <span class="hljs-keyword">var</span> instance = {
