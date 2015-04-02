@@ -327,26 +327,27 @@ define([
         var root = node._node;
         this._events = [];
         this._node = root;
-        if (!this.el && root.el) {
+        if (root && !this.el && root.el) {
             this.el = root.el;
         }
         if (!this.name) {
-            this.name = root.name;
+            this.name = node.name || root.name;
         }
-        if (this._node.bind && !this.bind) {
+        if (root && root.bind && !this.bind) {
             this.bind = root.bind;
         }
-        if (!this.dataset && root.data && root.data.dataset) {
+        if (root && !this.dataset && root.data && root.data.dataset) {
             this.dataset = root.data.dataset;
         }
-        if (this._node.children && !this.children) {
+        if (root && root.children && !this.children) {
             this.children = root.children;
         }
-
-        this.run = root.run;
-        this.applyAttach = root.applyAttach;
-        this.getParent = root.getParent;
-        this.setParent = root.setParent;
+        if (root) {
+            this.run = root.run;
+            this.applyAttach = root.applyAttach;
+            this.getParent = root.getParent;
+            this.setParent = root.setParent;
+        }
 
     }
 

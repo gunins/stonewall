@@ -55,7 +55,6 @@ define([
 
         if (node && node.getInstance) {
             var instance = node.getInstance();
-            this.root = new dom.Element(instance);
             instance.instance = this;
             instance.eventBus = this.eventBus;
         }
@@ -63,6 +62,10 @@ define([
         if (this.template) {
             var keys = (dataSet) ? Object.keys(dataSet) : [],
                 contextData = (keys.length > 0) ? dataSet : this.context.data;
+            this.root = new dom.Element({
+                el: this.el,
+                name:'root'
+            });
 
             if (contextData) {
                 this.data = contextData[data.bind] || contextData;
@@ -79,12 +82,12 @@ define([
                 this.applyBinders(this.data, this);
             }
 
-        } else {
+        }
+
+        else {
 
             this.el = document.createElement('div');
         }
-
-
 
         this.init.apply(this, arguments);
     }

@@ -719,26 +719,27 @@
         <span class="hljs-keyword">var</span> root = node._node;
         <span class="hljs-keyword">this</span>._events = [];
         <span class="hljs-keyword">this</span>._node = root;
-        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.el &amp;&amp; root.el) {
+        <span class="hljs-keyword">if</span> (root &amp;&amp; !<span class="hljs-keyword">this</span>.el &amp;&amp; root.el) {
             <span class="hljs-keyword">this</span>.el = root.el;
         }
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.name) {
-            <span class="hljs-keyword">this</span>.name = root.name;
+            <span class="hljs-keyword">this</span>.name = node.name || root.name;
         }
-        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.bind &amp;&amp; !<span class="hljs-keyword">this</span>.bind) {
+        <span class="hljs-keyword">if</span> (root &amp;&amp; root.bind &amp;&amp; !<span class="hljs-keyword">this</span>.bind) {
             <span class="hljs-keyword">this</span>.bind = root.bind;
         }
-        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.dataset &amp;&amp; root.data &amp;&amp; root.data.dataset) {
+        <span class="hljs-keyword">if</span> (root &amp;&amp; !<span class="hljs-keyword">this</span>.dataset &amp;&amp; root.data &amp;&amp; root.data.dataset) {
             <span class="hljs-keyword">this</span>.dataset = root.data.dataset;
         }
-        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._node.children &amp;&amp; !<span class="hljs-keyword">this</span>.children) {
+        <span class="hljs-keyword">if</span> (root &amp;&amp; root.children &amp;&amp; !<span class="hljs-keyword">this</span>.children) {
             <span class="hljs-keyword">this</span>.children = root.children;
         }
-
-        <span class="hljs-keyword">this</span>.run = root.run;
-        <span class="hljs-keyword">this</span>.applyAttach = root.applyAttach;
-        <span class="hljs-keyword">this</span>.getParent = root.getParent;
-        <span class="hljs-keyword">this</span>.setParent = root.setParent;
+        <span class="hljs-keyword">if</span> (root) {
+            <span class="hljs-keyword">this</span>.run = root.run;
+            <span class="hljs-keyword">this</span>.applyAttach = root.applyAttach;
+            <span class="hljs-keyword">this</span>.getParent = root.getParent;
+            <span class="hljs-keyword">this</span>.setParent = root.setParent;
+        }
 
     }
 

@@ -204,7 +204,6 @@ Basic Usage example</p>
 
         <span class="hljs-keyword">if</span> (node &amp;&amp; node.getInstance) {
             <span class="hljs-keyword">var</span> instance = node.getInstance();
-            <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(instance);
             instance.instance = <span class="hljs-keyword">this</span>;
             instance.eventBus = <span class="hljs-keyword">this</span>.eventBus;
         }
@@ -212,6 +211,10 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
             <span class="hljs-keyword">var</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [],
                 contextData = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data;
+            <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element({
+                el: <span class="hljs-keyword">this</span>.el,
+                name:<span class="hljs-string">'root'</span>
+            });
 
             <span class="hljs-keyword">if</span> (contextData) {
                 <span class="hljs-keyword">this</span>.data = contextData[data.bind] || contextData;
@@ -228,12 +231,12 @@ Basic Usage example</p>
                 <span class="hljs-keyword">this</span>.applyBinders(<span class="hljs-keyword">this</span>.data, <span class="hljs-keyword">this</span>);
             }
 
-        } <span class="hljs-keyword">else</span> {
+        }
+
+        <span class="hljs-keyword">else</span> {
 
             <span class="hljs-keyword">this</span>.el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
         }
-
-
 
         <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
     }
