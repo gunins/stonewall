@@ -1753,11 +1753,6 @@ define('widget/Constructor',[
         if (this.template) {
             var keys = (dataSet) ? Object.keys(dataSet) : [],
                 contextData = (keys.length > 0) ? dataSet : this.context.data;
-            this.root = new dom.Element({
-                el: this.el,
-                name:'root'
-            });
-
             if (contextData) {
                 this.data = contextData[data.bind] || contextData;
             }
@@ -1765,6 +1760,10 @@ define('widget/Constructor',[
             var decoder = new Decoder(this.template),
                 template = decoder.render(this.data);
             this.el = template.fragment;
+            this.root = new dom.Element({
+                el: this.el,
+                name:'root'
+            });
             this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
             setRoutes.call(this, this.children);

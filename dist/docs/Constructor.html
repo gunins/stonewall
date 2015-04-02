@@ -211,11 +211,6 @@ Basic Usage example</p>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
             <span class="hljs-keyword">var</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [],
                 contextData = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data;
-            <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element({
-                el: <span class="hljs-keyword">this</span>.el,
-                name:<span class="hljs-string">'root'</span>
-            });
-
             <span class="hljs-keyword">if</span> (contextData) {
                 <span class="hljs-keyword">this</span>.data = contextData[data.bind] || contextData;
             }
@@ -223,6 +218,10 @@ Basic Usage example</p>
             <span class="hljs-keyword">var</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
                 template = decoder.render(<span class="hljs-keyword">this</span>.data);
             <span class="hljs-keyword">this</span>.el = template.fragment;
+            <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element({
+                el: <span class="hljs-keyword">this</span>.el,
+                name:<span class="hljs-string">'root'</span>
+            });
             <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children, data), <span class="hljs-keyword">this</span>.children);
             <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
             setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
