@@ -5,6 +5,9 @@
     "type": "git",
     "url": "https://github.com/gunins/stonewall"
   },
+  "main": [
+    "dist/prod/loader.js"
+  ],
   "dependencies": {
     "requirejs": "^2.1.15",
     "bootstrap": "latest",
