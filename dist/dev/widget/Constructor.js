@@ -1739,6 +1739,13 @@ define('widget/Constructor',[
         }
         this.beforeInit.apply(this, arguments);
 
+        if (node && node.getInstance) {
+            var instance = node.getInstance();
+            this.root = new dom.Element(instance);
+            instance.instance = this;
+            instance.eventBus = this.eventBus;
+        }
+
         if (this.template) {
             var keys = (dataSet) ? Object.keys(dataSet) : [],
                 contextData = (keys.length > 0) ? dataSet : this.context.data;
@@ -1763,13 +1770,9 @@ define('widget/Constructor',[
             this.el = document.createElement('div');
         }
 
-        this.init.apply(this, arguments);
-        if (node && node.getInstance) {
-            var instance = node.getInstance();
-            instance.instance = this;
-            instance.eventBus = this.eventBus;
-        }
 
+
+        this.init.apply(this, arguments);
     }
 
     utils.extend(Constructor.prototype, {
@@ -1991,6 +1994,8 @@ define('widget/Constructor',[
                     instance.children = instance._node.children = cp.children;
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
+                    } else if (container.el !== undefined && options.pos !== undefined) {
+                        dom.insertBefore(container, cp, options.pos);
                     } else if (container.el !== undefined) {
                         dom.append(container, cp);
                     }
