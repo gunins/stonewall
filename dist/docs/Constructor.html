@@ -492,7 +492,11 @@ Usage Example</p>
                 <span class="hljs-keyword">this</span>._events[<span class="hljs-number">0</span>].remove();
                 <span class="hljs-keyword">this</span>._events.shift();
             }
-            <span class="hljs-keyword">this</span>.el.remove();
+            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>.root._events.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>.root._events[<span class="hljs-number">0</span>].remove();
+                <span class="hljs-keyword">this</span>.root._events.shift();
+            }
+            <span class="hljs-keyword">this</span>.root.remove();
         },
         setRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(instance)</span> </span>{
             <span class="hljs-keyword">if</span> (instance !== <span class="hljs-literal">undefined</span>) {

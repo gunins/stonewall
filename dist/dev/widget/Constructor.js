@@ -1899,7 +1899,11 @@ define('widget/Constructor',[
                 this._events[0].remove();
                 this._events.shift();
             }
-            this.el.remove();
+            while (this.root._events.length > 0) {
+                this.root._events[0].remove();
+                this.root._events.shift();
+            }
+            this.root.remove();
         },
         setRoutes: function (instance) {
             if (instance !== undefined) {
