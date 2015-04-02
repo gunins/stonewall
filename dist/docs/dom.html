@@ -719,8 +719,12 @@
         <span class="hljs-keyword">var</span> root = node._node;
         <span class="hljs-keyword">this</span>._events = [];
         <span class="hljs-keyword">this</span>._node = root;
-        <span class="hljs-keyword">if</span> (root &amp;&amp; !<span class="hljs-keyword">this</span>.el &amp;&amp; root.el) {
-            <span class="hljs-keyword">this</span>.el = root.el;
+        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.el) {
+            <span class="hljs-keyword">if</span> (root &amp;&amp; root.el) {
+                <span class="hljs-keyword">this</span>.el = root.el;
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (node.el) {
+                <span class="hljs-keyword">this</span>.el = node.el
+            }
         }
         <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.name) {
             <span class="hljs-keyword">this</span>.name = node.name || root.name;

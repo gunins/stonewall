@@ -327,8 +327,12 @@ define('widget/dom',[
         var root = node._node;
         this._events = [];
         this._node = root;
-        if (root && !this.el && root.el) {
-            this.el = root.el;
+        if (!this.el) {
+            if (root && root.el) {
+                this.el = root.el;
+            } else if (node.el) {
+                this.el = node.el
+            }
         }
         if (!this.name) {
             this.name = node.name || root.name;
