@@ -631,7 +631,7 @@
             
             <div class="content"><div class='highlight'><pre>        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el)</span> </span>{
             <span class="hljs-keyword">while</span> (el._events.length &gt; <span class="hljs-number">0</span>) {
-                el._events.remove();
+                el._events[<span class="hljs-number">0</span>].remove();
                 el._events.shift();
             }
             <span class="hljs-keyword">if</span> (el.el !== <span class="hljs-literal">undefined</span>) {

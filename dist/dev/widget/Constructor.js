@@ -276,7 +276,7 @@ define('widget/dom',[
         //      @param {dom.Element}
         remove: function (el) {
             while (el._events.length > 0) {
-                el._events.remove();
+                el._events[0].remove();
                 el._events.shift();
             }
             if (el.el !== undefined) {
