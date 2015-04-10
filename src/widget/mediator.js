@@ -19,8 +19,7 @@
     if(typeof define === 'function' && define.amd) {
         // AMD
         define(function() {
-            global.Mediator = factory();
-            return global.Mediator;
+            return factory();
         });
     } else if (typeof exports !== 'undefined') {
         // Node/CommonJS
