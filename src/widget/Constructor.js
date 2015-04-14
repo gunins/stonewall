@@ -38,7 +38,6 @@ define([
     //      @param {Object} children
     //      @param {Object} dataSet
     function Constructor(data, children, dataSet, node) {
-
         this._routes = [];
         this._events = [];
         this.children = {};
@@ -71,7 +70,7 @@ define([
             this.el = template.fragment;
             this.root = new dom.Element({
                 el: this.el,
-                name:'root'
+                name: 'root'
             });
             this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
@@ -260,7 +259,7 @@ define([
             this.children[name].el = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
-                this.elReady[name].call(this, this.children[name]);
+                this.elReady[name].call(this, this.children[name], data);
             }
 
             var events = this.events[name];

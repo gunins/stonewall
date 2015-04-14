@@ -169,6 +169,9 @@ define([
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span><span class="hljs-params">(elements, parentChildren, data)</span> </span>{
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Object</span>.keys(data).length === <span class="hljs-number">0</span>) {
+            data = <span class="hljs-keyword">this</span>.data;
+        }
         parentChildren = (parentChildren) ? applyElement.call(<span class="hljs-keyword">this</span>, parentChildren, data) : {};
         elements = (elements) ? applyElement.call(<span class="hljs-keyword">this</span>, elements, data) : {};
         <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
@@ -187,13 +190,13 @@ define([
                 }
 
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, parentChild);
+                    <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, parentChild, data);
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> parentChild == <span class="hljs-string">'string'</span>) {
                         dom.text(child, parentChild);
                     }
                     <span class="hljs-keyword">else</span> {
-                        dom.replace(child, parentChild);
+                        dom.replace(child, parentChild, data);
                     }
                     <span class="hljs-keyword">if</span> (parentChild.children !== <span class="hljs-literal">undefined</span>) {
                         child.children = parentChild.children
@@ -203,11 +206,11 @@ define([
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[key] !== <span class="hljs-literal">undefined</span> &amp;&amp;
                        child._node.data.tplSet.noattach === <span class="hljs-string">'true'</span> &amp;&amp;
                        child._node.data.dataset.bind === <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child);
+                <span class="hljs-keyword">this</span>.nodes[key].call(<span class="hljs-keyword">this</span>, child, data);
             }
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[key] !== <span class="hljs-literal">undefined</span> &amp;&amp; (child.el !== <span class="hljs-literal">undefined</span> || child.instance !== <span class="hljs-literal">undefined</span>)) {
-                <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, child);
+                <span class="hljs-keyword">this</span>.elReady[key].call(<span class="hljs-keyword">this</span>, child, data);
             }
 
             <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[key];

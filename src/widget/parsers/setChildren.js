@@ -44,6 +44,9 @@ define([
     }
 
     function setChildren(elements, parentChildren, data) {
+        if (Object.keys(data).length === 0) {
+            data = this.data;
+        }
         parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, data) : {};
         elements = (elements) ? applyElement.call(this, elements, data) : {};
         Object.keys(elements).forEach(function (key) {
@@ -62,13 +65,13 @@ define([
                 }
 
                 if (this.nodes[key] !== undefined) {
-                    this.nodes[key].call(this, child, parentChild);
+                    this.nodes[key].call(this, child, parentChild, data);
                 } else if (child !== undefined) {
                     if (typeof parentChild == 'string') {
                         dom.text(child, parentChild);
                     }
                     else {
-                        dom.replace(child, parentChild);
+                        dom.replace(child, parentChild, data);
                     }
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
@@ -78,11 +81,11 @@ define([
             } else if (this.nodes[key] !== undefined &&
                        child._node.data.tplSet.noattach === 'true' &&
                        child._node.data.dataset.bind === undefined) {
-                this.nodes[key].call(this, child);
+                this.nodes[key].call(this, child, data);
             }
 
             if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
-                this.elReady[key].call(this, child);
+                this.elReady[key].call(this, child, data);
             }
 
             var events = this.events[key];

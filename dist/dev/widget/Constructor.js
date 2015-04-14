@@ -551,7 +551,7 @@ define('widget/dom',[
 
         this._node.el = el;
         if (params.parse !== undefined) {
-            params.parse(el);
+            params.parse(el, data);
         }
         return el;
 
@@ -574,10 +574,13 @@ define('widget/dom',[
                 return this._node.parent;
             }.bind(self),
             run: function (fragment, keep, parent, data) {
+                if (data) {
+                    obj = data;
+                }
                 if (this._node.noAttach === undefined) {
                     var placeholder = fragment.querySelector('#' + this._node.id) || fragment;
                     if (placeholder) {
-                        return setElement.call(self, placeholder, keep, parent, data || obj);
+                        return setElement.call(self, placeholder, keep, parent, obj);
                     }
                 }
             }
@@ -606,10 +609,11 @@ define('widget/dom',[
         var context = false,
             children = false;
         root.children.forEach(function (node) {
-            var name = node.data.name;
+            var name = node.data.name,
+                contextData = (obj[name]) ? obj[name] : obj;
+
             if (node.children &&
                 node.children.length > 0) {
-                var contextData = (obj[name]) ? obj[name] : obj;
                 children = parseElements.call(this, node, contextData);
             }
             var tagName = node.tagName;
@@ -626,7 +630,7 @@ define('widget/dom',[
                 var data = _decoders[tagName].decode(node, children);
                 if (data) {
                     context[name]._node = data;
-                    setParams.call(context[name], node, children, obj[name] || obj);
+                    setParams.call(context[name], node, children, contextData);
                 }
 
             } else if (name) {
@@ -641,11 +645,11 @@ define('widget/dom',[
         }.bind(this));
         return context;
     };
-    function runEls(children, fragment) {
+    function runEls(children, fragment, data) {
         if (children) {
             Object.keys(children).forEach(function (key) {
                 if (children[key]._node.run !== undefined) {
-                    children[key]._node.run.call(children[key], fragment);
+                    children[key]._node.run.call(children[key], fragment, false, false, data);
                 }
                 if (children[key]._node.el === undefined && children[key]._node.template === undefined) {
                     children[key]._node.el = fragment.querySelector('#' + children[key]._node.id);
@@ -675,14 +679,15 @@ define('widget/dom',[
     utils.merge(Decoder.prototype, {
         addDecoder: Decoder.addDecoder,
         _renderFragment: function (root, data) {
+            data = data || {}
             var children = {},
                 fragment = applyFragment(root.template);
 
             if (root.children && root.children.length > 0) {
-                children = parseElements.call(this, root, data || {});
+                children = parseElements.call(this, root, data);
 
             }
-            runEls(children, fragment);
+            runEls(children, fragment, data);
 
             return {
                 fragment: fragment,
@@ -1345,6 +1350,9 @@ define('widget/parsers/setChildren',[
     }
 
     function setChildren(elements, parentChildren, data) {
+        if (Object.keys(data).length === 0) {
+            data = this.data;
+        }
         parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, data) : {};
         elements = (elements) ? applyElement.call(this, elements, data) : {};
         Object.keys(elements).forEach(function (key) {
@@ -1363,13 +1371,13 @@ define('widget/parsers/setChildren',[
                 }
 
                 if (this.nodes[key] !== undefined) {
-                    this.nodes[key].call(this, child, parentChild);
+                    this.nodes[key].call(this, child, parentChild, data);
                 } else if (child !== undefined) {
                     if (typeof parentChild == 'string') {
                         dom.text(child, parentChild);
                     }
                     else {
-                        dom.replace(child, parentChild);
+                        dom.replace(child, parentChild, data);
                     }
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
@@ -1379,11 +1387,11 @@ define('widget/parsers/setChildren',[
             } else if (this.nodes[key] !== undefined &&
                        child._node.data.tplSet.noattach === 'true' &&
                        child._node.data.dataset.bind === undefined) {
-                this.nodes[key].call(this, child);
+                this.nodes[key].call(this, child, data);
             }
 
             if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
-                this.elReady[key].call(this, child);
+                this.elReady[key].call(this, child, data);
             }
 
             var events = this.events[key];
@@ -1729,7 +1737,6 @@ define('widget/Constructor',[
     //      @param {Object} children
     //      @param {Object} dataSet
     function Constructor(data, children, dataSet, node) {
-
         this._routes = [];
         this._events = [];
         this.children = {};
@@ -1762,7 +1769,7 @@ define('widget/Constructor',[
             this.el = template.fragment;
             this.root = new dom.Element({
                 el: this.el,
-                name:'root'
+                name: 'root'
             });
             this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
             this.bindings = setBinders.call(this, this.children);
@@ -1951,7 +1958,7 @@ define('widget/Constructor',[
             this.children[name].el = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
-                this.elReady[name].call(this, this.children[name]);
+                this.elReady[name].call(this, this.children[name], data);
             }
 
             var events = this.events[name];
