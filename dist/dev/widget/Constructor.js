@@ -520,7 +520,7 @@ define('widget/dom',[
 
     function setElement(placeholder, keep, parent, data) {
         var params = this._node,
-            el = params.tmpEl((keep) ? placeholder : false, data),
+            el = params.tmpEl((keep) ? placeholder : false, data, this),
             attributes = params.data.attribs,
             plFragment = applyFragment(params.template, params.data.tag);
 
@@ -573,6 +573,9 @@ define('widget/dom',[
             getParent: function () {
                 return this._node.parent;
             }.bind(self),
+            getInstance: function () {
+                return this;
+            }.bind(self),
             run: function (fragment, keep, parent, data) {
                 if (data) {
                     obj = data;
@@ -592,6 +595,10 @@ define('widget/dom',[
         utils.merge(self._node, params);
         self.data = self._node.data;
 
+        self.getInstance = function () {
+            return this._node.getInstance.apply(this, arguments)
+        }.bind(this);
+
         self.run = function () {
             return this._node.run.apply(this, arguments)
         }.bind(this);
@@ -610,7 +617,8 @@ define('widget/dom',[
             children = false;
         root.children.forEach(function (node) {
             var name = node.data.name,
-                contextData = (obj[name]) ? obj[name] : obj;
+                contextData = (obj[name]) ? obj[name] : obj,
+                scope = {};
 
             if (node.children &&
                 node.children.length > 0) {
@@ -619,27 +627,24 @@ define('widget/dom',[
             var tagName = node.tagName;
 
             if (tagName) {
-                var name = name;
-                if (name !== undefined) {
-                    context = context || {};
-                    context[name] = {}
-                    node.getInstance = function () {
-                        return context[name];
-                    };
-                }
                 var data = _decoders[tagName].decode(node, children);
                 if (data) {
-                    context[name]._node = data;
-                    setParams.call(context[name], node, children, contextData);
+                    scope._node = data;
+                    setParams.call(scope, node, children, contextData);
+
+                }
+                if (name !== undefined) {
+                    context = context || {};
+                    context[name] = scope;
                 }
 
             } else if (name) {
                 context = context || {};
-                context[name] = {}
-                context[name]._node = {
+                scope._node = {
                     id: node.id,
                     data: node.data
                 }
+                context[name] = scope;
             }
             children = false;
         }.bind(this));
