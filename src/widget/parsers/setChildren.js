@@ -12,7 +12,7 @@ define([
     //
     //      @private applyElement
     //      @param {Object} elements
-    function applyElement(elements, data) {
+    function applyElement(elements, params) {
         Object.keys(elements).forEach(function (key) {
 
             var element = elements[key],
@@ -28,11 +28,11 @@ define([
                 if (node.data.type === 'pl' && node.data.tplSet.bind !== undefined) {
                     var bind = node.data.tplSet.bind;
                     Object.keys(bind).forEach(function (attr) {
-                        if (data[bind[attr]] !== undefined) {
+                        if (params[bind[attr]] !== undefined) {
                             if (attr !== 'class') {
-                                elements[key].setAttribute(attr, data[bind[attr]]);
+                                elements[key].setAttribute(attr, params[bind[attr]]);
                             } else {
-                                elements[key].addClass(data[bind[attr]]);
+                                elements[key].addClass(params[bind[attr]]);
                             }
                         }
                     }.bind(this));
@@ -43,16 +43,16 @@ define([
         return elements;
     }
 
-    function setChildren(elements, parentChildren, data) {
+    function setChildren(elements, parentChildren, data, params) {
         if (Object.keys(data).length === 0) {
             data = this.data;
         }
-        parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, data) : {};
-        elements = (elements) ? applyElement.call(this, elements, data) : {};
+        parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, params) : {};
+        elements = (elements) ? applyElement.call(this, elements, params) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
-                children = setChildren.call(this, children, parentChildren.children, data);
+                children = setChildren.call(this, children, parentChildren.children, data, params);
                 elements[key].bindings = setBinders(children);
             }
 

@@ -38,12 +38,12 @@ define([
     //      @param {Object} children
     //      @param {Object} dataSet
     function Constructor(data, children, dataSet, node) {
-        this._routes = [];
-        this._events = [];
+        this._routes  = [];
+        this._events  = [];
         this.children = {};
         //this._node = node;
         this.eventBus = new Mediator();
-        this.context = context;
+        this.context  = context;
         if (data.appContext !== undefined) {
             utils.extend(this.context, data.appContext);
         }
@@ -53,26 +53,27 @@ define([
         this.beforeInit.apply(this, arguments);
 
         if (node && node.getInstance) {
-            var instance = node.getInstance();
+            var instance      = node.getInstance();
             instance.instance = this;
             instance.eventBus = this.eventBus;
         }
 
         if (this.template) {
-            var keys = (dataSet) ? Object.keys(dataSet) : [],
+            var keys        = (dataSet) ? Object.keys(dataSet) : [],
                 contextData = (keys.length > 0) ? dataSet : this.context.data;
-            if (contextData) {
+
+            if (!this.data && contextData) {
                 this.data = contextData[data.bind] || contextData;
             }
 
-            var decoder = new Decoder(this.template),
-                template = decoder.render(this.data);
-            this.el = template.fragment;
-            this.root = new dom.Element({
-                el: this.el,
+            var decoder   = new Decoder(this.template),
+                template  = decoder.render(this.data);
+            this.el       = template.fragment;
+            this.root     = new dom.Element({
+                el:   this.el,
                 name: 'root'
             });
-            this.children = utils.extend(setChildren.call(this, template.children, children, data), this.children);
+            this.children = utils.extend(setChildren.call(this, template.children, children, this.data, data), this.children);
             this.bindings = setBinders.call(this, this.children);
             setRoutes.call(this, this.children);
 
@@ -116,7 +117,7 @@ define([
         //                  }
         //              }
         //          ]
-        events: {},
+        events:       {},
         // Applying extra methods to Element
         // Usage Example
         //
@@ -127,7 +128,7 @@ define([
         //              }
         //          }
         //      },
-        elReady: {},
+        elReady:      {},
         // Running when Constructor is initialised
         //
         //      @method init
@@ -136,7 +137,7 @@ define([
         //      from template)
         //      @param {Object} datatSet (data passing if component is
         //      in template binders)
-        init: function (data, children, dataSet) {
+        init:         function (data, children, dataSet) {
         },
         // Running before Constructor is initialised
         //
@@ -146,13 +147,13 @@ define([
         //      from template)
         //      @param {Object} datatSet (data passing if component is
         //      in template binders)
-        beforeInit: function (data, children, dataSet) {
+        beforeInit:   function (data, children, dataSet) {
         },
         // Load external css style for third party modules.
         //
         //      @method loadCss
         //      @param {string} url
-        loadCss: function (url) {
+        loadCss:      function (url) {
             this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
                 this.context._cssReady.push(url);
@@ -173,7 +174,7 @@ define([
         // Remove from parentNode
         //
         //      @method detach
-        detach: function () {
+        detach:       function () {
             if (!this._placeholder) {
                 this._placeholder = document.createElement(this.el.tagName);
             }
@@ -189,7 +190,7 @@ define([
         // Add to parentNode
         //
         //      @method attach
-        attach: function () {
+        attach:       function () {
             if (this._placeholder && this._parent) {
                 this._parent.replaceChild(this.el, this._placeholder)
             }
@@ -197,13 +198,13 @@ define([
         // Executes when Component is destroyed
         //
         //      @method applyBinders
-        onDestroy: function () {
+        onDestroy:    function () {
 
         },
         //Removing widget from Dom
         //
         //      @method destroy
-        destroy: function () {
+        destroy:      function () {
             this.onDestroy();
             this.eventBus.remove();
             while (this._events.length > 0) {
@@ -216,7 +217,7 @@ define([
             }
             this.root.remove();
         },
-        setRoutes: function (instance) {
+        setRoutes:    function (instance) {
             if (instance !== undefined) {
                 this._routes.push(instance);
             }
@@ -234,17 +235,17 @@ define([
             }
             matches.rebind();
         },
-        _reRoute: function () {
+        _reRoute:     function () {
             this._routes.splice(0, this._routes.length);
         },
-        rebind: function () {
+        rebind:       function () {
             this._reRoute();
         },
         // Adding Childrens manually after initialization.
         //  @method setChildren
         //  @param {Element} el
         //  @param {Object} data
-        setChildren: function (el, data) {
+        setChildren:  function (el, data) {
             var name = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
@@ -256,7 +257,7 @@ define([
             }
 
             this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
-            this.children[name].el = el.run(this.el, false, false, data);
+            this.children[name].el          = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
                 this.elReady[name].call(this, this.children[name], data);
@@ -278,7 +279,7 @@ define([
         // @param {Object} children
         // @param {Object} dataSet (Model for bindings)
         addComponent: function (Component, options) {
-            var name = options.name;
+            var name      = options.name;
             var container = options.container;
 
             if (name === undefined) {
@@ -288,7 +289,7 @@ define([
             } else if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')
             }
-            var component = this.setComponent(Component, options);
+            var component       = this.setComponent(Component, options);
 
             component.run(options.container);
             this.children[name] = component;
@@ -298,19 +299,19 @@ define([
         },
         setComponent: function (Component, options) {
             var instance = {
-                name: options.name,
+                name:  options.name,
                 _node: {
                     data: {
-                        tag: 'div',
+                        tag:  'div',
                         type: 'cp'
                     }
                 },
-                run: function (container) {
+                run:   function (container) {
                     options.appContext = this.context;
-                    var cp = new Component(options, options.children, options.data);
-                    instance.instance = cp;
-                    instance.eventBus = cp.eventBus;
-                    instance.children = instance._node.children = cp.children;
+                    var cp             = new Component(options, options.children, options.data);
+                    instance.instance  = cp;
+                    instance.eventBus  = cp.eventBus;
+                    instance.children  = instance._node.children = cp.children;
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {
