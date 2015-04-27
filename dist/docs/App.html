@@ -172,8 +172,11 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span><span class="hljs-params">()</span> </span>{
-        <span class="hljs-keyword">var</span> router = <span class="hljs-keyword">new</span> Router();
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span><span class="hljs-params">(options)</span> </span>{
+        options    = options || {};
+        <span class="hljs-keyword">var</span> router = <span class="hljs-keyword">new</span> Router(),
+            mapHandler;
+
         <span class="hljs-keyword">this</span>.context = utils.extend(<span class="hljs-keyword">this</span>.setContext(), {</pre></div></div>
             
         </li>
@@ -198,11 +201,23 @@ Usage Example</p>
                 appContext: <span class="hljs-keyword">this</span>.context
             });
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) {
-                router.match(<span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer));
+                mapHandler = <span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer);
+            } <span class="hljs-keyword">else</span> {
+                mapHandler = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+                }
+            }
+
+            <span class="hljs-keyword">if</span> (options.rootRoute !== <span class="hljs-literal">undefined</span>) {
+                router.match(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(match)</span> </span>{
+                    match(options.rootRoute, mapHandler);
+                });
+            } <span class="hljs-keyword">else</span> {
+                router.match(mapHandler);
             }
 
             <span class="hljs-keyword">this</span>.setContext();
-            <span class="hljs-keyword">this</span>.el = <span class="hljs-keyword">this</span>.appContainer.el;
+            <span class="hljs-keyword">this</span>.el           = <span class="hljs-keyword">this</span>.appContainer.el;
             setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
                 <span class="hljs-keyword">this</span>.el.classList.add(<span class="hljs-string">'show'</span>);
             }.bind(<span class="hljs-keyword">this</span>), <span class="hljs-number">100</span>);
@@ -261,7 +276,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        init: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        init:       <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
         },</pre></div></div>
             
         </li>
@@ -297,7 +312,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        start: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(container)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        start:      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(container)</span> </span>{
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
                 container.appendChild(<span class="hljs-keyword">this</span>.el);
             }

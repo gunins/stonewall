@@ -495,8 +495,11 @@ define('widget/App',[
     //
     //      var app= new App();
     //      app.start(document.body);
-    function App() {
-        var router = new Router();
+    function App(options) {
+        options    = options || {};
+        var router = new Router(),
+            mapHandler;
+
         this.context = utils.extend(this.setContext(), {
             // Creating `EventBus` More info look in `Mediator` Section
             eventBus: new Mediator()
@@ -508,11 +511,23 @@ define('widget/App',[
                 appContext: this.context
             });
             if (this.appContainer._match !== undefined) {
-                router.match(this.appContainer._match.bind(this.appContainer));
+                mapHandler = this.appContainer._match.bind(this.appContainer);
+            } else {
+                mapHandler = function () {
+
+                }
+            }
+
+            if (options.rootRoute !== undefined) {
+                router.match(function (match) {
+                    match(options.rootRoute, mapHandler);
+                });
+            } else {
+                router.match(mapHandler);
             }
 
             this.setContext();
-            this.el = this.appContainer.el;
+            this.el           = this.appContainer.el;
             setTimeout(function () {
                 this.el.classList.add('show');
             }.bind(this), 100);
@@ -536,7 +551,7 @@ define('widget/App',[
         // Running after 'AppContainer' is initialised.
         //
         //      @method init
-        init: function () {
+        init:       function () {
         },
         // SettingContext for the `App`
         //
@@ -548,7 +563,7 @@ define('widget/App',[
         //
         //      @method start
         //      @param {HTMLElement} container
-        start: function (container) {
+        start:      function (container) {
             if (container instanceof HTMLElement === true) {
                 container.appendChild(this.el);
             }
