@@ -1285,12 +1285,14 @@ define('widget/parsers/applyEvents',[],function () {
  */
 define('widget/parsers/setBinders',[],function () {
 
-    function setBinders(children) {
-        var bindings = false
+    function setBinders(children, ignoreCP) {
+        var bindings = false;
         Object.keys(children).forEach(function (key) {
-            bindings = bindings || {};
-            var el = children[key];
-            if (el._node && el._node.bind !== undefined) {
+            bindings   = bindings || {};
+            var el     = children[key],
+                ignore = (ignoreCP === true && el._node.data.type === 'cp');
+
+            if (el._node && el._node.bind !== undefined && !ignore) {
                 bindings[el._node.bind] = bindings[el._node.bind] || []
                 bindings[el._node.bind].push(el);
             }
@@ -1336,7 +1338,7 @@ define('widget/parsers/setChildren',[
         Object.keys(elements).forEach(function (key) {
 
             var element = elements[key],
-                node = element._node;
+                node    = element._node;
             if (typeof element == 'string') {
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
@@ -1368,15 +1370,15 @@ define('widget/parsers/setChildren',[
             data = this.data;
         }
         parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, params) : {};
-        elements = (elements) ? applyElement.call(this, elements, params) : {};
+        elements       = (elements) ? applyElement.call(this, elements, params) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
-                children = setChildren.call(this, children, parentChildren.children, data, params);
+                children               = setChildren.call(this, children, parentChildren.children, data, params);
                 elements[key].bindings = setBinders(children);
             }
 
-            var child = elements[key],
+            var child       = elements[key],
                 parentChild = parentChildren[key];
 
             if (parentChild !== undefined) {
@@ -1427,8 +1429,8 @@ define('widget/parsers/applyBinders',[
     './applyEvents',
     './applyAttribute'
 ], function (dom, utils, WatchJS, applyEvents, applyAttribute) {
-    var watch = WatchJS.watch,
-        unwatch = WatchJS.unwatch,
+    var watch        = WatchJS.watch,
+        unwatch      = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
@@ -1459,9 +1461,9 @@ define('widget/parsers/applyBinders',[
                     binder.applyAttach();
 
                     var updateChildren = function () {
-                        var hasParent = false,
+                        var hasParent  = false,
                             bindedData = [],
-                            addItem = function (item) {
+                            addItem    = function (item) {
 
                                 var childBinder = utils.extend({}, binder);//.clone();
 
@@ -1475,14 +1477,17 @@ define('widget/parsers/applyBinders',[
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
                                 applyEvents.call(this, childBinder, events, item);
-                                bindedData.push({binder: childBinder, data: item});
+                                bindedData.push({
+                                    binder: childBinder,
+                                    data:   item
+                                });
 
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
                                 }
                             };
                         data.forEach(addItem.bind(this));
-                        var update = binder._node.data.tplSet.update;
+                        var update     = binder._node.data.tplSet.update;
                         if (update === 'true') {
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
@@ -1517,11 +1522,11 @@ define('widget/parsers/applyBinders',[
                         dom.replace(childBinder, binder, data);
                         //childBinder.replace(binder, data);
                     }
-                    else if (!childBinder._node.data.tplSet.bind) {
-                        applyBinders.call(this, data, childBinder);
-                    } else {
+                    else {
                         applyAttribute.call(this, childBinder, data);
+                        applyBinders.call(this, data, childBinder);
                     }
+
                     if (this.elReady[childBinder._node.name]) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
@@ -1533,10 +1538,9 @@ define('widget/parsers/applyBinders',[
 
     function applyBinders(obj, instance) {
         var binders = instance.bindings,
-            parent = instance.el;
+            parent  = instance.el;
 
         if (obj && binders !== undefined) {
-
             Object.keys(obj).forEach(function (objKey) {
                 if (binders[objKey] !== undefined) {
                     //TODO: Investigate, why not always an Array
@@ -1787,7 +1791,7 @@ define('widget/Constructor',[
                 name: 'root'
             });
             this.children = utils.extend(setChildren.call(this, template.children, children, this.data, data), this.children);
-            this.bindings = setBinders.call(this, this.children);
+            this.bindings = setBinders.call(this, this.children, true);
             setRoutes.call(this, this.children);
 
             if (this.data) {

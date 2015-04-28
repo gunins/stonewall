@@ -3,12 +3,14 @@
  */
 define(function () {
 
-    function setBinders(children) {
-        var bindings = false
+    function setBinders(children, ignoreCP) {
+        var bindings = false;
         Object.keys(children).forEach(function (key) {
-            bindings = bindings || {};
-            var el = children[key];
-            if (el._node && el._node.bind !== undefined) {
+            bindings   = bindings || {};
+            var el     = children[key],
+                ignore = (ignoreCP === true && el._node.data.type === 'cp');
+
+            if (el._node && el._node.bind !== undefined && !ignore) {
                 bindings[el._node.bind] = bindings[el._node.bind] || []
                 bindings[el._node.bind].push(el);
             }

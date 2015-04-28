@@ -74,7 +74,7 @@ define([
                 name: 'root'
             });
             this.children = utils.extend(setChildren.call(this, template.children, children, this.data, data), this.children);
-            this.bindings = setBinders.call(this, this.children);
+            this.bindings = setBinders.call(this, this.children, true);
             setRoutes.call(this, this.children);
 
             if (this.data) {

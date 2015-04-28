@@ -16,7 +16,7 @@ define([
         Object.keys(elements).forEach(function (key) {
 
             var element = elements[key],
-                node = element._node;
+                node    = element._node;
             if (typeof element == 'string') {
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
@@ -48,15 +48,15 @@ define([
             data = this.data;
         }
         parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, params) : {};
-        elements = (elements) ? applyElement.call(this, elements, params) : {};
+        elements       = (elements) ? applyElement.call(this, elements, params) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
-                children = setChildren.call(this, children, parentChildren.children, data, params);
+                children               = setChildren.call(this, children, parentChildren.children, data, params);
                 elements[key].bindings = setBinders(children);
             }
 
-            var child = elements[key],
+            var child       = elements[key],
                 parentChild = parentChildren[key];
 
             if (parentChild !== undefined) {

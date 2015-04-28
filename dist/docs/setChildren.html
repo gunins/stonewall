@@ -141,7 +141,7 @@ define([
         <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
 
             <span class="hljs-keyword">var</span> element = elements[key],
-                node = element._node;
+                node    = element._node;
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> element == <span class="hljs-string">'string'</span>) {
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ([<span class="hljs-string">'cp'</span>].indexOf(node.data.type) !== -<span class="hljs-number">1</span>) {
                 <span class="hljs-keyword">if</span> (node.children &amp;&amp; !element.children) {
@@ -173,15 +173,15 @@ define([
             data = <span class="hljs-keyword">this</span>.data;
         }
         parentChildren = (parentChildren) ? applyElement.call(<span class="hljs-keyword">this</span>, parentChildren, params) : {};
-        elements = (elements) ? applyElement.call(<span class="hljs-keyword">this</span>, elements, params) : {};
+        elements       = (elements) ? applyElement.call(<span class="hljs-keyword">this</span>, elements, params) : {};
         <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
             <span class="hljs-keyword">var</span> children = elements[key].children;
             <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-                children = setChildren.call(<span class="hljs-keyword">this</span>, children, parentChildren.children, data, params);
+                children               = setChildren.call(<span class="hljs-keyword">this</span>, children, parentChildren.children, data, params);
                 elements[key].bindings = setBinders(children);
             }
 
-            <span class="hljs-keyword">var</span> child = elements[key],
+            <span class="hljs-keyword">var</span> child       = elements[key],
                 parentChild = parentChildren[key];
 
             <span class="hljs-keyword">if</span> (parentChild !== <span class="hljs-literal">undefined</span>) {

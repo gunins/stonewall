@@ -223,7 +223,7 @@ Basic Usage example</p>
                 name: <span class="hljs-string">'root'</span>
             });
             <span class="hljs-keyword">this</span>.children = utils.extend(setChildren.call(<span class="hljs-keyword">this</span>, template.children, children, <span class="hljs-keyword">this</span>.data, data), <span class="hljs-keyword">this</span>.children);
-            <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
+            <span class="hljs-keyword">this</span>.bindings = setBinders.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children, <span class="hljs-literal">true</span>);
             setRoutes.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.data) {

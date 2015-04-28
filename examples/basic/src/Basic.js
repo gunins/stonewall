@@ -9,7 +9,7 @@ define([
 
     return App.extend({
         AppContainer: Container,
-        setContext: function () {
+        setContext:   function () {
             return {
                 data: {
                     cmp: {

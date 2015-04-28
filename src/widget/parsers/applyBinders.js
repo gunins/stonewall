@@ -8,8 +8,8 @@ define([
     './applyEvents',
     './applyAttribute'
 ], function (dom, utils, WatchJS, applyEvents, applyAttribute) {
-    var watch = WatchJS.watch,
-        unwatch = WatchJS.unwatch,
+    var watch        = WatchJS.watch,
+        unwatch      = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
@@ -40,9 +40,9 @@ define([
                     binder.applyAttach();
 
                     var updateChildren = function () {
-                        var hasParent = false,
+                        var hasParent  = false,
                             bindedData = [],
-                            addItem = function (item) {
+                            addItem    = function (item) {
 
                                 var childBinder = utils.extend({}, binder);//.clone();
 
@@ -56,14 +56,17 @@ define([
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
                                 applyEvents.call(this, childBinder, events, item);
-                                bindedData.push({binder: childBinder, data: item});
+                                bindedData.push({
+                                    binder: childBinder,
+                                    data:   item
+                                });
 
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
                                 }
                             };
                         data.forEach(addItem.bind(this));
-                        var update = binder._node.data.tplSet.update;
+                        var update     = binder._node.data.tplSet.update;
                         if (update === 'true') {
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
@@ -98,11 +101,11 @@ define([
                         dom.replace(childBinder, binder, data);
                         //childBinder.replace(binder, data);
                     }
-                    else if (!childBinder._node.data.tplSet.bind) {
-                        applyBinders.call(this, data, childBinder);
-                    } else {
+                    else {
                         applyAttribute.call(this, childBinder, data);
+                        applyBinders.call(this, data, childBinder);
                     }
+
                     if (this.elReady[childBinder._node.name]) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
@@ -114,10 +117,9 @@ define([
 
     function applyBinders(obj, instance) {
         var binders = instance.bindings,
-            parent = instance.el;
+            parent  = instance.el;
 
         if (obj && binders !== undefined) {
-
             Object.keys(obj).forEach(function (objKey) {
                 if (binders[objKey] !== undefined) {
                     //TODO: Investigate, why not always an Array
