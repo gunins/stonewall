@@ -152,7 +152,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
         version: <span class="hljs-string">"0.1.0"</span>,
         load: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(moduleName, req, onLoad, config)</span> </span>{
             moduleName = (getName(moduleName) !== <span class="hljs-literal">undefined</span>) ? moduleName : moduleName + <span class="hljs-string">'.html'</span>;
-            define(<span class="hljs-string">'widget/parser!'</span> + moduleName,
+            define(moduleName,
                 [
                     <span class="hljs-string">'templating/parser!'</span> + moduleName,
                     <span class="hljs-string">'widget/Constructor'</span>
@@ -162,7 +162,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> <s
                     });
                     <span class="hljs-keyword">return</span> Widget;
                 });
-            req([<span class="hljs-string">'widget/parser!'</span> + moduleName], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Widget)</span> </span>{
+            req([moduleName], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Widget)</span> </span>{
                 onLoad(Widget);
             });
         },

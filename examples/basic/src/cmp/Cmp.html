@@ -1,27 +1,6 @@
 <div class="container-fluid cmp">
     <style-less>
-        div {
-
-            p {
-                color: ~'rgb(45, 85, 246)';
-            }
-
-            h4 {
-                background: #00bffa;
-                padding: 5px;
-                border-radius: 10px;
-                border: solid 1px #123456;
-                margin: -5px -15px 10px -15px;
-                color: ~'rgb(255, 255, 255)';
-            }
-
-            div {
-                color: ~'rgb(200, 200, 200)';
-            }
-            img {
-                width: 100%;
-            }
-        }
+        @import "@{import-url}_cmp.less";
     </style-less>
     <pl-header tp-tag="h4"></pl-header>
     <img tp-name="image" tp-type="pl" tp-bind-src="image" tp-bind-class="class" alt="Image"/>

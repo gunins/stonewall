@@ -29,7 +29,7 @@ define('widget/parser',[],function () {
         version: "0.1.0",
         load: function (moduleName, req, onLoad, config) {
             moduleName = (getName(moduleName) !== undefined) ? moduleName : moduleName + '.html';
-            define('widget/parser!' + moduleName,
+            define(moduleName,
                 [
                     'templating/parser!' + moduleName,
                     'widget/Constructor'
@@ -39,7 +39,7 @@ define('widget/parser',[],function () {
                     });
                     return Widget;
                 });
-            req(['widget/parser!' + moduleName], function (Widget) {
+            req([moduleName], function (Widget) {
                 onLoad(Widget);
             });
         },
