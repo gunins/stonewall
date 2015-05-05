@@ -218,46 +218,17 @@ define([
                     updateChildren.call(<span class="hljs-keyword">this</span>);
 
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isObject(data)) {
-                    <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder); <span class="hljs-comment">//.clone();</span>
-
+                    <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);
                     <span class="hljs-keyword">if</span> (childBinder._node.data.type === <span class="hljs-string">'cp'</span>) {
                         <span class="hljs-keyword">if</span> (childBinder.el === <span class="hljs-literal">undefined</span>) {
                             dom.add(childBinder, parent, <span class="hljs-literal">false</span>, data);
                         } <span class="hljs-keyword">else</span> {
                             dom.replace(childBinder, binder, data);
-                        }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>childBinder.replace(binder, data);</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                    }
+                        }
+                    }
                     <span class="hljs-keyword">else</span> {
-                        dom.add(childBinder, parent);</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <p>childBinder.add(parent);</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                        applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
+                        dom.add(childBinder, parent);
+                        applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
                         applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, data);
                         applyBinders.call(<span class="hljs-keyword">this</span>, data, childBinder);
                     }
@@ -282,11 +253,11 @@ define([
         </li>
         
         
-        <li id="section-5">
+        <li id="section-3">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p>TODO: Investigate, why not always an Array</p>
 

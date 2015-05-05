@@ -1513,20 +1513,16 @@ define('widget/parsers/applyBinders',[
                     updateChildren.call(this);
 
                 } else if (utils.isObject(data)) {
-                    var childBinder = utils.extend({}, binder); //.clone();
-
+                    var childBinder = utils.extend({}, binder);
                     if (childBinder._node.data.type === 'cp') {
                         if (childBinder.el === undefined) {
                             dom.add(childBinder, parent, false, data);
                         } else {
                             dom.replace(childBinder, binder, data);
                         }
-
-                        //childBinder.replace(binder, data);
                     }
                     else {
                         dom.add(childBinder, parent);
-                        //childBinder.add(parent);
                         applyEvents.call(this, childBinder, events, data);
                         applyAttribute.call(this, childBinder, data);
                         applyBinders.call(this, data, childBinder);
