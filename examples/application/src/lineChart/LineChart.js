@@ -7,15 +7,15 @@ define([
     var watch = WartchJs.watch;
     return Constructor.extend({
         template: template,
-        init: function (data, children) {
+        init:     function (data, children) {
         },
-        nodes: {
+        nodes:    {
             content: function (el, parent, data) {
                 el.add(parent);
                 el.onDOMAttached().then(function () {
                     var chart = new Chart();
                     chart.start(el, data);
-                })
+                });
             }
         }
     })

@@ -1514,15 +1514,20 @@ define('widget/parsers/applyBinders',[
 
                 } else if (utils.isObject(data)) {
                     var childBinder = utils.extend({}, binder); //.clone();
-                    dom.add(childBinder, parent);
-                    //childBinder.add(parent);
 
-                    applyEvents.call(this, childBinder, events, data);
-                    if (binder._node.data.type === 'cp') {
-                        dom.replace(childBinder, binder, data);
+                    if (childBinder._node.data.type === 'cp') {
+                        if (childBinder.el === undefined) {
+                            dom.add(childBinder, parent, false, data);
+                        } else {
+                            dom.replace(childBinder, binder, data);
+                        }
+
                         //childBinder.replace(binder, data);
                     }
                     else {
+                        dom.add(childBinder, parent);
+                        //childBinder.add(parent);
+                        applyEvents.call(this, childBinder, events, data);
                         applyAttribute.call(this, childBinder, data);
                         applyBinders.call(this, data, childBinder);
                     }
