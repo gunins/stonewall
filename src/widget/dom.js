@@ -97,7 +97,12 @@ define([
             //console.log(fragment, parent, data);
             el.placeholder = fragment.querySelector('#' + el._node.id) ||
                              createPlaceholder(el._node.data.tag || el.el.tagName);
+
             el.el = el.run.call(el, fragment, false, parent, data);
+
+            if (el._node && el._node.data && el._node.data.instance) {
+                utils.extend(el, el._node.data.instance);
+            }
 
         },
         // Adding text in to node
