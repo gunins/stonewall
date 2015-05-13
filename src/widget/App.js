@@ -66,7 +66,6 @@ define([
                 router.match(mapHandler);
             }
 
-            this.setContext();
             this.el           = this.appContainer.el;
             setTimeout(function () {
                 this.el.classList.add('show');
