@@ -14,7 +14,7 @@
  */
 
 (function(global, factory) {
-    
+    'use strict';
 
     if(typeof define === 'function' && define.amd) {
         // AMD
@@ -29,7 +29,7 @@
         global.Mediator = factory();
     }
 }(this, function() {
-    
+    'use strict';
 
     // We'll generate guids for class instances for easy referencing later on.
     // Subscriber instances will have an id that can be refernced for quick
@@ -468,7 +468,7 @@ define('widget/utils',[],function () {
 //          'widget/App',
 //          'widget/parser!container/Container',
 //      ], function (App, Container) {
-//          
+//          'use strict';
 //          return App.extend({
 //              AppContainer: Container
 //          });
@@ -478,7 +478,7 @@ define('widget/App',[
     'router/Router',
     './utils'
 ], function (Mediator, Router, utils) {
-    
+    'use strict';
     function triggerRoute(router) {
         router.start();
         function onHashChange() {
@@ -500,12 +500,11 @@ define('widget/App',[
         var router = new Router(),
             mapHandler;
 
-        this.context = utils.extend(this.setContext(), {
+        this.beforeInit.apply(this, arguments);
+        this.context = utils.extend(this.setContext.apply(this, arguments), {
             // Creating `EventBus` More info look in `Mediator` Section
             eventBus: new Mediator()
         });
-
-        this.beforeInit.apply(this, arguments);
         if (this.AppContainer !== undefined) {
             this.appContainer = new this.AppContainer({
                 appContext: this.context

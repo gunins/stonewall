@@ -41,12 +41,11 @@ define([
         var router = new Router(),
             mapHandler;
 
-        this.context = utils.extend(this.setContext(), {
+        this.beforeInit.apply(this, arguments);
+        this.context = utils.extend(this.setContext.apply(this, arguments), {
             // Creating `EventBus` More info look in `Mediator` Section
             eventBus: new Mediator()
         });
-
-        this.beforeInit.apply(this, arguments);
         if (this.AppContainer !== undefined) {
             this.appContainer = new this.AppContainer({
                 appContext: this.context

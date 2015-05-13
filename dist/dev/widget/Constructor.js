@@ -1268,7 +1268,7 @@ define('widget/parsers/applyAttribute',[
     return applyAttribute;
 });
 define('widget/parsers/applyEvents',[],function () {
-    
+    'use strict';
     //Aplying Events to elements
     //
     //      @private applyEvents
@@ -1751,7 +1751,7 @@ define('widget/Constructor',[
     './parsers/setRoutes',
     './parsers/applyEvents'
 ], function (require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
-    
+    'use strict';
     var context = {};
 
     // Constructor Class
