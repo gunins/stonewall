@@ -1623,7 +1623,7 @@ define('widget/parsers/setRoutes',[
                     }
                 }.bind(this));
                 matches.to(function () {
-                    var args = [].slice.call(arguments, 0);
+                    var args   = [].slice.call(arguments, 0);
                     var params = args.pop();
                     if (args.length > 0) {
                         var id = args.join('_');
@@ -1632,24 +1632,24 @@ define('widget/parsers/setRoutes',[
                     if (child.el !== undefined && child.sessId !== id && id !== undefined) {
                         applyToChildren.call(this, child.children, destroyComponent);
                         destroyComponent(child);
+                    } else {
+                        applyToChildren.call(this, child.children, function (cp, instance) {
+                            var data    = cp._node.data,
+                                dataSet = data.dataset;
+
+                            dataSet.params = params;
+
+                            if (args.length > 0) {
+                                dataSet.link = args;
+                            }
+
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, args.concat(params));
+
+                            }
+
+                        });
                     }
-
-                    applyToChildren.call(this, child.children, function (cp, instance) {
-                        var data = cp._node.data,
-                            dataSet = data.dataset;
-
-                        dataSet.params = params;
-
-                        if (args.length > 0) {
-                            dataSet.link = args;
-                        }
-
-                        if (instance && instance.to) {
-                            instance.to.apply(instance, args.concat(params));
-
-                        }
-
-                    });
 
                     if (child.el === undefined) {
                         child.applyAttach();
@@ -1709,7 +1709,7 @@ define('widget/parsers/setRoutes',[
 
     function setRoutes(children) {
         if (!this._match) {
-            var parent = this.el;
+            var parent  = this.el;
             this._match = function (match) {
                 matchRoute.call(this, children, match, parent);
                 if (this.match) {
