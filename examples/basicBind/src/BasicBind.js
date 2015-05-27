@@ -6,7 +6,7 @@ define([
     'container/Container'
 ], function (App, Container) {
     var badge = 1;
-    var data = {
+    var data  = {
         val: {
             items: {
                 value: 'Some Value'
@@ -82,6 +82,33 @@ define([
                 }
             });
         }, 5000);
+        setTimeout(function () {
+            data.val.list.concat([
+                {
+                    test: {
+                        value: 'Test Value Third',
+                        badge: badge++
+                    }
+                }, {
+                    test: {
+                        value: 'Test Value Fourth',
+                        badge: badge++
+                    }
+                }
+            ], [
+                {
+                    test: {
+                        value: 'Test Value Third',
+                        badge: badge++
+                    }
+                }, {
+                    test: {
+                        value: 'Test Value Fourth',
+                        badge: badge++
+                    }
+                }
+            ]);
+        }, 6000);
     }
 
     return App.extend({

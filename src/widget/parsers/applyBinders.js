@@ -53,7 +53,7 @@ define([
                                         binder: childBinder,
                                         data:   item
                                     });
-                                } else if (index <= bindedData.length - 1) {
+                                } else if (index !== undefined && index <= bindedData.length - 1) {
                                     childBinder.add(parent, hasParent, false, bindedData[index].binder.el);
                                     bindedData.splice(index, 0, {
                                         binder: childBinder,
@@ -80,38 +80,28 @@ define([
                         data.forEach(addItem.bind(this));
                         var update     = binder._node.data.tplSet.update;
                         if (update === 'true') {
-                            var methodNames = ['pop', 'shift', 'splice'];
+                            var removeMethodNames = ['pop', 'shift', 'splice'],
+                                insertMethodNames = ['push', 'unshift'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
                                 var clonedData = bindedData.slice(0);
-
-                                if (oldvalue === undefined && action === 'push') {
+                                if (oldvalue === undefined && insertMethodNames.indexOf(action) !== -1) {
                                     var filter = clonedData.filter(function (item) {
                                         return item.data === newvalue[0];
                                     });
                                     if (filter.length === 0) {
-                                        addItem.call(this, newvalue[0]);
+                                        addItem.call(this, newvalue[0], (action === 'unshift') ? 0 : clonedData.length);
                                     }
-                                } else if (oldvalue === undefined && action === 'unshift') {
-                                    var filter = clonedData.filter(function (item) {
-                                        return item.data === newvalue[0];
-                                    });
-                                    if (filter.length === 0) {
-                                        addItem.call(this, newvalue[0], 0);
-                                    }
-                                } else if (methodNames.indexOf(action) !== -1) {
-                                    clonedData.forEach(function (binder, index) {
+                                } else if (removeMethodNames.indexOf(action) !== -1) {
+                                    clonedData.forEach(function (binder) {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
                                             binder.binder.remove();
                                             bindedData.splice(bindedData.indexOf(binder), 1);
-
                                         }
                                     }.bind(this));
 
                                     if (action === 'splice') {
                                         var vals = Array.prototype.slice.call(newvalue, 2);
-
                                         if (vals && vals.length > 0) {
-
                                             vals.forEach(function (val) {
                                                 var index = obj[objKey].indexOf(val);
                                                 if (index !== -1) {
@@ -124,7 +114,6 @@ define([
                             }.bind(this));
                         }
                     }
-
                     updateChildren.call(this);
 
                 } else if (utils.isObject(data)) {
