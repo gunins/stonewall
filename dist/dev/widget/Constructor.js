@@ -1496,18 +1496,19 @@ define('widget/parsers/applyBinders',[
                         if (update === 'true') {
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
+                                var clonedData = bindedData.slice(0);
                                 if (oldvalue === undefined && action === 'push') {
-                                    var filter = bindedData.filter(function (item) {
+                                    var filter = clonedData.filter(function (item) {
                                         return item.data === newvalue[0];
                                     });
                                     if (filter.length === 0) {
                                         addItem.call(this, newvalue[0]);
                                     }
                                 } else if (methodNames.indexOf(action) !== -1) {
-                                    bindedData.forEach(function (binder, index) {
+                                    clonedData.forEach(function (binder, index) {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
                                             binder.binder.remove();
-                                            bindedData.splice(index, 1);
+                                            bindedData.splice(bindedData.indexOf(binder), 1);
                                         }
                                     }.bind(this));
                                 }
