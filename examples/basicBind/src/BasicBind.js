@@ -82,33 +82,7 @@ define([
                 }
             });
         }, 5000);
-        setTimeout(function () {
-            data.val.list.concat([
-                {
-                    test: {
-                        value: 'Test Value Third',
-                        badge: badge++
-                    }
-                }, {
-                    test: {
-                        value: 'Test Value Fourth',
-                        badge: badge++
-                    }
-                }
-            ], [
-                {
-                    test: {
-                        value: 'Test Value Third',
-                        badge: badge++
-                    }
-                }, {
-                    test: {
-                        value: 'Test Value Fourth',
-                        badge: badge++
-                    }
-                }
-            ]);
-        }, 6000);
+
     }
 
     return App.extend({
