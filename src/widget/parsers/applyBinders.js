@@ -42,24 +42,36 @@ define([
                     var updateChildren = function () {
                         var hasParent  = false,
                             bindedData = [],
-                            addItem    = function (item) {
+                            addItem    = function (item, index) {
 
                                 var childBinder = utils.extend({}, binder);//.clone();
 
                                 if (!hasParent) {
                                     childBinder.add(parent);
                                     hasParent = binder.getParent();
+                                    bindedData.push({
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+                                } else if (index <= bindedData.length - 1) {
+                                    childBinder.add(parent, hasParent, false, bindedData[index].binder.el);
+                                    bindedData.splice(index, 0, {
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+
                                 } else {
                                     childBinder.add(parent, hasParent);
+                                    bindedData.push({
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+
                                 }
 
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
                                 applyEvents.call(this, childBinder, events, item);
-                                bindedData.push({
-                                    binder: childBinder,
-                                    data:   item
-                                });
 
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
@@ -71,6 +83,7 @@ define([
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
                                 var clonedData = bindedData.slice(0);
+
                                 if (oldvalue === undefined && action === 'push') {
                                     var filter = clonedData.filter(function (item) {
                                         return item.data === newvalue[0];
@@ -78,13 +91,35 @@ define([
                                     if (filter.length === 0) {
                                         addItem.call(this, newvalue[0]);
                                     }
+                                } else if (oldvalue === undefined && action === 'unshift') {
+                                    var filter = clonedData.filter(function (item) {
+                                        return item.data === newvalue[0];
+                                    });
+                                    if (filter.length === 0) {
+                                        addItem.call(this, newvalue[0], 0);
+                                    }
                                 } else if (methodNames.indexOf(action) !== -1) {
                                     clonedData.forEach(function (binder, index) {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
                                             binder.binder.remove();
                                             bindedData.splice(bindedData.indexOf(binder), 1);
+
                                         }
                                     }.bind(this));
+
+                                    if (action === 'splice') {
+                                        var vals = Array.prototype.slice.call(newvalue, 2);
+
+                                        if (vals && vals.length > 0) {
+
+                                            vals.forEach(function (val) {
+                                                var index = obj[objKey].indexOf(val);
+                                                if (index !== -1) {
+                                                    addItem.call(this, val, index);
+                                                }
+                                            }.bind(this));
+                                        }
+                                    }
                                 }
                             }.bind(this));
                         }

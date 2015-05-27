@@ -1,10 +1,11 @@
 /**
  * Created by guntars on 10/10/2014.
  */
-//## widget/dom Class for dom manipulation
+    //## widget/dom Class for dom manipulation
 define('widget/dom',[
     './utils'
 ], function (utils) {
+    'use strict';
     function createPlaceholder(tag) {
         var placeholder = document.createElement(tag || 'div');
         placeholder.setAttribute('style', 'display:none;');
@@ -18,7 +19,7 @@ define('widget/dom',[
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        _after: function (parent, child, data) {
+        _after:          function (parent, child, data) {
             if (child._node !== undefined) {
                 child.placeholder = parent.el.querySelector('#' + child._node.id) ||
                                     createPlaceholder(child._node.data.tag || child.el.tagName);
@@ -40,7 +41,7 @@ define('widget/dom',[
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
         //      @param {Object} data
-        replace: function (parent, child, data) {
+        replace:         function (parent, child, data) {
             parent.el.innerHTML = '';
             dom._after.apply(this, arguments);
         },
@@ -49,7 +50,7 @@ define('widget/dom',[
         //      @method append
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
-        append: function (parent, child) {
+        append:          function (parent, child) {
             if (parent.el !== undefined && child.el !== undefined) {
                 parent.el.appendChild(child.el);
             }
@@ -60,7 +61,7 @@ define('widget/dom',[
         //      @method prepend
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
-        prepend: function (parent, child) {
+        prepend:         function (parent, child) {
             dom.insertBefore(parent, child, 0);
         },
         // Insert element to the before of specific, child by index
@@ -68,9 +69,9 @@ define('widget/dom',[
         //      @method insertBefore
         //      @param {dom.Element} parent
         //      @param {dom.Element} child
-        insertBefore: function (parent, child, index) {
+        insertBefore:    function (parent, child, index) {
             var parentEl = parent.el;
-            var childEl = child.el;
+            var childEl  = child.el;
             if (parentEl !== undefined && childEl !== undefined) {
                 if (parentEl.childNodes[index] !== undefined) {
                     parentEl.insertBefore(childEl, parentEl.childNodes[index]);
@@ -79,7 +80,7 @@ define('widget/dom',[
                 }
             }
         },
-        detach: function (el) {
+        detach:          function (el) {
             if (el.placeholder instanceof HTMLElement === false) {
                 el.placeholder = createPlaceholder(el._node.data.tag || el.el.tagName);
             }
@@ -88,17 +89,16 @@ define('widget/dom',[
                 el.el.parentNode.replaceChild(el.placeholder, el.el)
             }
         },
-        attach: function (el) {
+        attach:          function (el) {
             if (el && el.el && el.placeholder && el.placeholder.parentNode) {
                 el.placeholder.parentNode.replaceChild(el.el, el.placeholder)
             }
         },
-        add: function (el, fragment, parent, data) {
-            //console.log(fragment, parent, data);
+        add:             function (el, fragment, parent, data, index) {
             el.placeholder = fragment.querySelector('#' + el._node.id) ||
                              createPlaceholder(el._node.data.tag || el.el.tagName);
 
-            el.el = el.run.call(el, fragment, false, parent, data);
+            el.el = el.run.call(el, fragment, false, parent, data, index);
 
             if (el._node && el._node.data && el._node.data.instance) {
                 utils.extend(el, el._node.data.instance);
@@ -110,7 +110,7 @@ define('widget/dom',[
         //      @method text
         //      @param {dom.Element}
         //      @param {String} text
-        text: function (node, text) {
+        text:            function (node, text) {
             if (node && node.el) {
                 node.el.innerHTML = text;
             }
@@ -121,7 +121,7 @@ define('widget/dom',[
         //      @prop {dom.Element} node
         //      @prop {String||Object} prop
         //      @prop {String} value
-        setAttribute: function (node, prop, value) {
+        setAttribute:    function (node, prop, value) {
             if (node && node.el) {
                 if (utils.isObject(prop)) {
                     Object.keys(prop).forEach(function (key) {
@@ -138,7 +138,7 @@ define('widget/dom',[
         //      @prop {dom.Element} node
         //      @prop {String||Object} prop
         //      @return {String} value
-        getAttribute: function (node, prop) {
+        getAttribute:    function (node, prop) {
             if (node && node.el) {
                 return node.el.getAttribute(prop);
             } else {
@@ -161,7 +161,7 @@ define('widget/dom',[
         //      @prop {dom.Element} node
         //      @prop {String||Object} prop
         //      @prop {String} value
-        setStyle: function (node, prop, value) {
+        setStyle:        function (node, prop, value) {
             if (node && node.el) {
                 if (utils.isObject(prop)) {
                     Object.keys(prop).forEach(function (key) {
@@ -178,7 +178,7 @@ define('widget/dom',[
         //      @prop {dom.Element} node
         //      @prop {String} prop
         //      @return {String} value
-        getStyle: function (node, prop) {
+        getStyle:        function (node, prop) {
             if (node && node.el) {
                 if (node.el !== undefined && node.el.style !== undefined) {
                     return node.el.style[prop];
@@ -192,7 +192,7 @@ define('widget/dom',[
         //      @method removeAttribute
         //      @prop {dom.Element} node
         //      @prop {String} prop
-        removeStyle: function (node, prop) {
+        removeStyle:     function (node, prop) {
             if (node && node.el) {
                 node.el.style[prop] = '';
             }
@@ -202,7 +202,7 @@ define('widget/dom',[
         //      @method addClass
         //      @param {dom.Element} node
         //      @param {String} className
-        addClass: function (node, className) {
+        addClass:        function (node, className) {
             if (node && node.el) {
                 node.el.classList.add(className);
             }
@@ -213,7 +213,7 @@ define('widget/dom',[
         //      @param {dom.Element} node
         //      @param {String} className
         //      @return boolean
-        hasClass: function (node, className) {
+        hasClass:        function (node, className) {
             if (node && node.el) {
                 return node.el.classList.contains(className);
             } else {
@@ -225,7 +225,7 @@ define('widget/dom',[
         //      @method removeClass
         //      @param {dom.Element} node
         //      @param {string} className
-        removeClass: function (node, className) {
+        removeClass:     function (node, className) {
             if (node && node.el) {
                 node.el.classList.remove(className);
             }
@@ -236,7 +236,7 @@ define('widget/dom',[
         //      @param {dom.Element} node
         //      @param? {String} val
         //      @return {String}
-        val: function (node, val) {
+        val:             function (node, val) {
             if (node && node.el) {
                 var el = node.el;
                 if (val !== undefined) {
@@ -254,18 +254,18 @@ define('widget/dom',[
         //      @param {Function} cb
         //      @param {Object} context
         //      @return {Object} { remove() }
-        on: function (element, ev, cb, context) {
-            var args = Array.prototype.slice.call(arguments, 4, arguments.length),
-                el = element.el,
+        on:              function (element, ev, cb, context) {
+            var args   = Array.prototype.slice.call(arguments, 4, arguments.length),
+                el     = element.el,
                 events = ev.split(' '),
-                fn = function (e) {
+                fn     = function (e) {
                     cb.apply(context || this, [e, element].concat(args));
                 };
 
             events.forEach(function (event) {
                 el.addEventListener(event, fn);
             });
-            var evt = {
+            var evt    = {
                 remove: function () {
                     events.forEach(function (event) {
                         el.removeEventListener(event, fn);
@@ -279,7 +279,7 @@ define('widget/dom',[
         //
         //      @method remove
         //      @param {dom.Element}
-        remove: function (el) {
+        remove:          function (el) {
             while (el._events.length > 0) {
                 el._events[0].remove();
                 el._events.shift();
@@ -294,12 +294,12 @@ define('widget/dom',[
         //      @param {dom.Element}
         //      @param {function} cb
         //      @param {function} context
-        onDOMAttached: function (el) {
+        onDOMAttached:   function (el) {
             var handlers = [];
             if (el.el !== undefined) {
                 var attached = false,
                     handler;
-                var step = function () {
+                var step     = function () {
                     if (attached) {
                         while (handlers.length > 0) {
                             handler = handlers[0];
@@ -322,16 +322,16 @@ define('widget/dom',[
             }
         },
         // Element
-        Element: Element
+        Element:         Element
     }
 
     // ## widget/dom.Element
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var root = node._node;
+        var root     = node._node;
         this._events = [];
-        this._node = root;
+        this._node   = root;
         if (!this.el) {
             if (root && root.el) {
                 this.el = root.el;
@@ -352,60 +352,60 @@ define('widget/dom',[
             this.children = root.children;
         }
         if (root) {
-            this.run = root.run;
+            this.run         = root.run;
             this.applyAttach = root.applyAttach;
-            this.getParent = root.getParent;
-            this.setParent = root.setParent;
+            this.getParent   = root.getParent;
+            this.setParent   = root.setParent;
         }
 
     }
 
     utils.extend(Element.prototype, {
-        clone: function () {
-            var extend = utils.extend({}, this);
+        clone:           function () {
+            var extend     = utils.extend({}, this);
             extend._events = [];
             return extend;
         },
         // Shortcut to - `dom.append`
-        _after: function (child) {
+        _after:          function (child) {
             dom._after(this, child)
         },
         // Shortcut to - `dom.replace`
-        replace: function (child, data) {
+        replace:         function (child, data) {
             dom.replace(this, child, data);
         },
         // Shortcut to - `dom.prepend`
-        prepend: function (child) {
+        prepend:         function (child) {
             dom.prepend(this, child);
         },
         // Shortcut to - `dom.insertBefore`
-        insertBefore: function (child, index) {
+        insertBefore:    function (child, index) {
             dom.insertBefore(this, child, index);
         },
         // Shortcut to - `dom.append`
-        append: function (child) {
+        append:          function (child) {
             dom.append(this, child);
         },
         // Shortcut to - `dom.text`
-        text: function (text) {
+        text:            function (text) {
             dom.text(this, text);
         },
         // Shortcut to - `dom.add`
-        add: function (fragment, parent, data) {
-            dom.add(this, fragment, parent, data);
+        add:             function (fragment, parent, data, index) {
+            dom.add(this, fragment, parent, data, index);
         },
-        detach: function () {
+        detach:          function () {
             dom.detach(this);
         },
-        attach: function () {
+        attach:          function () {
             dom.attach(this);
         },
         // Shortcut to - `dom.setAttribute`
-        setAttribute: function (prop, value) {
+        setAttribute:    function (prop, value) {
             dom.setAttribute(this, prop, value);
         },
         // Shortcut to - `dom.getAttribute`
-        getAttribute: function (prop) {
+        getAttribute:    function (prop) {
             return dom.getAttribute(this, prop);
         },
         // Shortcut to - `dom.removeAttribute`
@@ -413,44 +413,44 @@ define('widget/dom',[
             dom.removeAttribute(this, prop);
         },
         // Shortcut to - `dom.setStyle`
-        setStyle: function (prop, value) {
+        setStyle:        function (prop, value) {
             dom.setStyle(this, prop, value);
         },
         // Shortcut to - `dom.getStyle`
-        getStyle: function (prop) {
+        getStyle:        function (prop) {
             return dom.getStyle(this, prop);
         },
         // Shortcut to - `dom.removeStyle`
-        removeStyle: function (prop) {
+        removeStyle:     function (prop) {
             dom.removeStyle(this, prop);
         },
         // Shortcut to - `dom.addClass`
-        addClass: function (className) {
+        addClass:        function (className) {
             dom.addClass(this, className);
         },
         // Shortcut to - `dom.hasClass`
-        hasClass: function (className) {
+        hasClass:        function (className) {
             return dom.hasClass(this, className);
         },
         // Shortcut to - `dom.removeClass`
-        removeClass: function (className) {
+        removeClass:     function (className) {
             dom.removeClass(this, className);
         },
         // Shortcut to - `dom.val`
-        val: function (val) {
+        val:             function (val) {
             return dom.val(this, val);
         },
         // Shortcut to - `dom.on`
-        on: function (event, cb, context) {
+        on:              function (event, cb, context) {
             var args = Array.prototype.slice.call(arguments, 0);
             return dom.on.apply(false, [this].concat(args));
         },
         // Shortcut to - `dom.onDOMAttached`
-        onDOMAttached: function () {
+        onDOMAttached:   function () {
             return dom.onDOMAttached(this);
         },
         // Shortcut to - `dom.remove`
-        remove: function () {
+        remove:          function () {
             dom.remove(this);
         }
     });
@@ -496,7 +496,7 @@ define('widget/dom',[
         module.exports = factory(require('./utils'));
     } else {
         // Browser globals (root is window)
-        root.Templating = root.Templating || {};
+        root.Templating         = root.Templating || {};
         root.Templating.Decoder = factory(root.Templating.utils);
     }
 }(this, function (utils) {
@@ -516,16 +516,16 @@ define('widget/dom',[
         } else {
             elTag = 'div'
         }
-        var el = document.createElement(elTag),
+        var el       = document.createElement(elTag),
             fragment = document.createDocumentFragment();
         el.innerHTML = template;
         fragment.appendChild(el.firstChild);
         return fragment.firstChild;
     }
 
-    function setElement(placeholder, keep, parent, data) {
-        var params = this._node,
-            el = params.tmpEl((keep) ? placeholder : false, data, this),
+    function setElement(placeholder, keep, parent, data, beforeEl) {
+        var params     = this._node,
+            el         = params.tmpEl((keep) ? placeholder : false, data, this),
             attributes = params.data.attribs,
             plFragment = applyFragment(params.template, params.data.tag);
 
@@ -547,7 +547,12 @@ define('widget/dom',[
             if (params.parent !== null || params.parent !== undefined) {
                 params.parent.replaceChild(el, placeholder);
             }
-        } else {
+        } else if (parent !== undefined && beforeEl !== undefined) {
+            params.setParent(parent);
+            if (params.parent !== null) {
+                params.parent.insertBefore(el, beforeEl);
+            }
+        } else if (parent) {
             params.setParent(parent);
             if (params.parent !== null) {
                 params.parent.appendChild(el);
@@ -564,31 +569,31 @@ define('widget/dom',[
 
     function setParams(node, children, obj) {
         var tagName = node.tagName,
-            self = this;
-        var params = {
-            id: node.id,
-            template: node.template,
-            noAttach: _decoders[tagName].noAttach || node.data.tplSet.noattach,
+            self    = this;
+        var params  = {
+            id:          node.id,
+            template:    node.template,
+            noAttach:    _decoders[tagName].noAttach || node.data.tplSet.noattach,
             applyAttach: function () {
                 delete this._node.noAttach;
             },
-            setParent: function (parent) {
+            setParent:   function (parent) {
                 this._node.parent = parent;
             }.bind(self),
-            getParent: function () {
+            getParent:   function () {
                 return this._node.parent;
             }.bind(self),
             getInstance: function () {
                 return this;
             }.bind(self),
-            run: function (fragment, keep, parent, data) {
+            run:         function (fragment, keep, parent, data, beforeEl) {
                 if (data) {
                     obj = data;
                 }
                 if (this._node.noAttach === undefined) {
                     var placeholder = fragment.querySelector('#' + this._node.id) || fragment;
                     if (placeholder) {
-                        return setElement.call(self, placeholder, keep, parent, obj);
+                        return setElement.call(self, placeholder, keep, parent, obj, beforeEl);
                     }
                 }
             }
@@ -598,7 +603,7 @@ define('widget/dom',[
         }
         self._node = self._node || {};
         utils.merge(self._node, params);
-        self.data = self._node.data;
+        self.data  = self._node.data;
 
         self.getInstance = function () {
             return this._node.getInstance.apply(this, arguments)
@@ -618,12 +623,12 @@ define('widget/dom',[
         if (!obj) {
             obj = {};
         }
-        var context = false,
+        var context  = false,
             children = false;
         root.children.forEach(function (node) {
-            var name = node.data.name,
+            var name        = node.data.name,
                 contextData = (obj[name]) ? obj[name] : obj,
-                scope = {};
+                scope       = {};
 
             if (node.children &&
                 node.children.length > 0) {
@@ -639,14 +644,14 @@ define('widget/dom',[
 
                 }
                 if (name !== undefined) {
-                    context = context || {};
+                    context       = context || {};
                     context[name] = scope;
                 }
 
             } else if (name) {
-                context = context || {};
-                scope._node = {
-                    id: node.id,
+                context       = context || {};
+                scope._node   = {
+                    id:   node.id,
                     data: node.data
                 }
                 context[name] = scope;
@@ -687,9 +692,9 @@ define('widget/dom',[
     });
 
     utils.merge(Decoder.prototype, {
-        addDecoder: Decoder.addDecoder,
+        addDecoder:      Decoder.addDecoder,
         _renderFragment: function (root, data) {
-            data = data || {}
+            data         = data || {}
             var children = {},
                 fragment = applyFragment(root.template);
 
@@ -700,8 +705,8 @@ define('widget/dom',[
             runEls(children, fragment, data);
 
             return {
-                fragment: fragment,
-                children: children,
+                fragment:   fragment,
+                children:   children,
                 templateId: root.templateId
             };
         },
@@ -1468,24 +1473,36 @@ define('widget/parsers/applyBinders',[
                     var updateChildren = function () {
                         var hasParent  = false,
                             bindedData = [],
-                            addItem    = function (item) {
+                            addItem    = function (item, index) {
 
                                 var childBinder = utils.extend({}, binder);//.clone();
 
                                 if (!hasParent) {
                                     childBinder.add(parent);
                                     hasParent = binder.getParent();
+                                    bindedData.push({
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+                                } else if (index <= bindedData.length - 1) {
+                                    childBinder.add(parent, hasParent, false, bindedData[index].binder.el);
+                                    bindedData.splice(index, 0, {
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+
                                 } else {
                                     childBinder.add(parent, hasParent);
+                                    bindedData.push({
+                                        binder: childBinder,
+                                        data:   item
+                                    });
+
                                 }
 
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
                                 applyEvents.call(this, childBinder, events, item);
-                                bindedData.push({
-                                    binder: childBinder,
-                                    data:   item
-                                });
 
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
@@ -1497,6 +1514,7 @@ define('widget/parsers/applyBinders',[
                             var methodNames = ['pop', 'shift', 'splice'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
                                 var clonedData = bindedData.slice(0);
+
                                 if (oldvalue === undefined && action === 'push') {
                                     var filter = clonedData.filter(function (item) {
                                         return item.data === newvalue[0];
@@ -1504,13 +1522,35 @@ define('widget/parsers/applyBinders',[
                                     if (filter.length === 0) {
                                         addItem.call(this, newvalue[0]);
                                     }
+                                } else if (oldvalue === undefined && action === 'unshift') {
+                                    var filter = clonedData.filter(function (item) {
+                                        return item.data === newvalue[0];
+                                    });
+                                    if (filter.length === 0) {
+                                        addItem.call(this, newvalue[0], 0);
+                                    }
                                 } else if (methodNames.indexOf(action) !== -1) {
                                     clonedData.forEach(function (binder, index) {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
                                             binder.binder.remove();
                                             bindedData.splice(bindedData.indexOf(binder), 1);
+
                                         }
                                     }.bind(this));
+
+                                    if (action === 'splice') {
+                                        var vals = Array.prototype.slice.call(newvalue, 2);
+
+                                        if (vals && vals.length > 0) {
+
+                                            vals.forEach(function (val) {
+                                                var index = obj[objKey].indexOf(val);
+                                                if (index !== -1) {
+                                                    addItem.call(this, val, index);
+                                                }
+                                            }.bind(this));
+                                        }
+                                    }
                                 }
                             }.bind(this));
                         }

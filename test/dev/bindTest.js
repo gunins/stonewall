@@ -10,7 +10,7 @@ define([
                 value: 'Some Value'
 
             },
-            list: [
+            list:  [
                 {
                     test: {
                         value: 'Test Value',
@@ -35,7 +35,7 @@ define([
 
     expect = chai.expect;
 
-    container = document.createElement('div');
+    container      = document.createElement('div');
     var $container = $(container);
 
     $container.css('opacity', 0).appendTo('body');
@@ -44,14 +44,14 @@ define([
     app.start(container);
 
     var $template = $container.children(),
-        data = app.context.data;
+        data      = app.context.data;
 
     function testRender(list, data) {
         list.each(function (index) {
-            var item = $(this),
+            var item  = $(this),
                 value = item.find('.value'),
                 badge = item.find('.badge'),
-                obj = data[index].test;
+                obj   = data[index].test;
             expect(value).to.have.$text(obj.value);
             expect(badge).to.have.$text(obj.badge.toString());
 
@@ -71,17 +71,17 @@ define([
         });
     };
     function addOther() {
-        data.val.list.push({
+        data.val.list.unshift({
             test: {
-                value: 'Test Value New2',
+                value: 'Test Value First',
                 badge: 5
             }
         });
     };
 
-    function removeSecond() {
-        data.val.list.splice(2, 1);
-    };
+    function removeAndAdd() {
+        data.val.list.splice(1, 1);
+    }
 
     describe('Basic Data Binding Dev Tests', function () {
         describe('Checking if DOM Elements are binded to list, and update correctly', function () {
@@ -89,7 +89,7 @@ define([
                 var list = $template.find('.bindedlist');
                 testRender(list, testData.val.list);
             });
-            it('Remove first Item from data, and check if it applied to DOM', function (done) {
+            it('Remove second Item from data, and check if it applied to DOM', function (done) {
                 removeFirst();
                 var list = $template.find('.bindedlist');
                 testRender(list, [testData.val.list[0], testData.val.list[2]]);
@@ -113,40 +113,50 @@ define([
                 addOther();
                 var list = $template.find('.bindedlist');
                 testRender(list, [
+                    {
+                        test: {
+                            value: 'Test Value First',
+                            badge: 5
+                        }
+                    },
                     testData.val.list[0],
                     testData.val.list[2], {
                         test: {
                             value: 'Test Value New',
                             badge: 4
                         }
-                    },
-                    {
-                        test: {
-                            value: 'Test Value New2',
-                            badge: 5
-                        }
                     }
                 ]);
                 done();
             });
             it('Remove middle Item from Array, and check if it applied to DOM', function (done) {
-                removeSecond();
+                removeAndAdd();
                 var list = $template.find('.bindedlist');
                 testRender(list, [
-                    testData.val.list[0],
-                    testData.val.list[2],
                     {
                         test: {
-                            value: 'Test Value New2',
+                            value: 'Test Value First',
                             badge: 5
                         }
+                    }, {
+                        test: {
+                            value: 'Test Value1',
+                            badge: 3
+                        }
+                    },
+                    {
+                        test: {
+                            value: 'Test Value New',
+                            badge: 4
+                        }
                     }
+
                 ]);
                 done();
             });
         });
         describe('Checking Both way binding for item, when Input is typed, value also are changed', function () {
-            var input = $template.find('input'),
+            var input     = $template.find('input'),
                 valueBind = $template.find('.valueBind');
             it('Value should be binded from AppData', function () {
                 expect(input).to.have.$val('Some Value');

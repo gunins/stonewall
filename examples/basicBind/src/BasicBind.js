@@ -5,29 +5,30 @@ define([
     'widget/App',
     'container/Container'
 ], function (App, Container) {
+    var badge = 1;
     var data = {
         val: {
             items: {
                 value: 'Some Value'
 
             },
-            list: [
+            list:  [
                 {
                     test: {
                         value: 'Test Value',
-                        badge: 1
+                        badge: badge++
                     }
                 },
                 {
                     test: {
                         value: 'Test Inner',
-                        badge: 2
+                        badge: badge++
                     }
                 },
                 {
                     test: {
                         value: 'Test Value1',
-                        badge: 3
+                        badge: badge++
                     }
                 }
             ]
@@ -37,7 +38,7 @@ define([
     function changeValues() {
         setTimeout(function () {
             data.val.newitem = {
-                value:'Delay Value'
+                value: 'Delay Value'
             };
         }, 1000);
         setTimeout(function () {
@@ -55,30 +56,40 @@ define([
             data.val.list.push({
                 test: {
                     value: 'Test Value New',
-                    badge: 4
+                    badge: badge++
                 }
             });
         }, 3000);
         setTimeout(function () {
-            data.val.list.push({
+            data.val.list.unshift({
                 test: {
-                    value: 'Test Value New2',
-                    badge: 5
+                    value: 'Test Value v',
+                    badge: badge++
                 }
             });
         }, 4000);
 
         setTimeout(function () {
-            data.val.list.splice(1, 1);
+            data.val.list.splice(2, 1, {
+                test: {
+                    value: 'Test Value Third',
+                    badge: badge++
+                }
+            }, {
+                test: {
+                    value: 'Test Value Fourth',
+                    badge: badge++
+                }
+            });
         }, 5000);
     }
 
     return App.extend({
         AppContainer: Container,
-        init: function () {
+        init:         function () {
             this.context.eventBus.subscribe('changeValues', changeValues);
         },
-        setContext: function () {
+        setContext:   function () {
             return {
                 data: data
             }
