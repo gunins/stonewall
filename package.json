@@ -6,15 +6,15 @@
     "url": "https://github.com/gunins/stonewall"
   },
   "devDependencies": {
-    "chai": "~1.10.0",
+    "chai": "~2.3.0",
     "chai-jq": "0.0.8",
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.0.1",
-    "grunt-bump": "0.0.16",
-    "grunt-contrib-clean": "^0.5.0",
+    "grunt-bump": "0.3.1",
+    "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-concat": "^0.5.0",
-    "grunt-contrib-connect": "^0.9.0",
-    "grunt-contrib-copy": "^0.7.0",
+    "grunt-contrib-connect": "^0.10.1",
+    "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-docco": "^0.3.3",
     "grunt-exec": "^0.4.6",
@@ -22,12 +22,12 @@
     "jquery": "^2.1.3",
     "less": "^2.5.1",
     "clean-css": "^3.0.10",
-    "mocha": "~2.0.1",
+    "mocha": "~2.2.5",
     "node-static": "^0.7.6"
   },
   "dependencies": {
     "requirejs": "^2.1.15",
-    "richtemplate": "0.2.17",
+    "richtemplate": "0.2.18",
     "urlmanager": "^0.2.10"
   },
   "scripts": {
