@@ -130,7 +130,7 @@
 <pre><code> define([
      <span class="hljs-string">'widget/App'</span>,
      <span class="hljs-string">'widget/parser!container/Container'</span>,
- ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(App, Container)</span> </span>{
+ ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">App, Container</span>) </span>{
 <span class="hljs-pi">     'use strict'</span>;
      <span class="hljs-keyword">return</span> App.extend({
          AppContainer: Container
@@ -143,11 +143,11 @@
     <span class="hljs-string">'./mediator'</span>,
     <span class="hljs-string">'router/Router'</span>,
     <span class="hljs-string">'./utils'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Mediator, Router, utils)</span> </span>{
+], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Mediator, Router, utils</span>) </span>{
 <span class="hljs-pi">    'use strict'</span>;
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">triggerRoute</span><span class="hljs-params">(router)</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">triggerRoute</span>(<span class="hljs-params">router</span>) </span>{
         router.start();
-        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onHashChange</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onHashChange</span>(<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">var</span> match = <span class="hljs-built_in">window</span>.location.href.match(<span class="hljs-regexp">/#(.*)$/</span>);
             router.trigger(match ? match[<span class="hljs-number">1</span>] : <span class="hljs-string">''</span>);
         };
@@ -172,7 +172,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span><span class="hljs-params">(options)</span> </span>{
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span>(<span class="hljs-params">options</span>) </span>{
         options    = options || {};
         <span class="hljs-keyword">var</span> router = <span class="hljs-keyword">new</span> Router(),
             mapHandler;
@@ -202,13 +202,13 @@ Usage Example</p>
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) {
                 mapHandler = <span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer);
             } <span class="hljs-keyword">else</span> {
-                mapHandler = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+                mapHandler = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
                 }
             }
 
             <span class="hljs-keyword">if</span> (options.rootRoute !== <span class="hljs-literal">undefined</span>) {
-                router.match(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(match)</span> </span>{
+                router.match(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
                     match(options.rootRoute, mapHandler);
                 });
             } <span class="hljs-keyword">else</span> {
@@ -216,7 +216,7 @@ Usage Example</p>
             }
 
             <span class="hljs-keyword">this</span>.el           = <span class="hljs-keyword">this</span>.appContainer.el;
-            setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
                 <span class="hljs-keyword">this</span>.el.classList.add(<span class="hljs-string">'show'</span>);
             }.bind(<span class="hljs-keyword">this</span>), <span class="hljs-number">100</span>);
             triggerRoute(router);
@@ -257,7 +257,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        beforeInit: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        beforeInit: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
         },</pre></div></div>
             
         </li>
@@ -274,7 +274,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        init:       <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        init:       <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
         },</pre></div></div>
             
         </li>
@@ -291,7 +291,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        setContext: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        setContext: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">return</span> {};
         },</pre></div></div>
             
@@ -310,7 +310,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        start:      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(container)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        start:      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">container</span>) </span>{
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
                 container.appendChild(<span class="hljs-keyword">this</span>.el);
             }

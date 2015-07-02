@@ -120,7 +120,7 @@ define([
     <span class="hljs-string">'./applyEvents'</span>,
     <span class="hljs-string">'./setBinders'</span>,
     <span class="hljs-string">'./deepBindings'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(dom, utils, applyEvents, setBinders, deepBindings)</span> </span>{</pre></div></div>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom, utils, applyEvents, setBinders, deepBindings</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -137,8 +137,8 @@ define([
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyElement</span><span class="hljs-params">(elements, params)</span> </span>{
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyElement</span>(<span class="hljs-params">elements, params</span>) </span>{
+        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
 
             <span class="hljs-keyword">var</span> element = elements[key],
                 node    = element._node;
@@ -152,7 +152,7 @@ define([
                 elements[key] = <span class="hljs-keyword">new</span> dom.Element(element);
                 <span class="hljs-keyword">if</span> (node.data.type === <span class="hljs-string">'pl'</span> &amp;&amp; node.data.tplSet.bind !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">var</span> bind = node.data.tplSet.bind;
-                    <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(attr)</span> </span>{
+                    <span class="hljs-built_in">Object</span>.keys(bind).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">attr</span>) </span>{
                         <span class="hljs-keyword">if</span> (params[bind[attr]] !== <span class="hljs-literal">undefined</span>) {
                             <span class="hljs-keyword">if</span> (attr !== <span class="hljs-string">'class'</span>) {
                                 elements[key].setAttribute(attr, params[bind[attr]]);
@@ -168,13 +168,13 @@ define([
         <span class="hljs-keyword">return</span> elements;
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span><span class="hljs-params">(elements, parentChildren, data, params)</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span>(<span class="hljs-params">elements, parentChildren, data, params</span>) </span>{
         <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Object</span>.keys(data).length === <span class="hljs-number">0</span>) {
             data = <span class="hljs-keyword">this</span>.data;
         }
         parentChildren = (parentChildren) ? applyElement.call(<span class="hljs-keyword">this</span>, parentChildren, params) : {};
         elements       = (elements) ? applyElement.call(<span class="hljs-keyword">this</span>, elements, params) : {};
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
             <span class="hljs-keyword">var</span> children = elements[key].children;
             <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
                 children               = setChildren.call(<span class="hljs-keyword">this</span>, children, parentChildren.children, data, params);

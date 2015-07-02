@@ -131,7 +131,7 @@ Basic Usage example</p>
 <pre><code> define([
      <span class="hljs-string">'templating/parser!widget.html'</span>,
      <span class="hljs-string">'widget/Constructor'</span>
- ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(template, Constructor)</span> </span>{
+ ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
      <span class="hljs-keyword">var</span> Widget = Constructor.extend({
          template: template
      });
@@ -152,7 +152,7 @@ Basic Usage example</p>
     <span class="hljs-string">'./parsers/setBinders'</span>,
     <span class="hljs-string">'./parsers/setRoutes'</span>,
     <span class="hljs-string">'./parsers/applyEvents'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents)</span> </span>{
+], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents</span>) </span>{
 <span class="hljs-pi">    'use strict'</span>;
     <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
@@ -173,7 +173,7 @@ Basic Usage example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span><span class="hljs-params">(data, children, dataSet, node)</span> </span>{
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span>(<span class="hljs-params">data, children, dataSet, node</span>) </span>{
         <span class="hljs-keyword">this</span>._routes  = [];
         <span class="hljs-keyword">this</span>._events  = [];
         <span class="hljs-keyword">this</span>.children = {};</pre></div></div>
@@ -254,7 +254,7 @@ Basic Usage example</p>
               <p><code>nodes</code> Object override default methods to Elements.
 Usage Example</p>
 <pre><code> nodes: {
-     listItem: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, parent, data)</span> </span>{
+     listItem: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, parent, data</span>) </span>{
          el.add(parent);
          el.text(data);
      }
@@ -280,7 +280,7 @@ Usage Example</p>
      <span class="hljs-keyword">delete</span>: [
          {
              name: <span class="hljs-string">'click'</span>,
-             action: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+             action: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
                  <span class="hljs-keyword">this</span>.data.remove = <span class="hljs-literal">true</span>
                  <span class="hljs-keyword">this</span>.destroy();
              }
@@ -303,7 +303,7 @@ Usage Example</p>
               <p>Applying extra methods to Element
 Usage Example</p>
 <pre><code> elReady: {
-     links: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
+     links: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
          <span class="hljs-keyword">if</span>(data.class===<span class="hljs-string">'active'</span>){
              el.addClass(<span class="hljs-string">'active'</span>);
          }
@@ -333,7 +333,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        init:         <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data, children, dataSet)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        init:         <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data, children, dataSet</span>) </span>{
         },</pre></div></div>
             
         </li>
@@ -355,7 +355,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        beforeInit:   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data, children, dataSet)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        beforeInit:   <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data, children, dataSet</span>) </span>{
         },</pre></div></div>
             
         </li>
@@ -373,7 +373,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        loadCss:      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(url)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        loadCss:      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">url</span>) </span>{
             <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === -<span class="hljs-number">1</span>) {
                 <span class="hljs-keyword">this</span>.context._cssReady.push(url);
@@ -418,7 +418,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        detach:       <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        detach:       <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._placeholder) {
                 <span class="hljs-keyword">this</span>._placeholder = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-keyword">this</span>.el.tagName);
             }
@@ -446,7 +446,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        attach:       <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        attach:       <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._placeholder &amp;&amp; <span class="hljs-keyword">this</span>._parent) {
                 <span class="hljs-keyword">this</span>._parent.replaceChild(<span class="hljs-keyword">this</span>.el, <span class="hljs-keyword">this</span>._placeholder)
             }
@@ -466,7 +466,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        onDestroy:    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        onDestroy:    <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
         },</pre></div></div>
             
@@ -484,7 +484,7 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        destroy:      <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>        destroy:      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">this</span>.onDestroy();
             <span class="hljs-keyword">this</span>.eventBus.remove();
             <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._events.length &gt; <span class="hljs-number">0</span>) {
@@ -497,16 +497,16 @@ Usage Example</p>
             }
             <span class="hljs-keyword">this</span>.root.remove();
         },
-        setRoutes:    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(instance)</span> </span>{
+        setRoutes:    <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">instance</span>) </span>{
             <span class="hljs-keyword">if</span> (instance !== <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">this</span>._routes.push(instance);
             }
         },
-        _applyRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(matches)</span> </span>{
+        _applyRoutes: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">matches</span>) </span>{
             <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._routes.length &gt; <span class="hljs-number">0</span>) {
                 <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>._routes[<span class="hljs-number">0</span>];
                 <span class="hljs-keyword">if</span> (instance &amp;&amp; instance._match) {
-                    matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routes)</span> </span>{
+                    matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routes</span>) </span>{
                         instance._match.call(instance, routes.match.bind(routes));
                         routes.run();
                     }.bind(<span class="hljs-keyword">this</span>));
@@ -515,10 +515,10 @@ Usage Example</p>
             }
             matches.rebind();
         },
-        _reRoute:     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+        _reRoute:     <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">this</span>._routes.splice(<span class="hljs-number">0</span>, <span class="hljs-keyword">this</span>._routes.length);
         },
-        rebind:       <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+        rebind:       <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">this</span>._reRoute();
         },</pre></div></div>
             
@@ -538,7 +538,7 @@ Usage Example</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        setChildren:  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(el, data)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        setChildren:  <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
             <span class="hljs-keyword">var</span> name = el._node.name;
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.children[name] !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.children[name].el !== <span class="hljs-literal">undefined</span>) {
                 dom.detach(<span class="hljs-keyword">this</span>.children[name]); <span class="hljs-comment">//.detach();</span>
@@ -584,7 +584,7 @@ Usage Example</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Component, options)</span> </span>{
+            <div class="content"><div class='highlight'><pre>        addComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Component, options</span>) </span>{
             <span class="hljs-keyword">var</span> name      = options.name;
             <span class="hljs-keyword">var</span> container = options.container;
 
@@ -603,7 +603,7 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.rebind();
             <span class="hljs-keyword">return</span> component;
         },
-        setComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Component, options)</span> </span>{
+        setComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Component, options</span>) </span>{
             <span class="hljs-keyword">var</span> instance = {
                 name:  options.name,
                 _node: {
@@ -612,7 +612,7 @@ Usage Example</p>
                         type: <span class="hljs-string">'cp'</span>
                     }
                 },
-                run:   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(container)</span> </span>{
+                run:   <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">container</span>) </span>{
                     options.appContext = <span class="hljs-keyword">this</span>.context;
                     <span class="hljs-keyword">var</span> cp             = <span class="hljs-keyword">new</span> Component(options, options.children, options.data);
                     instance.instance  = cp;

@@ -128,12 +128,12 @@
               <h3 id="requirejs-plugin">Requirejs plugin</h3>
 <p>For to simplify <code>widget/Constructor</code> Class
 Usage Example</p>
-<pre><code> `&lt;cp-widget src=<span class="hljs-string">"widget/parser!widget.html"</span>&gt;<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-title">cp-widget</span>&gt;</span>`</span>
+<pre><code> <span class="hljs-string">`&lt;cp-widget src="widget/parser!widget.html"&gt;&lt;/cp-widget&gt;`</span>
 </code></pre><p> This savining to create extra unnecessary javascript file.</p>
 <pre><code> define([
      <span class="hljs-string">'templating/parser!widget.html'</span>,
      <span class="hljs-string">'widget/Constructor'</span>
- ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(template, Constructor)</span> </span>{
+ ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
      <span class="hljs-keyword">var</span> Widget = Constructor.extend({
          template: template
      });
@@ -143,30 +143,30 @@ Usage Example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-define(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getName</span><span class="hljs-params">(fileName)</span> </span>{
+define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getName</span>(<span class="hljs-params">fileName</span>) </span>{
         <span class="hljs-keyword">return</span> (<span class="hljs-regexp">/[.]/</span>.exec(fileName)) ? <span class="hljs-regexp">/[^.]+$/</span>.exec(fileName) : <span class="hljs-literal">undefined</span>;
     }
 
     <span class="hljs-keyword">return</span> {
         version: <span class="hljs-string">"0.1.0"</span>,
-        load: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(moduleName, req, onLoad, config)</span> </span>{
+        load: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">moduleName, req, onLoad, config</span>) </span>{
             moduleName = (getName(moduleName) !== <span class="hljs-literal">undefined</span>) ? moduleName : moduleName + <span class="hljs-string">'.html'</span>;
             define(moduleName,
                 [
                     <span class="hljs-string">'templating/parser!'</span> + moduleName,
                     <span class="hljs-string">'widget/Constructor'</span>
-                ], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(template, Constructor)</span> </span>{
+                ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
                     <span class="hljs-keyword">var</span> Widget = Constructor.extend({
                         template: template
                     });
                     <span class="hljs-keyword">return</span> Widget;
                 });
-            req([moduleName], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Widget)</span> </span>{
+            req([moduleName], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Widget</span>) </span>{
                 onLoad(Widget);
             });
         },
-        write: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pluginName, moduleName, write)</span> </span>{
+        write: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pluginName, moduleName, write</span>) </span>{
             <span class="hljs-keyword">var</span> Name = (getName(moduleName) !== <span class="hljs-literal">undefined</span>) ? moduleName : moduleName + <span class="hljs-string">'.html'</span>;
             write(<span class="hljs-string">'define("'</span> + pluginName + <span class="hljs-string">'!'</span> + moduleName + <span class="hljs-string">'", '</span> +
                   <span class="hljs-string">'['</span> +

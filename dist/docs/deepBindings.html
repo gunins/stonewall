@@ -116,9 +116,9 @@
  */</span>
 define([
     <span class="hljs-string">'./setBinders'</span>
-],<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(setBinders)</span> </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deepBindings</span><span class="hljs-params">(elements)</span> </span>{
-        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+],<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">setBinders</span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">deepBindings</span>(<span class="hljs-params">elements</span>) </span>{
+        <span class="hljs-built_in">Object</span>.keys(elements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
             <span class="hljs-keyword">var</span> element = elements[key];
             <span class="hljs-keyword">if</span> (element.children) {
                 elements[key].children = deepBindings(element.children);

@@ -110,18 +110,18 @@
               </div>
               <h2 id="loader-loads-the-application-main-script">Loader Loads the Application main script</h2>
 <p>Following Attributes Supported</p>
-<pre><code> data-name: location of main script <span class="hljs-keyword">for</span> Application
+<pre><code> data-name: location <span class="hljs-keyword">of</span> main script <span class="hljs-keyword">for</span> Application
  data-target?: location to container <span class="hljs-keyword">if</span> not set,
  use <span class="hljs-built_in">document</span>.body
 </code></pre><p>There below is Example of usage in <code>index.html</code></p>
-<pre><code> `&lt;script data-name=<span class="hljs-string">"App"</span> data-target=<span class="hljs-string">"body"</span>
-     src=<span class="hljs-string">"../../src/loader.js"</span>&gt;<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-title">script</span>&gt;</span>`</span>
+<pre><code> <span class="hljs-string">`&lt;script data-name="App" data-target="body"
+     src="../../src/loader.js"&gt;&lt;/script&gt;`</span>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getData</span><span class="hljs-params">(attributes, dataset)</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getData</span>(<span class="hljs-params">attributes, dataset</span>) </span>{
         <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> a = <span class="hljs-number">0</span>; a &lt; attributes.length; a++) {
             <span class="hljs-keyword">var</span> attribs = attributes[a];
             <span class="hljs-keyword">if</span> (attribs.name.indexOf(<span class="hljs-string">'data-'</span>) == <span class="hljs-number">0</span> &amp;&amp; attribs.name.length &gt; <span class="hljs-number">5</span>) {
@@ -131,7 +131,7 @@
         <span class="hljs-keyword">return</span> dataset;
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getDataSet</span><span class="hljs-params">()</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getDataSet</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">var</span> dataset = {},
             scripts = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">'script'</span>);
         <span class="hljs-keyword">if</span> (scripts.length &gt; <span class="hljs-number">0</span>) {
@@ -145,16 +145,16 @@
         <span class="hljs-keyword">return</span> dataset;
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">containerStart</span><span class="hljs-params">(dataset)</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">containerStart</span>(<span class="hljs-params">dataset</span>) </span>{
         <span class="hljs-keyword">if</span> (dataset.name !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">require</span>([dataset.name], <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(App)</span> </span>{
+            <span class="hljs-built_in">require</span>([dataset.name], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">App</span>) </span>{
                 <span class="hljs-keyword">var</span> container = (dataset.target) ? <span class="hljs-built_in">document</span>.querySelector(dataset.target) : <span class="hljs-built_in">document</span>.body;
                 <span class="hljs-keyword">var</span> app = <span class="hljs-keyword">new</span> App();
                 app.start(container);
             });
         }
     }
-    <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">"DOMContentLoaded"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+    <span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">"DOMContentLoaded"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
         containerStart(getDataSet());
     }, <span class="hljs-literal">false</span>);
 
