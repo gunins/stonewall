@@ -171,7 +171,7 @@ define([
                             addItem    = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item, index)</span> </span>{
 
                                 <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);<span class="hljs-comment">//.clone();</span>
-
+                                childBinder._events = [];
                                 <span class="hljs-keyword">if</span> (!hasParent) {
                                     childBinder.add(parent);
                                     hasParent = binder.getParent();
@@ -206,8 +206,9 @@ define([
                         data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
                         <span class="hljs-keyword">var</span> update     = binder._node.data.tplSet.update;
                         <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            <span class="hljs-keyword">var</span> removeMethodNames = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>],
-                                insertMethodNames = [<span class="hljs-string">'push'</span>, <span class="hljs-string">'unshift'</span>];
+                            <span class="hljs-keyword">var</span> removeMethodNames  = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>],
+                                insertMethodNames  = [<span class="hljs-string">'push'</span>, <span class="hljs-string">'unshift'</span>],
+                                sortingMethodNames = [<span class="hljs-string">'reverse'</span>, <span class="hljs-string">'sort'</span>];
                             watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(prop, action, newvalue, oldvalue)</span> </span>{
                                 <span class="hljs-keyword">var</span> clonedData = bindedData.slice(<span class="hljs-number">0</span>);
                                 <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
@@ -236,6 +237,8 @@ define([
                                             }.bind(<span class="hljs-keyword">this</span>));
                                         }
                                     }
+                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
+
                                 }
                             }.bind(<span class="hljs-keyword">this</span>));
                         }

@@ -1476,7 +1476,7 @@ define('widget/parsers/applyBinders',[
                             addItem    = function (item, index) {
 
                                 var childBinder = utils.extend({}, binder);//.clone();
-
+                                childBinder._events = [];
                                 if (!hasParent) {
                                     childBinder.add(parent);
                                     hasParent = binder.getParent();
@@ -1511,8 +1511,9 @@ define('widget/parsers/applyBinders',[
                         data.forEach(addItem.bind(this));
                         var update     = binder._node.data.tplSet.update;
                         if (update === 'true') {
-                            var removeMethodNames = ['pop', 'shift', 'splice'],
-                                insertMethodNames = ['push', 'unshift'];
+                            var removeMethodNames  = ['pop', 'shift', 'splice'],
+                                insertMethodNames  = ['push', 'unshift'],
+                                sortingMethodNames = ['reverse', 'sort'];
                             watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
                                 var clonedData = bindedData.slice(0);
                                 if (oldvalue === undefined && insertMethodNames.indexOf(action) !== -1) {
@@ -1541,6 +1542,8 @@ define('widget/parsers/applyBinders',[
                                             }.bind(this));
                                         }
                                     }
+                                } else if (sortingMethodNames.indexOf(action) !== -1) {
+
                                 }
                             }.bind(this));
                         }
