@@ -6,9 +6,9 @@ define([
     'templating/parser!./_cmp.html'
 ], function (Constructor, template) {
     'use strict';
-    var action = [
+    var action    = [
         {
-            name: 'change',
+            name:   'change',
             action: function (e, el) {
                 this.setLocation({id: el.val()})
             }
@@ -23,38 +23,39 @@ define([
         return str.join("&");
     };
     return Constructor.extend({
-        template: template,
-        init: function (data) {
+        template:    template,
+        init:        function (data) {
             console.log('init'); //, this.el, data);
         },
-        match: function (match) {
+        match:       function (match) {
+            //console.log(match, 'match');
             match('/:id').to(function (id) {
                 console.log('custom', id);
             })
         },
-        to: function (id) {
-            this.children.showid.text((typeof id !== 'object')?id:'Link id not dynamic');
+        to:          function (id) {
+            this.children.showid.text((typeof id !== 'object') ? id : 'Link id not dynamic');
             console.log('to', id); //, this.el, id);
         },
-        leave: function () {
+        leave:       function () {
             console.log('leave'); //, this.el)
         },
-        query:function (params) {
-                this.children.input.val(params.getQuery().id || '');
-                this.children.inputA.val(params.getQuery().id || '');
+        query:       function (params) {
+            this.children.input.val(params.getQuery().id || '');
+            this.children.inputA.val(params.getQuery().id || '');
         },
         getLocation: function () {
 
         },
         setLocation: function (query) {
-            var location = window.location.hash.split('?', 2)[0]
+            var location         = window.location.hash.split('?', 2)[0]
             window.location.hash = location + '?' + serialize(query);
         },
-        events: {
-            input: action,
+        events:      {
+            input:  action,
             inputA: action
         },
-        nodes: {
+        nodes:       {
             footer: function (el) {
                 setTimeout(function () {
                     this.setChildren(el);

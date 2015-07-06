@@ -5,11 +5,11 @@ define([
     '../dom',
 ], function (dom) {
 
-    function destroyComponent(cp) {
+    function destroyComponent(cp, force) {
         var children = cp.children;
         if (children !== undefined) {
             Object.keys(children).forEach(function (key) {
-                destroyComponent(children[key]);
+                destroyComponent(children[key], true);
             });
         }
         var instance = cp.instance;
@@ -22,6 +22,12 @@ define([
         if (cp.el) {
             cp.el.remove();
             delete cp.el;
+        }
+
+        if (force) {
+            if (cp._matches) {
+                cp._matches.remove();
+            }
         }
     }
 
@@ -54,12 +60,9 @@ define([
                     }
 
                     if (child.el !== undefined && child.sessId !== id && id !== undefined) {
-                        applyToChildren.call(this, child.children, function (child) {
-                            if (child._matches) {
-                                child._matches.remove();
-                            }
-                            destroyComponent(child);
-                        });
+                        /*  applyToChildren.call(this, child.children, function (deepChild) {
+                         destroyComponent(deepChild, true);
+                         }.bind(this));*/
                         destroyComponent(child);
                     } else {
                         applyToChildren.call(this, child.children, function (cp, instance) {
@@ -86,15 +89,24 @@ define([
                         dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
-
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
 
                             if (!cp.el && instance && instance._match) {
-
+                                if (cp._routeHandlers !== undefined && cp._routeHandlers.length > 0) {
+                                    cp._routeHandlers.forEach(function (handler) {
+                                        handler.remove();
+                                    });
+                                    delete cp._routeHandlers;
+                                }
                                 matches.setRoutes(function (routes) {
-                                    instance._match.call(instance, routes.match.bind(routes));
+                                    instance._match.call(instance, function (route) {
+                                        var match         = routes.match.call(routes, route);
+                                        cp._routeHandlers = cp._routeHandlers || [];
+                                        cp._routeHandlers.push(match);
+                                        return match
+                                    });
                                     routes.run();
                                 }.bind(this));
                                 instance._reRoute = function () {

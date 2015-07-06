@@ -82,13 +82,13 @@ define([
                             },
                             {
                                 link: {
-                                    href: '#/leveln/844',
+                                    href: '#/leveln/844/test',
                                     text: 'Leven N / :id 844'
                                 }
                             },
                             {
                                 link: {
-                                    href: '#/leveln/845',
+                                    href: '#/leveln/845/test',
                                     text: 'Leven N / :id 845'
                                 }
                             }

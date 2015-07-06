@@ -215,6 +215,9 @@ define([
                 this.root._events[0].remove();
                 this.root._events.shift();
             }
+         /*   if(this.to!==undefined){
+                delete this.to;
+            }*/
             this.root.remove();
         },
         setRoutes:    function (instance) {
