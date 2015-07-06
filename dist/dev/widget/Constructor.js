@@ -1711,14 +1711,12 @@ define('widget/parsers/setRoutes',[
                                     delete cp._routeHandlers;
                                 }
                                 matches.setRoutes(function (routes) {
-                                    var handler = function (route) {
+                                    instance._match.call(instance, function (route) {
                                         var match         = routes.match.call(routes, route);
                                         cp._routeHandlers = cp._routeHandlers || [];
                                         cp._routeHandlers.push(match);
                                         return match
-                                    };
-
-                                    instance._match.call(instance, handler);
+                                    });
                                     routes.run();
                                 }.bind(this));
                                 instance._reRoute = function () {

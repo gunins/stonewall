@@ -214,14 +214,12 @@ define([
                                     <span class="hljs-keyword">delete</span> cp._routeHandlers;
                                 }
                                 matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routes</span>) </span>{
-                                    <span class="hljs-keyword">var</span> handler = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">route</span>) </span>{
+                                    instance._match.call(instance, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">route</span>) </span>{
                                         <span class="hljs-keyword">var</span> match         = routes.match.call(routes, route);
                                         cp._routeHandlers = cp._routeHandlers || [];
                                         cp._routeHandlers.push(match);
                                         <span class="hljs-keyword">return</span> match
-                                    };
-
-                                    instance._match.call(instance, handler);
+                                    });
                                     routes.run();
                                 }.bind(<span class="hljs-keyword">this</span>));
                                 instance._reRoute = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
