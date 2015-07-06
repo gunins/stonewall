@@ -13,7 +13,7 @@
     "bootstrap": "latest",
     "watch": "latest",
     "d3": "~3.4.13",
-    "urlmanager": "~0.2.10",
+    "urlmanager": "~0.2.11",
     "three.js": "*"
   },
   "ignore": [

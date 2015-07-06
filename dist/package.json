@@ -28,7 +28,7 @@
   "dependencies": {
     "requirejs": "2.1.17",
     "richtemplate": "0.2.18",
-    "urlmanager": "^0.2.10"
+    "urlmanager": "^0.2.11"
   },
   "scripts": {
     "start": "node server.js",

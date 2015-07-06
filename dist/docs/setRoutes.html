@@ -153,11 +153,12 @@ define([
             <span class="hljs-keyword">var</span> child = children[name];
             <span class="hljs-keyword">var</span> route = (child._node !== <span class="hljs-literal">undefined</span>) ? child._node.data.route : <span class="hljs-literal">undefined</span>;
             <span class="hljs-keyword">if</span> (route !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.type !== <span class="hljs-string">'cp'</span>) {
-                <span class="hljs-keyword">var</span> matches = match(route, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
+                <span class="hljs-keyword">var</span> matches    = match(route, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
                     <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span>) {
                         matchRoute.call(<span class="hljs-keyword">this</span>, child.children, match, parent);
                     }
                 }.bind(<span class="hljs-keyword">this</span>));
+                child._matches = matches;
                 matches.to(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
                     <span class="hljs-keyword">var</span> args   = [].slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>);
                     <span class="hljs-keyword">var</span> params = args.pop();
@@ -166,7 +167,12 @@ define([
                     }
 
                     <span class="hljs-keyword">if</span> (child.el !== <span class="hljs-literal">undefined</span> &amp;&amp; child.sessId !== id &amp;&amp; id !== <span class="hljs-literal">undefined</span>) {
-                        applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, destroyComponent);
+                        applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">child</span>) </span>{
+                            <span class="hljs-keyword">if</span> (child._matches) {
+                                child._matches.remove();
+                            }
+                            destroyComponent(child);
+                        });
                         destroyComponent(child);
                     } <span class="hljs-keyword">else</span> {
                         applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">cp, instance</span>) </span>{

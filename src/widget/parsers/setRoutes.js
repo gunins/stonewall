@@ -40,11 +40,12 @@ define([
             var child = children[name];
             var route = (child._node !== undefined) ? child._node.data.route : undefined;
             if (route !== undefined && child._node.data.type !== 'cp') {
-                var matches = match(route, function (match) {
+                var matches    = match(route, function (match) {
                     if (child.children !== undefined) {
                         matchRoute.call(this, child.children, match, parent);
                     }
                 }.bind(this));
+                child._matches = matches;
                 matches.to(function () {
                     var args   = [].slice.call(arguments, 0);
                     var params = args.pop();
@@ -53,7 +54,12 @@ define([
                     }
 
                     if (child.el !== undefined && child.sessId !== id && id !== undefined) {
-                        applyToChildren.call(this, child.children, destroyComponent);
+                        applyToChildren.call(this, child.children, function (child) {
+                            if (child._matches) {
+                                child._matches.remove();
+                            }
+                            destroyComponent(child);
+                        });
                         destroyComponent(child);
                     } else {
                         applyToChildren.call(this, child.children, function (cp, instance) {
