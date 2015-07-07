@@ -169,7 +169,7 @@ define([
                     <span class="hljs-keyword">var</span> args   = [].slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>);
                     <span class="hljs-keyword">var</span> params = args.pop();
                     <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
-                        <span class="hljs-keyword">var</span> id = args.join(<span class="hljs-string">'_'</span>);
+                        <span class="hljs-keyword">var</span> id = params.getLocation() + <span class="hljs-string">'_'</span> + args.join(<span class="hljs-string">'_'</span>);
                     }
 
                     <span class="hljs-keyword">if</span> (child.el !== <span class="hljs-literal">undefined</span> &amp;&amp; child.sessId !== id &amp;&amp; id !== <span class="hljs-literal">undefined</span>) {
@@ -207,6 +207,7 @@ define([
                             }
 
                             <span class="hljs-keyword">if</span> (!cp.el &amp;&amp; instance &amp;&amp; instance._match) {
+
                                 <span class="hljs-keyword">if</span> (cp._routeHandlers !== <span class="hljs-literal">undefined</span> &amp;&amp; cp._routeHandlers.length &gt; <span class="hljs-number">0</span>) {
                                     cp._routeHandlers.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">handler</span>) </span>{
                                         handler.remove();

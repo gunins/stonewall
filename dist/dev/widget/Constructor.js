@@ -1666,7 +1666,7 @@ define('widget/parsers/setRoutes',[
                     var args   = [].slice.call(arguments, 0);
                     var params = args.pop();
                     if (args.length > 0) {
-                        var id = args.join('_');
+                        var id = params.getLocation() + '_' + args.join('_');
                     }
 
                     if (child.el !== undefined && child.sessId !== id && id !== undefined) {
@@ -1704,6 +1704,7 @@ define('widget/parsers/setRoutes',[
                             }
 
                             if (!cp.el && instance && instance._match) {
+
                                 if (cp._routeHandlers !== undefined && cp._routeHandlers.length > 0) {
                                     cp._routeHandlers.forEach(function (handler) {
                                         handler.remove();
@@ -1812,9 +1813,10 @@ define('widget/Constructor',[
     //      @param {Object} children
     //      @param {Object} dataSet
     function Constructor(data, children, dataSet, node) {
-        this._routes  = [];
-        this._events  = [];
-        this.children = {};
+        this._routes        = [];
+        this._appliedRoutes = [];
+        this._events        = [];
+        this.children       = {};
         //this._node = node;
         this.eventBus = new Mediator();
         this.context  = context;
@@ -1989,9 +1991,10 @@ define('widget/Constructor',[
                 this.root._events[0].remove();
                 this.root._events.shift();
             }
-         /*   if(this.to!==undefined){
-                delete this.to;
-            }*/
+            while (this._appliedRoutes.length > 0) {
+                this._appliedRoutes[0].remove();
+                this._appliedRoutes.shift();
+            }
             this.root.remove();
         },
         setRoutes:    function (instance) {
@@ -2004,7 +2007,11 @@ define('widget/Constructor',[
                 var instance = this._routes[0];
                 if (instance && instance._match) {
                     matches.setRoutes(function (routes) {
-                        instance._match.call(instance, routes.match.bind(routes));
+                        instance._match.call(instance, function () {
+                            var match = routes.match.apply(routes, arguments);
+                            this._appliedRoutes.push(match)
+                            return match;
+                        }.bind(this));
                         routes.run();
                     }.bind(this));
                 }

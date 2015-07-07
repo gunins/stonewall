@@ -56,7 +56,7 @@ define([
                     var args   = [].slice.call(arguments, 0);
                     var params = args.pop();
                     if (args.length > 0) {
-                        var id = args.join('_');
+                        var id = params.getLocation() + '_' + args.join('_');
                     }
 
                     if (child.el !== undefined && child.sessId !== id && id !== undefined) {
@@ -94,6 +94,7 @@ define([
                             }
 
                             if (!cp.el && instance && instance._match) {
+
                                 if (cp._routeHandlers !== undefined && cp._routeHandlers.length > 0) {
                                     cp._routeHandlers.forEach(function (handler) {
                                         handler.remove();

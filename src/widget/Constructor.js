@@ -38,9 +38,10 @@ define([
     //      @param {Object} children
     //      @param {Object} dataSet
     function Constructor(data, children, dataSet, node) {
-        this._routes  = [];
-        this._events  = [];
-        this.children = {};
+        this._routes        = [];
+        this._appliedRoutes = [];
+        this._events        = [];
+        this.children       = {};
         //this._node = node;
         this.eventBus = new Mediator();
         this.context  = context;
@@ -215,9 +216,10 @@ define([
                 this.root._events[0].remove();
                 this.root._events.shift();
             }
-         /*   if(this.to!==undefined){
-                delete this.to;
-            }*/
+            while (this._appliedRoutes.length > 0) {
+                this._appliedRoutes[0].remove();
+                this._appliedRoutes.shift();
+            }
             this.root.remove();
         },
         setRoutes:    function (instance) {
@@ -230,7 +232,11 @@ define([
                 var instance = this._routes[0];
                 if (instance && instance._match) {
                     matches.setRoutes(function (routes) {
-                        instance._match.call(instance, routes.match.bind(routes));
+                        instance._match.call(instance, function () {
+                            var match = routes.match.apply(routes, arguments);
+                            this._appliedRoutes.push(match)
+                            return match;
+                        }.bind(this));
                         routes.run();
                     }.bind(this));
                 }

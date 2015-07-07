@@ -174,9 +174,10 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Constructor</span>(<span class="hljs-params">data, children, dataSet, node</span>) </span>{
-        <span class="hljs-keyword">this</span>._routes  = [];
-        <span class="hljs-keyword">this</span>._events  = [];
-        <span class="hljs-keyword">this</span>.children = {};</pre></div></div>
+        <span class="hljs-keyword">this</span>._routes        = [];
+        <span class="hljs-keyword">this</span>._appliedRoutes = [];
+        <span class="hljs-keyword">this</span>._events        = [];
+        <span class="hljs-keyword">this</span>.children       = {};</pre></div></div>
             
         </li>
         
@@ -495,9 +496,10 @@ Usage Example</p>
                 <span class="hljs-keyword">this</span>.root._events[<span class="hljs-number">0</span>].remove();
                 <span class="hljs-keyword">this</span>.root._events.shift();
             }
-         <span class="hljs-comment">/*   if(this.to!==undefined){
-                delete this.to;
-            }*/</span>
+            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._appliedRoutes.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">this</span>._appliedRoutes[<span class="hljs-number">0</span>].remove();
+                <span class="hljs-keyword">this</span>._appliedRoutes.shift();
+            }
             <span class="hljs-keyword">this</span>.root.remove();
         },
         setRoutes:    <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">instance</span>) </span>{
@@ -510,7 +512,11 @@ Usage Example</p>
                 <span class="hljs-keyword">var</span> instance = <span class="hljs-keyword">this</span>._routes[<span class="hljs-number">0</span>];
                 <span class="hljs-keyword">if</span> (instance &amp;&amp; instance._match) {
                     matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routes</span>) </span>{
-                        instance._match.call(instance, routes.match.bind(routes));
+                        instance._match.call(instance, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                            <span class="hljs-keyword">var</span> match = routes.match.apply(routes, <span class="hljs-built_in">arguments</span>);
+                            <span class="hljs-keyword">this</span>._appliedRoutes.push(match)
+                            <span class="hljs-keyword">return</span> match;
+                        }.bind(<span class="hljs-keyword">this</span>));
                         routes.run();
                     }.bind(<span class="hljs-keyword">this</span>));
                 }
