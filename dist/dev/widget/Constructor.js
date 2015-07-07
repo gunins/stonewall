@@ -1236,6 +1236,15 @@ define('widget/parsers/applyAttribute',[
                             childBinder.el.checked = data[key];
                         }.bind(this));
                     }
+                } else if (bindItem === 'value') {
+                    if (dataItem !== undefined) {
+                        childBinder.el.value = dataItem;
+                    }
+                    if (update === 'true') {
+                        watch(data, key, function () {
+                            childBinder.el.value = data[key];
+                        }.bind(this));
+                    }
                 } else if (bindItem === 'required') {
                     if (dataItem !== undefined) {
                         childBinder.el.required = dataItem;

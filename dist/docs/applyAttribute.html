@@ -160,6 +160,15 @@ define([
                             childBinder.el.checked = data[key];
                         }.bind(<span class="hljs-keyword">this</span>));
                     }
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'value'</span>) {
+                    <span class="hljs-keyword">if</span> (dataItem !== <span class="hljs-literal">undefined</span>) {
+                        childBinder.el.value = dataItem;
+                    }
+                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                        watch(data, key, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                            childBinder.el.value = data[key];
+                        }.bind(<span class="hljs-keyword">this</span>));
+                    }
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bindItem === <span class="hljs-string">'required'</span>) {
                     <span class="hljs-keyword">if</span> (dataItem !== <span class="hljs-literal">undefined</span>) {
                         childBinder.el.required = dataItem;
