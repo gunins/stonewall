@@ -220,6 +220,23 @@ define([
                 this._appliedRoutes[0].remove();
                 this._appliedRoutes.shift();
             }
+            var destroy = function (instance) {
+                var keys = Object.keys(instance);
+                if (keys.length > 0) {
+                    keys.forEach(function (key) {
+                        var child = instance[key];
+                        if (child.instance !== undefined && child.instance.destroy !== undefined) {
+                            child.instance.destroy();
+                        } else if (child.remove !== undefined) {
+                            if (child.children) {
+                                destroy(child.children);
+                            }
+                            child.remove();
+                        }
+                    });
+                }
+            }
+            destroy(this.children);
             this.root.remove();
         },
         setRoutes:    function (instance) {
