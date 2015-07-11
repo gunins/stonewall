@@ -126,10 +126,10 @@
  * Last update: October 19 2013
  */</span>
 
-(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">global, factory</span>) </span>{
+(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">global, factory</span>) </span>{
 <span class="hljs-pi">    'use strict'</span>;
 
-    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
             
         </li>
         
@@ -144,7 +144,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        define(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+            <div class="content"><div class='highlight'><pre>        define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">return</span> factory();
         });
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> exports !== <span class="hljs-string">'undefined'</span>) {</pre></div></div>
@@ -180,7 +180,7 @@
             
             <div class="content"><div class='highlight'><pre>        global.Mediator = factory();
     }
-}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 <span class="hljs-pi">    'use strict'</span>;</pre></div></div>
             
         </li>
@@ -200,11 +200,11 @@ lookups.</p>
             
             <div class="content"><div class='highlight'><pre>
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">guidGenerator</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">var</span> S4 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">return</span> (((<span class="hljs-number">1</span>+<span class="hljs-built_in">Math</span>.random())*<span class="hljs-number">0x10000</span>)|<span class="hljs-number">0</span>).toString(<span class="hljs-number">16</span>).substring(<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">var</span> S4 = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">return</span> (((<span class="hljs-number">1</span> + <span class="hljs-built_in">Math</span>.random()) * <span class="hljs-number">0x10000</span>) | <span class="hljs-number">0</span>).toString(<span class="hljs-number">16</span>).substring(<span class="hljs-number">1</span>);
         };
 
-        <span class="hljs-keyword">return</span> (S4()+S4()+<span class="hljs-string">"-"</span>+S4()+<span class="hljs-string">"-"</span>+S4()+<span class="hljs-string">"-"</span>+S4()+<span class="hljs-string">"-"</span>+S4()+S4()+S4());
+        <span class="hljs-keyword">return</span> (S4() + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + S4() + S4());
     }</pre></div></div>
             
         </li>
@@ -224,13 +224,13 @@ to be called, options object, and context.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Subscriber</span>(<span class="hljs-params">fn, options, context</span>)</span>{
-        <span class="hljs-keyword">if</span>(!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Subscriber)) {
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Subscriber</span>(<span class="hljs-params">fn, options, context</span>) </span>{
+        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Subscriber)) {
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Subscriber(fn, options, context);
         }
 
-        <span class="hljs-keyword">this</span>.id = guidGenerator();
-        <span class="hljs-keyword">this</span>.fn = fn;
+        <span class="hljs-keyword">this</span>.id      = guidGenerator();
+        <span class="hljs-keyword">this</span>.fn      = fn;
         <span class="hljs-keyword">this</span>.options = options;
         <span class="hljs-keyword">this</span>.context = context;
         <span class="hljs-keyword">this</span>.channel = <span class="hljs-literal">null</span>;
@@ -254,29 +254,28 @@ options keys.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        update: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">options</span>)</span>{
-            <span class="hljs-keyword">if</span>(options){
-                <span class="hljs-keyword">this</span>.fn = options.fn || <span class="hljs-keyword">this</span>.fn;
+        update: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">options</span>) </span>{
+            <span class="hljs-keyword">if</span> (options) {
+                <span class="hljs-keyword">this</span>.fn      = options.fn || <span class="hljs-keyword">this</span>.fn;
                 <span class="hljs-keyword">this</span>.context = options.context || <span class="hljs-keyword">this</span>.context;
                 <span class="hljs-keyword">this</span>.options = options.options || <span class="hljs-keyword">this</span>.options;
-                <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>.channel &amp;&amp; <span class="hljs-keyword">this</span>.options &amp;&amp; <span class="hljs-keyword">this</span>.options.priority !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.channel &amp;&amp; <span class="hljs-keyword">this</span>.options &amp;&amp; <span class="hljs-keyword">this</span>.options.priority !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">this</span>.channel.setPriority(<span class="hljs-keyword">this</span>.id, <span class="hljs-keyword">this</span>.options.priority);
                 }
             }
         }
     };
 
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Channel</span>(<span class="hljs-params">namespace, parent</span>)</span>{
-        <span class="hljs-keyword">if</span>(!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Channel)) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Channel(namespace);
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Channel</span>(<span class="hljs-params">namespace, parent, context</span>) </span>{
+        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Channel)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Channel(namespace, parent, context);
         }
-
-        <span class="hljs-keyword">this</span>.namespace = namespace || <span class="hljs-string">""</span>;
+        <span class="hljs-keyword">this</span>.namespace    = namespace || <span class="hljs-string">""</span>;
         <span class="hljs-keyword">this</span>._subscribers = [];
-        <span class="hljs-keyword">this</span>._channels = {};
-        <span class="hljs-keyword">this</span>._parent = parent;
-        <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>._channels    = {};
+        <span class="hljs-keyword">this</span>._parent      = parent;
+        <span class="hljs-keyword">this</span>.stopped      = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">this</span>._context     = context||{};
     }</pre></div></div>
             
         </li>
@@ -298,10 +297,12 @@ through the Mediator instance.</p>
             
             <div class="content"><div class='highlight'><pre>
     Channel.prototype = {
-        addSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">fn, options, context</span>)</span>{
+        addSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fn, options, context</span>) </span>{
+            context = context || <span class="hljs-keyword">this</span>._context;
+
             <span class="hljs-keyword">var</span> subscriber = <span class="hljs-keyword">new</span> Subscriber(fn, options, context);
 
-            <span class="hljs-keyword">if</span>(options &amp;&amp; options.priority !== <span class="hljs-literal">undefined</span>){</pre></div></div>
+            <span class="hljs-keyword">if</span> (options &amp;&amp; options.priority !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
             
         </li>
         
@@ -320,15 +321,25 @@ return a NaN.</p>
             
             <div class="content"><div class='highlight'><pre>                options.priority = options.priority &gt;&gt; <span class="hljs-number">0</span>;
 
-                <span class="hljs-keyword">if</span>(options.priority &lt; <span class="hljs-number">0</span>){ options.priority = <span class="hljs-number">0</span>; }
-                <span class="hljs-keyword">if</span>(options.priority &gt;= <span class="hljs-keyword">this</span>._subscribers.length){ options.priority = <span class="hljs-keyword">this</span>._subscribers.length-<span class="hljs-number">1</span>; }
+                <span class="hljs-keyword">if</span> (options.priority &lt; <span class="hljs-number">0</span>) {
+                    options.priority = <span class="hljs-number">0</span>;
+                }
+                <span class="hljs-keyword">if</span> (options.priority &gt;= <span class="hljs-keyword">this</span>._subscribers.length) {
+                    options.priority = <span class="hljs-keyword">this</span>._subscribers.length - <span class="hljs-number">1</span>;
+                }
 
                 <span class="hljs-keyword">this</span>._subscribers.splice(options.priority, <span class="hljs-number">0</span>, subscriber);
-            }<span class="hljs-keyword">else</span>{
+            } <span class="hljs-keyword">else</span> {
                 <span class="hljs-keyword">this</span>._subscribers.push(subscriber);
             }
 
             subscriber.channel = <span class="hljs-keyword">this</span>;
+            subscriber.remove  = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">this</span>.removeSubscriber(fn);
+            }.bind(<span class="hljs-keyword">this</span>);
+
+            context._globalEvents = context._globalEvents || [];
+            context._globalEvents.push(subscriber);
 
             <span class="hljs-keyword">return</span> subscriber;
         },</pre></div></div>
@@ -348,16 +359,16 @@ channel.StopPropagation().</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        stopPropagation: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+            <div class="content"><div class='highlight'><pre>        stopPropagation: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
             <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">true</span>;
         },
 
-        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">identifier</span>)</span>{
+        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier</span>) </span>{
             <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>,
                 y = <span class="hljs-keyword">this</span>._subscribers.length;
 
-            <span class="hljs-keyword">for</span>(x, y; x &lt; y; x++){
-                <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier){
+            <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier) {
                     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._subscribers[x];
                 }
             }
@@ -379,39 +390,40 @@ an array index. It will not search recursively through subchannels.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        setPriority: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">identifier, priority</span>)</span>{
+        setPriority: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier, priority</span>) </span>{
             <span class="hljs-keyword">var</span> oldIndex = <span class="hljs-number">0</span>,
-                x = <span class="hljs-number">0</span>,
+                x        = <span class="hljs-number">0</span>,
                 sub, firstHalf, lastHalf, y;
 
-            <span class="hljs-keyword">for</span>(x = <span class="hljs-number">0</span>, y = <span class="hljs-keyword">this</span>._subscribers.length; x &lt; y; x++){
-                <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier){
+            <span class="hljs-keyword">for</span> (x = <span class="hljs-number">0</span>, y = <span class="hljs-keyword">this</span>._subscribers.length; x &lt; y; x++) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier) {
                     <span class="hljs-keyword">break</span>;
                 }
-                oldIndex ++;
+                oldIndex++;
             }
 
-            sub = <span class="hljs-keyword">this</span>._subscribers[oldIndex];
+            sub       = <span class="hljs-keyword">this</span>._subscribers[oldIndex];
             firstHalf = <span class="hljs-keyword">this</span>._subscribers.slice(<span class="hljs-number">0</span>, oldIndex);
-            lastHalf = <span class="hljs-keyword">this</span>._subscribers.slice(oldIndex+<span class="hljs-number">1</span>);
+            lastHalf  = <span class="hljs-keyword">this</span>._subscribers.slice(oldIndex + <span class="hljs-number">1</span>);
 
             <span class="hljs-keyword">this</span>._subscribers = firstHalf.concat(lastHalf);
             <span class="hljs-keyword">this</span>._subscribers.splice(priority, <span class="hljs-number">0</span>, sub);
         },
 
-        addChannel: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channel</span>)</span>{
-            <span class="hljs-keyword">this</span>._channels[channel] = <span class="hljs-keyword">new</span> Channel((<span class="hljs-keyword">this</span>.namespace ? <span class="hljs-keyword">this</span>.namespace + <span class="hljs-string">':'</span> : <span class="hljs-string">''</span>) + channel, <span class="hljs-keyword">this</span>);
+        addChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
+            <span class="hljs-keyword">this</span>._channels[channel] = <span class="hljs-keyword">new</span> Channel((<span class="hljs-keyword">this</span>.namespace ? <span class="hljs-keyword">this</span>.namespace + <span class="hljs-string">':'</span> : <span class="hljs-string">''</span>) +
+                                                  channel, <span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>._context);
         },
 
-        hasChannel: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channel</span>)</span>{
+        hasChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels.hasOwnProperty(channel);
         },
 
-        returnChannel: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channel</span>)</span>{
+        returnChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels[channel];
         },
 
-        removeSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">identifier</span>)</span>{
+        removeSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier</span>) </span>{
             <span class="hljs-keyword">var</span> x = <span class="hljs-keyword">this</span>._subscribers.length - <span class="hljs-number">1</span>;</pre></div></div>
             
         </li>
@@ -427,7 +439,7 @@ an array index. It will not search recursively through subchannels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span>(!identifier){
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (!identifier) {
                 <span class="hljs-keyword">this</span>._subscribers = [];
                 <span class="hljs-keyword">return</span>;
             }</pre></div></div>
@@ -445,10 +457,10 @@ an array index. It will not search recursively through subchannels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span>(x; x &gt;= <span class="hljs-number">0</span>; x--) {
-                <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>._subscribers[x].fn === identifier || <span class="hljs-keyword">this</span>._subscribers[x].id === identifier){
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (x; x &gt;= <span class="hljs-number">0</span>; x--) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].fn === identifier || <span class="hljs-keyword">this</span>._subscribers[x].id === identifier) {
                     <span class="hljs-keyword">this</span>._subscribers[x].channel = <span class="hljs-literal">null</span>;
-                    <span class="hljs-keyword">this</span>._subscribers.splice(x,<span class="hljs-number">1</span>);
+                    <span class="hljs-keyword">this</span>._subscribers.splice(x, <span class="hljs-number">1</span>);
                 }
             }
         },</pre></div></div>
@@ -468,12 +480,12 @@ channels.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        publish: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>)</span>{
-            <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>,
-                y = <span class="hljs-keyword">this</span>._subscribers.length,
+        publish: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+            <span class="hljs-keyword">var</span> x          = <span class="hljs-number">0</span>,
+                y          = <span class="hljs-keyword">this</span>._subscribers.length,
                 shouldCall = <span class="hljs-literal">false</span>,
                 subscriber, l,
-                subsBefore,subsAfter;</pre></div></div>
+                subsBefore, subsAfter;</pre></div></div>
             
         </li>
         
@@ -488,7 +500,7 @@ channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span>(x, y; x &lt; y; x++) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {</pre></div></div>
             
         </li>
         
@@ -506,10 +518,10 @@ channels.</p>
             <div class="content"><div class='highlight'><pre>                shouldCall = <span class="hljs-literal">false</span>;
                 subscriber = <span class="hljs-keyword">this</span>._subscribers[x];
 
-                <span class="hljs-keyword">if</span>(!<span class="hljs-keyword">this</span>.stopped){
+                <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.stopped) {
                     subsBefore = <span class="hljs-keyword">this</span>._subscribers.length;
-                    <span class="hljs-keyword">if</span>(subscriber.options !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">typeof</span> subscriber.options.predicate === <span class="hljs-string">"function"</span>){
-                        <span class="hljs-keyword">if</span>(subscriber.options.predicate.apply(subscriber.context, data)){</pre></div></div>
+                    <span class="hljs-keyword">if</span> (subscriber.options !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">typeof</span> subscriber.options.predicate === <span class="hljs-string">"function"</span>) {
+                        <span class="hljs-keyword">if</span> (subscriber.options.predicate.apply(subscriber.context, data)) {</pre></div></div>
             
         </li>
         
@@ -526,7 +538,7 @@ channels.</p>
             
             <div class="content"><div class='highlight'><pre>                            shouldCall = <span class="hljs-literal">true</span>;
                         }
-                    }<span class="hljs-keyword">else</span>{</pre></div></div>
+                    } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -558,7 +570,7 @@ channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span>(shouldCall) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> (shouldCall) {</pre></div></div>
             
         </li>
         
@@ -573,7 +585,7 @@ channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (subscriber.options &amp;&amp; subscriber.options.calls !== <span class="hljs-literal">undefined</span>){</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (subscriber.options &amp;&amp; subscriber.options.calls !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
             
         </li>
         
@@ -603,7 +615,7 @@ channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                        <span class="hljs-keyword">if</span>(subscriber.options.calls &lt; <span class="hljs-number">1</span>){
+            <div class="content"><div class='highlight'><pre>                        <span class="hljs-keyword">if</span> (subscriber.options.calls &lt; <span class="hljs-number">1</span>) {
                             <span class="hljs-keyword">this</span>.removeSubscriber(subscriber.id);
                         }
                     }</pre></div></div>
@@ -625,14 +637,14 @@ cause the callback to be called as we just removed it as a subscriber</p>
             <div class="content"><div class='highlight'><pre>                    subscriber.fn.apply(subscriber.context, data);
 
                     subsAfter = <span class="hljs-keyword">this</span>._subscribers.length;
-                    y = subsAfter;
-                    <span class="hljs-keyword">if</span> (subsAfter === subsBefore - <span class="hljs-number">1</span>){
+                    y         = subsAfter;
+                    <span class="hljs-keyword">if</span> (subsAfter === subsBefore - <span class="hljs-number">1</span>) {
                         x--;
                     }
                 }
             }
 
-            <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span>._parent){
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._parent) {
                 <span class="hljs-keyword">this</span>._parent.publish(data);
             }
 
@@ -640,12 +652,12 @@ cause the callback to be called as we just removed it as a subscriber</p>
         }
     };
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Mediator</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">if</span>(!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Mediator)) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Mediator();
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Mediator</span>(<span class="hljs-params">context</span>) </span>{
+        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Mediator)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Mediator(context);
         }
 
-        <span class="hljs-keyword">this</span>._channels = <span class="hljs-keyword">new</span> Channel(<span class="hljs-string">''</span>);
+        <span class="hljs-keyword">this</span>._channels = <span class="hljs-keyword">new</span> Channel(<span class="hljs-string">''</span>, <span class="hljs-literal">false</span>, context);
     }</pre></div></div>
             
         </li>
@@ -681,20 +693,20 @@ will refrain from creating non existing channels.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        getChannel: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">namespace, readOnly</span>)</span>{
-            <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>._channels,
+        getChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">namespace, readOnly</span>) </span>{
+            <span class="hljs-keyword">var</span> channel            = <span class="hljs-keyword">this</span>._channels,
                 namespaceHierarchy = namespace.split(<span class="hljs-string">':'</span>),
-                x = <span class="hljs-number">0</span>,
-                y = namespaceHierarchy.length;
+                x                  = <span class="hljs-number">0</span>,
+                y                  = namespaceHierarchy.length;
 
-            <span class="hljs-keyword">if</span>(namespace === <span class="hljs-string">''</span>){
+            <span class="hljs-keyword">if</span> (namespace === <span class="hljs-string">''</span>) {
                 <span class="hljs-keyword">return</span> channel;
             }
 
-            <span class="hljs-keyword">if</span>(namespaceHierarchy.length &gt; <span class="hljs-number">0</span>){
-                <span class="hljs-keyword">for</span>(x, y; x &lt; y; x++){
+            <span class="hljs-keyword">if</span> (namespaceHierarchy.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {
 
-                    <span class="hljs-keyword">if</span>(!channel.hasChannel(namespaceHierarchy[x])){
+                    <span class="hljs-keyword">if</span> (!channel.hasChannel(namespaceHierarchy[x])) {
                         <span class="hljs-keyword">if</span> (readOnly) {
                             <span class="hljs-keyword">break</span>;
                         } <span class="hljs-keyword">else</span> {
@@ -727,11 +739,10 @@ index.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        subscribe: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channelName, fn, options, context</span>)</span>{
+        subscribe: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, fn, options, context</span>) </span>{
             <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">false</span>);
 
             options = options || {};
-            context = context || {};
 
             <span class="hljs-keyword">return</span> channel.addSubscriber(fn, options, context);
         },</pre></div></div>
@@ -754,8 +765,8 @@ index.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        once: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channelName, fn, options, context</span>)</span>{
-            options = options || {};
+        once: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, fn, options, context</span>) </span>{
+            options       = options || {};
             options.calls = <span class="hljs-number">1</span>;
 
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.subscribe(channelName, fn, options, context);
@@ -776,7 +787,7 @@ channel namespace</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">identifier, channelName</span>)</span>{
+        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier, channelName</span>) </span>{
             <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);</pre></div></div>
             
         </li>
@@ -815,7 +826,7 @@ a passed-in subscriber id or named function.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        remove: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channelName, identifier</span>)</span>{
+        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, identifier</span>) </span>{
             <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);
             <span class="hljs-keyword">if</span> (channel.namespace !== channelName) {
                 <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
@@ -841,7 +852,7 @@ Called using Mediator.publish(“application:chat”, [ args ]);</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        publish: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">channelName</span>)</span>{
+        publish: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName</span>) </span>{
             <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);
             <span class="hljs-keyword">if</span> (channel.namespace !== channelName) {
                 <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
@@ -868,11 +879,11 @@ Called using Mediator.publish(“application:chat”, [ args ]);</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    Mediator.prototype.on = Mediator.prototype.subscribe;
-    Mediator.prototype.bind = Mediator.prototype.subscribe;
-    Mediator.prototype.emit = Mediator.prototype.publish;
+            <div class="content"><div class='highlight'><pre>    Mediator.prototype.on      = Mediator.prototype.subscribe;
+    Mediator.prototype.bind    = Mediator.prototype.subscribe;
+    Mediator.prototype.emit    = Mediator.prototype.publish;
     Mediator.prototype.trigger = Mediator.prototype.publish;
-    Mediator.prototype.off = Mediator.prototype.remove;</pre></div></div>
+    Mediator.prototype.off     = Mediator.prototype.remove;</pre></div></div>
             
         </li>
         
@@ -888,9 +899,9 @@ Called using Mediator.publish(“application:chat”, [ args ]);</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    Mediator.Channel = Channel;
+    Mediator.Channel    = Channel;
     Mediator.Subscriber = Subscriber;
-    Mediator.version = <span class="hljs-string">"0.9.8"</span>;
+    Mediator.version    = <span class="hljs-string">"0.9.8"</span>;
 
     <span class="hljs-keyword">return</span> Mediator;
 }));</pre></div></div>

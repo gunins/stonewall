@@ -1825,9 +1825,10 @@ define('widget/Constructor',[
         this._routes        = [];
         this._appliedRoutes = [];
         this._events        = [];
+        this._globalEvents  = [];
         this.children       = {};
         //this._node = node;
-        this.eventBus = new Mediator();
+        this.eventBus = new Mediator(this);
         this.context  = context;
         if (data.appContext !== undefined) {
             utils.extend(this.context, data.appContext);
@@ -2004,6 +2005,11 @@ define('widget/Constructor',[
                 this._appliedRoutes[0].remove();
                 this._appliedRoutes.shift();
             }
+            while (this._globalEvents.length > 0) {
+                this._globalEvents[0].remove();
+                this._globalEvents.shift();
+            }
+
             var destroy = function (instance) {
                 var keys = Object.keys(instance);
                 if (keys.length > 0) {

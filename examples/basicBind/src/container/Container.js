@@ -9,10 +9,10 @@ define([
 
     return Constructor.extend({
         template: template,
-        events: {
+        events:   {
             btn: [
                 {
-                    name: 'click',
+                    name:   'click',
                     action: function () {
                         this.context.eventBus.publish('changeValues')
                     }
