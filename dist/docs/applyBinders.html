@@ -69,6 +69,11 @@
               </a>
             
               
+              <a class="source" href="elOnChange.html">
+                elOnChange.js
+              </a>
+            
+              
               <a class="source" href="setBinders.html">
                 setBinders.js
               </a>
@@ -119,8 +124,9 @@ define([
     <span class="hljs-string">'../utils'</span>,
     <span class="hljs-string">'watch'</span>,
     <span class="hljs-string">'./applyEvents'</span>,
-    <span class="hljs-string">'./applyAttribute'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom, utils, WatchJS, applyEvents, applyAttribute</span>) </span>{
+    <span class="hljs-string">'./applyAttribute'</span>,
+    <span class="hljs-string">'./elOnChange'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange</span>) </span>{
     <span class="hljs-keyword">var</span> watch        = WatchJS.watch,
         unwatch      = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;</pre></div></div>
@@ -139,6 +145,7 @@ define([
             </div>
             
             <div class="content"><div class='highlight'><pre>
+
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBinder</span>(<span class="hljs-params">objKey, obj, parent, binder</span>) </span>{
         <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[binder._node.name];
         <span class="hljs-keyword">if</span> (binder !== <span class="hljs-literal">undefined</span>) {
@@ -156,9 +163,12 @@ define([
                     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name] !== <span class="hljs-literal">undefined</span>) {
                         <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
                     }
+                    elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, data);
                     <span class="hljs-keyword">if</span> (childBinder._node.data.tplSet.update === <span class="hljs-string">'true'</span>) {
                         watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
                             childBinder.text(obj[objKey]);
+                            elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, obj[objKey]);
+
                         }.bind(<span class="hljs-keyword">this</span>));
                     }
                     applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
@@ -202,6 +212,8 @@ define([
                                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
                                     <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, item);
                                 }
+                                elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, item);
+
                             };
                         data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
                         <span class="hljs-keyword">var</span> update     = binder._node.data.tplSet.update;
@@ -240,6 +252,7 @@ define([
                                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
 
                                 }
+
                             }.bind(<span class="hljs-keyword">this</span>));
                         }
                     }
@@ -264,6 +277,8 @@ define([
                     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
                         <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
                     }
+                    elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, data);
+
                 }
             }
         }

@@ -1439,6 +1439,16 @@ define('widget/parsers/setChildren',[
     return setChildren;
 });
 /**
+ * Created by guntars on 11/07/15.
+ */
+define('widget/parsers/elOnChange',[],function () {
+    return function (childBinder, data) {
+        if (this.elOnChange[childBinder._node.name] !== undefined) {
+            this.elOnChange[childBinder._node.name].call(this, childBinder, data);
+        }
+    };
+});
+/**
  * Created by guntars on 11/11/14.
  */
 define('widget/parsers/applyBinders',[
@@ -1446,12 +1456,14 @@ define('widget/parsers/applyBinders',[
     '../utils',
     'watch',
     './applyEvents',
-    './applyAttribute'
-], function (dom, utils, WatchJS, applyEvents, applyAttribute) {
+    './applyAttribute',
+    './elOnChange'
+], function (dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange) {
     var watch        = WatchJS.watch,
         unwatch      = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
+
 
     function parseBinder(objKey, obj, parent, binder) {
         var events = this.events[binder._node.name];
@@ -1470,9 +1482,12 @@ define('widget/parsers/applyBinders',[
                     if (this.elReady[childBinder._node.name] !== undefined) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
+                    elOnChange.call(this, childBinder, data);
                     if (childBinder._node.data.tplSet.update === 'true') {
                         watch(obj, objKey, function () {
                             childBinder.text(obj[objKey]);
+                            elOnChange.call(this, childBinder, obj[objKey]);
+
                         }.bind(this));
                     }
                     applyEvents.call(this, childBinder, events, data);
@@ -1516,6 +1531,8 @@ define('widget/parsers/applyBinders',[
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
                                 }
+                                elOnChange.call(this, childBinder, item);
+
                             };
                         data.forEach(addItem.bind(this));
                         var update     = binder._node.data.tplSet.update;
@@ -1554,6 +1571,7 @@ define('widget/parsers/applyBinders',[
                                 } else if (sortingMethodNames.indexOf(action) !== -1) {
 
                                 }
+
                             }.bind(this));
                         }
                     }
@@ -1578,6 +1596,8 @@ define('widget/parsers/applyBinders',[
                     if (this.elReady[childBinder._node.name]) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
+                    elOnChange.call(this, childBinder, data);
+
                 }
             }
         }
@@ -1915,6 +1935,17 @@ define('widget/Constructor',[
         //          }
         //      },
         elReady:      {},
+        // Applying methods to element when data is changed to Element
+        // Usage Example
+        //
+        //      elOnChange: {
+        //          links: function (el, data) {
+        //              if(data.class==='active'){
+        //                  el.addClass('active');
+        //              }
+        //          }
+        //      },
+        elOnChange:      {},
         // Running when Constructor is initialised
         //
         //      @method init

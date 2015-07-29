@@ -131,6 +131,17 @@ define([
         //          }
         //      },
         elReady:      {},
+        // Applying methods to element when data is changed to Element
+        // Usage Example
+        //
+        //      elOnChange: {
+        //          links: function (el, data) {
+        //              if(data.class==='active'){
+        //                  el.addClass('active');
+        //              }
+        //          }
+        //      },
+        elOnChange:      {},
         // Running when Constructor is initialised
         //
         //      @method init

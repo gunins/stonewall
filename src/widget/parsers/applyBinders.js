@@ -6,12 +6,14 @@ define([
     '../utils',
     'watch',
     './applyEvents',
-    './applyAttribute'
-], function (dom, utils, WatchJS, applyEvents, applyAttribute) {
+    './applyAttribute',
+    './elOnChange'
+], function (dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange) {
     var watch        = WatchJS.watch,
         unwatch      = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
+
 
     function parseBinder(objKey, obj, parent, binder) {
         var events = this.events[binder._node.name];
@@ -30,9 +32,12 @@ define([
                     if (this.elReady[childBinder._node.name] !== undefined) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
+                    elOnChange.call(this, childBinder, data);
                     if (childBinder._node.data.tplSet.update === 'true') {
                         watch(obj, objKey, function () {
                             childBinder.text(obj[objKey]);
+                            elOnChange.call(this, childBinder, obj[objKey]);
+
                         }.bind(this));
                     }
                     applyEvents.call(this, childBinder, events, data);
@@ -76,6 +81,8 @@ define([
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
                                 }
+                                elOnChange.call(this, childBinder, item);
+
                             };
                         data.forEach(addItem.bind(this));
                         var update     = binder._node.data.tplSet.update;
@@ -114,6 +121,7 @@ define([
                                 } else if (sortingMethodNames.indexOf(action) !== -1) {
 
                                 }
+
                             }.bind(this));
                         }
                     }
@@ -138,6 +146,8 @@ define([
                     if (this.elReady[childBinder._node.name]) {
                         this.elReady[childBinder._node.name].call(this, childBinder, data);
                     }
+                    elOnChange.call(this, childBinder, data);
+
                 }
             }
         }
