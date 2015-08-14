@@ -121,7 +121,7 @@
 
             subscriber.channel = this;
             subscriber.remove  = function () {
-                this.removeSubscriber(fn);
+                this.removeSubscriber(subscriber.id);
             }.bind(this);
 
             context._globalEvents = context._globalEvents || [];
