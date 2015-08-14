@@ -340,7 +340,7 @@ return a NaN.</p>
 
             subscriber.channel = <span class="hljs-keyword">this</span>;
             subscriber.remove  = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">this</span>.removeSubscriber(fn);
+                <span class="hljs-keyword">this</span>.removeSubscriber(subscriber.id);
             }.bind(<span class="hljs-keyword">this</span>);
 
             context._globalEvents = context._globalEvents || [];
