@@ -1464,7 +1464,6 @@ define('widget/parsers/applyBinders',[
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
-
     function parseBinder(objKey, obj, parent, binder) {
         var events = this.events[binder._node.name];
         if (binder !== undefined) {
@@ -1487,7 +1486,6 @@ define('widget/parsers/applyBinders',[
                         watch(obj, objKey, function () {
                             childBinder.text(obj[objKey]);
                             elOnChange.call(this, childBinder, obj[objKey]);
-
                         }.bind(this));
                     }
                     applyEvents.call(this, childBinder, events, data);
@@ -1498,11 +1496,18 @@ define('widget/parsers/applyBinders',[
                         var hasParent  = false,
                             bindedData = [],
                             addItem    = function (item, index) {
-
                                 var childBinder = utils.extend({}, binder);//.clone();
+                                var isString = false;
+                                if (!utils.isArray(item) && !utils.isObject(item)) {
+                                    isString = true;
+                                }
+
                                 childBinder._events = [];
                                 if (!hasParent) {
                                     childBinder.add(parent);
+                                    if (isString) {
+                                        childBinder.text(item);
+                                    }
                                     hasParent = binder.getParent();
                                     bindedData.push({
                                         binder: childBinder,
@@ -1510,13 +1515,20 @@ define('widget/parsers/applyBinders',[
                                     });
                                 } else if (index !== undefined && index <= bindedData.length - 1) {
                                     childBinder.add(parent, hasParent, false, bindedData[index].binder.el);
+                                    if (isString) {
+                                        childBinder.text(item);
+                                    }
                                     bindedData.splice(index, 0, {
                                         binder: childBinder,
                                         data:   item
                                     });
 
                                 } else {
-                                    childBinder.add(parent, hasParent);
+                                    var nextSibling = bindedData[index - 1].binder.el.nextSibling;
+                                    childBinder.add(parent, hasParent, false, nextSibling || false);
+                                    if (isString) {
+                                        childBinder.text(item);
+                                    }
                                     bindedData.push({
                                         binder: childBinder,
                                         data:   item
@@ -1526,12 +1538,19 @@ define('widget/parsers/applyBinders',[
 
                                 applyAttribute.call(this, childBinder, item);
                                 applyBinders.call(this, item, childBinder);
-                                applyEvents.call(this, childBinder, events, item);
 
                                 if (this.elReady[childBinder._node.name]) {
                                     this.elReady[childBinder._node.name].call(this, childBinder, item);
                                 }
+
                                 elOnChange.call(this, childBinder, item);
+                                if (isString && childBinder._node.data.tplSet.update === 'true') {
+                                    watch(obj, objKey, function () {
+                                        childBinder.text(item);
+                                        elOnChange.call(this, childBinder, item);
+                                    }.bind(this));
+                                }
+                                applyEvents.call(this, childBinder, events, item);
 
                             };
                         data.forEach(addItem.bind(this));

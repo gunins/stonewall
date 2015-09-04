@@ -12,6 +12,11 @@ define([
                 value: 'Some Value'
 
             },
+            names: [
+                "email",
+                "truthy",
+                "imsi"
+            ],
             list:  [
                 {
                     test: {
@@ -36,6 +41,16 @@ define([
     };
 
     function changeValues() {
+        setTimeout(function () {
+            data.val.names.splice(1, 1);
+        }, 1000);
+        setTimeout(function () {
+            data.val.names.push('one', 'two');
+        }, 2000);
+        setTimeout(function () {
+            data.val.names.unshift('onTop');
+        }, 3000);
+
         setTimeout(function () {
             data.val.newitem = {
                 value: 'Delay Value'

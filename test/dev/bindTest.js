@@ -10,6 +10,11 @@ define([
                 value: 'Some Value'
 
             },
+            names: [
+                "email",
+                "truthy",
+                "imsi"
+            ],
             list:  [
                 {
                     test: {
@@ -58,6 +63,22 @@ define([
         });
     }
 
+    function testArray(list, data) {
+        list.each(function (index) {
+            var item = $(this),
+                obj  = data[index];
+            expect(item).to.have.$text(obj);
+
+        });
+    }
+
+    function removeFirstArray() {
+        app.context.data.val.names.splice(1, 1);
+    };
+    function addOneArray() {
+        data.val.names.push('TestValue');
+    };
+
     function removeFirst() {
         app.context.data.val.list.splice(1, 1);
     };
@@ -84,6 +105,22 @@ define([
     }
 
     describe('Basic Data Binding Dev Tests', function () {
+        describe('Checking if DOM Elements are binded to plain array', function () {
+            it('array data correctly when Initialised', function () {
+                var list = $template.find('.array');
+                testArray(list, testData.val.names);
+            });
+            it('Remove First array  data correctly when Initialised', function () {
+                removeFirstArray();
+                var list = $template.find('.array');
+                testArray(list, [testData.val.names[0], testData.val.names[2]]);
+            });
+            it('Add last record in array  data correctly when Initialised', function () {
+                addOneArray();
+                var list = $template.find('.array');
+                testArray(list, [testData.val.names[0], testData.val.names[2], 'TestValue']);
+            });
+        });
         describe('Checking if DOM Elements are binded to list, and update correctly', function () {
             it('List data are rendered correctly when Initialised', function () {
                 var list = $template.find('.bindedlist');

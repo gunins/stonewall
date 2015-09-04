@@ -1,18 +1,27 @@
 <div>
     <div class="form-group">
-        <input tp-name="input" tp-type="bd" data-bind="items" tp-update="true" type="text" tp-bind-value="value" class="form-control"
+        <input tp-name="input" tp-type="bd" data-bind="items" tp-update="true" type="text" tp-bind-value="value"
+               class="form-control"
                placeholder="Enter Value...">
     </div>
     <bd-test data-bind="items" tp-tag="ul" class="list-group">
         <li class="list-group-item active">Value below is binded from input field</li>
         <bd-value tp-tag="li" class="list-group-item valueBind" tp-update="true"></bd-value>
     </bd-test>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <bd-names tp-update="true" class="array badge" style="float: left; margin-right:5px" tp-tag="span"></bd-names>
+            <div class="clearfix"></div>
+        </li>
+    </ul>
 
     <ul tp-name="listParent" class="list-group">
         <li class="list-group-item active">Items below is passed to the new widget.</li>
         <bd-list tp-tag="li" tp-update="true" class="list-group-item bindedlist">
             <cp-test src="widget/parser!item/Item" data-bind="test" tp-update="true"></cp-test>
         </bd-list>
+        <li class="list-group-item active">Footer</li>
+
     </ul>
     <bd-newitem tp-tag="ul" class="list-group" tp-update="true">
         <li class="list-group-item active">This item Initialised after.</li>
