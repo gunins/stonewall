@@ -7,7 +7,7 @@ define([
     'watch',
     './applyEvents',
     './applyAttribute',
-    './elOnChange'
+    './elOnchange'
 ], function (dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange) {
     var watch        = WatchJS.watch,
         unwatch      = WatchJS.unwatch,
