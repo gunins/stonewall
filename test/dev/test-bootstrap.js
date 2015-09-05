@@ -32,7 +32,7 @@
         templateDecoders: coders.templateDecoders
     });
 
-    mocha.ui('bdd');
+    mocha.setup('bdd');
 
     var tests = [
         {
@@ -73,7 +73,9 @@
             if (index == tests.length - 1) {
 
                 if (window.mochaPhantomJS) {
-                    window.mochaPhantomJS.run();
+                    setTimeout(function () {
+                        window.mochaPhantomJS.run();
+                    },200);
                 }
                 else {
                     setTimeout(function () {
