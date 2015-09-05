@@ -1441,7 +1441,7 @@ define('widget/parsers/setChildren',[
 /**
  * Created by guntars on 11/07/15.
  */
-define('widget/parsers/elOnChange',[],function () {
+define('widget/parsers/elOnchange',[],function () {
     return function (childBinder, data) {
         if (this.elOnChange[childBinder._node.name] !== undefined) {
             this.elOnChange[childBinder._node.name].call(this, childBinder, data);
@@ -1457,7 +1457,7 @@ define('widget/parsers/applyBinders',[
     'watch',
     './applyEvents',
     './applyAttribute',
-    './elOnChange'
+    './elOnchange'
 ], function (dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange) {
     var watch        = WatchJS.watch,
         unwatch      = WatchJS.unwatch,
