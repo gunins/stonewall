@@ -74,8 +74,12 @@ define([
                                     });
 
                                 } else {
-                                    var nextSibling = bindedData[index - 1].binder.el.nextSibling;
-                                    childBinder.add(parent, hasParent, false, nextSibling || false);
+                                    var nextSibling;
+                                    if (index > 0) {
+                                        nextSibling = bindedData[index - 1].binder.el.nextSibling;
+                                    }
+                                    childBinder.add(parent, hasParent, false, nextSibling);
+
                                     if (isString) {
                                         childBinder.text(item);
                                     }
