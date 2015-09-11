@@ -112,7 +112,11 @@ define('widget/dom',[
         //      @param {String} text
         text:            function (node, text) {
             if (node && node.el) {
-                node.el.innerHTML = text;
+                if (text !== undefined) {
+                    node.el.innerHTML = text;
+                } else {
+                    return node.el.innerHTML
+                }
             }
         },
         // Setting Attribute in to node
