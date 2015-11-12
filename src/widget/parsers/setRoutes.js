@@ -25,6 +25,7 @@ define([
         }
 
         if (force) {
+            delete cp._created;
             if (cp._matches) {
                 cp._matches.remove();
             }
@@ -41,10 +42,14 @@ define([
     }
 
     function matchRoute(children, match, parent) {
+
         var names = Object.keys(children);
+
         names.forEach(function (name) {
             var child = children[name];
-            var route = (child._node !== undefined) ? child._node.data.route : undefined;
+            var route = (child._node !== undefined &&
+                         child._node.data !== undefined) ? child._node.data.route : undefined;
+
             if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches    = match(route, function (match) {
                     if (child.children !== undefined) {
@@ -66,6 +71,7 @@ define([
                         destroyComponent(child);
                     } else {
                         applyToChildren.call(this, child.children, function (cp, instance) {
+
                             var data    = cp._node.data,
                                 dataSet = data.dataset;
 
@@ -77,24 +83,20 @@ define([
 
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
-
                             }
 
                         });
                     }
-
                     if (child.el === undefined) {
                         child.applyAttach();
-
                         dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
-
-                            if (!cp.el && instance && instance._match) {
-
+                            if (!cp._created && instance && instance._match) {
+                                cp._created       = true;
                                 if (cp._routeHandlers !== undefined && cp._routeHandlers.length > 0) {
                                     cp._routeHandlers.forEach(function (handler) {
                                         handler.remove();
@@ -139,7 +141,6 @@ define([
                         }
                     }.bind(this));
                 }.bind(this));
-
             } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
             } else if (child.instance !== undefined) {

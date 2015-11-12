@@ -141,7 +141,7 @@ define([
         //              }
         //          }
         //      },
-        elOnChange:      {},
+        elOnChange:   {},
         // Running when Constructor is initialised
         //
         //      @method init
@@ -174,7 +174,7 @@ define([
                 linkRef.setAttribute("rel", "stylesheet")
                 linkRef.setAttribute("type", "text/css")
                 linkRef.setAttribute("href", url)
-                if (typeof linkRef != "undefined") {
+                if (typeof linkRef !== "undefined") {
                     document.getElementsByTagName("head")[0].appendChild(linkRef);
                 }
             }
@@ -289,7 +289,7 @@ define([
         //  @param {Element} el
         //  @param {Object} data
         setChildren:  function (el, data) {
-            var name = el._node.name;
+            var name                              = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }
@@ -298,9 +298,8 @@ define([
             if (el._node.data.type !== 'cp') {
                 this.children[name] = new dom.Element(el);
             }
-
             this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
-            this.children[name].el          = el.run(this.el, false, false, data);
+            this.children[name].el                = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
                 this.elReady[name].call(this, this.children[name], data);
@@ -354,7 +353,7 @@ define([
                     var cp             = new Component(options, options.children, options.data);
                     instance.instance  = cp;
                     instance.eventBus  = cp.eventBus;
-                    instance.children  = instance._node.children = cp.children;
+                    instance.children  = cp.children;
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {

@@ -20,7 +20,7 @@ define([
         //      @param {dom.Element} child
         //      @param {Object} data
         _after:          function (parent, child, data) {
-            if (child._node !== undefined) {
+            if (child._node !== undefined && parent && parent.el) {
                 child.placeholder = parent.el.querySelector('#' + child._node.id) ||
                                     createPlaceholder(child._node.data.tag || child.el.tagName);
             } else {
@@ -32,7 +32,7 @@ define([
             }
 
             if (child._node && child._node.data && child._node.data.instance) {
-                utils.extend(child, child._node.data.instance);
+                //utils.extend(child, child._node.data.instance);
             }
         },
         // Replacing element in to DOM
@@ -42,7 +42,11 @@ define([
         //      @param {dom.Element} child
         //      @param {Object} data
         replace:         function (parent, child, data) {
-            parent.el.innerHTML = '';
+            if (parent && parent.el) {
+                parent.el.innerHTML = '';
+            }
+            //console.log(parent, child)
+
             dom._after.apply(this, arguments);
         },
         // Insert element to the end of parent childs
@@ -101,7 +105,7 @@ define([
             el.el = el.run.call(el, fragment, false, parent, data, index);
 
             if (el._node && el._node.data && el._node.data.instance) {
-                utils.extend(el, el._node.data.instance);
+                //utils.extend(el, el._node.data.instance);
             }
 
         },
@@ -329,33 +333,46 @@ define([
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var root     = node._node;
+        var _node    = node._node;
         this._events = [];
-        this._node   = root;
+        this._node   = _node;
         if (!this.el) {
-            if (root && root.el) {
-                this.el = root.el;
-            } else if (node.el) {
+            if (node.el) {
+                //console.log('root', node.el);
                 this.el = node.el
             }
+            else if (_node && _node.el !== undefined) {
+                //console.log('isnode', _node.el, _node.id);
+                //console.log('_node', node);
+                this.el = _node.el;
+            }
+        }else{
+            console.log('nonode', this.el, _node.id);
+
         }
         if (!this.name) {
-            this.name = node.name || root.name;
+            this.name = node.name || _node.name;
         }
-        if (root && root.bind && !this.bind) {
-            this.bind = root.bind;
+        if (_node && _node.bind && !this.bind) {
+            this.bind = _node.bind;
         }
-        if (root && !this.dataset && root.data && root.data.dataset) {
-            this.dataset = root.data.dataset;
+        if (_node && !this.dataset && _node.data && _node.data.dataset) {
+            this.dataset = _node.data.dataset;
         }
-        if (root && root.children && !this.children) {
-            this.children = root.children;
+        if (node && node.children && !this.children) {
+            this.children = node.children;
         }
-        if (root) {
-            this.run         = root.run;
-            this.applyAttach = root.applyAttach;
-            this.getParent   = root.getParent;
-            this.setParent   = root.setParent;
+        if (node.run) {
+            this.run = node.run.bind(node);
+        }
+        if (node.applyAttach) {
+            this.applyAttach = node.applyAttach.bind(node);
+        }
+        if (node.getParent) {
+            this.getParent = node.getParent.bind(node);
+        }
+        if (node.setParent) {
+            this.setParent = node.setParent.bind(node);
         }
 
     }

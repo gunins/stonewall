@@ -31,7 +31,6 @@ define([
                         data: this.data,
                         container: container
                     });
-
             }
         }
     });

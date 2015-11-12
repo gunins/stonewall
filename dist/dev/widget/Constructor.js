@@ -20,7 +20,7 @@ define('widget/dom',[
         //      @param {dom.Element} child
         //      @param {Object} data
         _after:          function (parent, child, data) {
-            if (child._node !== undefined) {
+            if (child._node !== undefined && parent && parent.el) {
                 child.placeholder = parent.el.querySelector('#' + child._node.id) ||
                                     createPlaceholder(child._node.data.tag || child.el.tagName);
             } else {
@@ -32,7 +32,7 @@ define('widget/dom',[
             }
 
             if (child._node && child._node.data && child._node.data.instance) {
-                utils.extend(child, child._node.data.instance);
+                //utils.extend(child, child._node.data.instance);
             }
         },
         // Replacing element in to DOM
@@ -42,7 +42,11 @@ define('widget/dom',[
         //      @param {dom.Element} child
         //      @param {Object} data
         replace:         function (parent, child, data) {
-            parent.el.innerHTML = '';
+            if (parent && parent.el) {
+                parent.el.innerHTML = '';
+            }
+            //console.log(parent, child)
+
             dom._after.apply(this, arguments);
         },
         // Insert element to the end of parent childs
@@ -101,7 +105,7 @@ define('widget/dom',[
             el.el = el.run.call(el, fragment, false, parent, data, index);
 
             if (el._node && el._node.data && el._node.data.instance) {
-                utils.extend(el, el._node.data.instance);
+                //utils.extend(el, el._node.data.instance);
             }
 
         },
@@ -112,11 +116,7 @@ define('widget/dom',[
         //      @param {String} text
         text:            function (node, text) {
             if (node && node.el) {
-                if (text !== undefined) {
-                    node.el.innerHTML = text;
-                } else {
-                    return node.el.innerHTML
-                }
+                node.el.innerHTML = text;
             }
         },
         // Setting Attribute in to node
@@ -333,33 +333,46 @@ define('widget/dom',[
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var root     = node._node;
+        var _node    = node._node;
         this._events = [];
-        this._node   = root;
+        this._node   = _node;
         if (!this.el) {
-            if (root && root.el) {
-                this.el = root.el;
-            } else if (node.el) {
+            if (node.el) {
+                //console.log('root', node.el);
                 this.el = node.el
             }
+            else if (_node && _node.el !== undefined) {
+                //console.log('isnode', _node.el, _node.id);
+                //console.log('_node', node);
+                this.el = _node.el;
+            }
+        }else{
+            console.log('nonode', this.el, _node.id);
+
         }
         if (!this.name) {
-            this.name = node.name || root.name;
+            this.name = node.name || _node.name;
         }
-        if (root && root.bind && !this.bind) {
-            this.bind = root.bind;
+        if (_node && _node.bind && !this.bind) {
+            this.bind = _node.bind;
         }
-        if (root && !this.dataset && root.data && root.data.dataset) {
-            this.dataset = root.data.dataset;
+        if (_node && !this.dataset && _node.data && _node.data.dataset) {
+            this.dataset = _node.data.dataset;
         }
-        if (root && root.children && !this.children) {
-            this.children = root.children;
+        if (node && node.children && !this.children) {
+            this.children = node.children;
         }
-        if (root) {
-            this.run         = root.run;
-            this.applyAttach = root.applyAttach;
-            this.getParent   = root.getParent;
-            this.setParent   = root.setParent;
+        if (node.run) {
+            this.run = node.run.bind(node);
+        }
+        if (node.applyAttach) {
+            this.applyAttach = node.applyAttach.bind(node);
+        }
+        if (node.getParent) {
+            this.getParent = node.getParent.bind(node);
+        }
+        if (node.setParent) {
+            this.setParent = node.setParent.bind(node);
         }
 
     }
@@ -473,7 +486,7 @@ define('widget/dom',[
         module.exports = factory();
     } else {
         // Browser globals (root is window)
-        root.Templating = root.Templating || {};
+        root.Templating       = root.Templating || {};
         root.Templating.utils = factory();
     }
 }(this, function () {
@@ -482,13 +495,13 @@ define('widget/dom',[
             Object.keys(dest).forEach(function (key) {
                 obj[key] = dest[key];
             });
+            return obj;
         }
     }
 
 }));
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
         // AMD. Register as an anonymous module.
         define('templating/Decoder',[
             'templating/utils'
@@ -531,7 +544,7 @@ define('widget/dom',[
         var params     = this._node,
             el         = params.tmpEl((keep) ? placeholder : false, data, this),
             attributes = params.data.attribs,
-            plFragment = applyFragment(params.template, params.data.tag);
+            plFragment = applyFragment(this._node.template, params.data.tag);
 
         if (!keep) {
             Object.keys(attributes).forEach(function (key) {
@@ -547,23 +560,24 @@ define('widget/dom',[
 
         if (!parent) {
             var parentNode = placeholder.parentNode;
-            params.setParent(parentNode);
-            if (params.parent !== null || params.parent !== undefined) {
+            this.setParent(parentNode);
+            if (params.parent !== null && params.parent !== undefined) {
                 params.parent.replaceChild(el, placeholder);
             }
         } else if (parent !== undefined && beforeEl !== undefined) {
-            params.setParent(parent);
+            this.setParent(parent);
             if (params.parent !== null) {
                 params.parent.insertBefore(el, beforeEl);
             }
         } else if (parent) {
-            params.setParent(parent);
+            this.setParent(parent);
             if (params.parent !== null) {
                 params.parent.appendChild(el);
             }
         }
 
-        this._node.el = el;
+        //this._node.el       = el;
+        this.el = el;
         if (params.parse !== undefined) {
             params.parse(el, data);
         }
@@ -571,55 +585,41 @@ define('widget/dom',[
 
     }
 
-    function setParams(node, children, obj) {
-        var tagName = node.tagName,
-            self    = this;
-        var params  = {
-            id:          node.id,
-            template:    node.template,
-            noAttach:    _decoders[tagName].noAttach || node.data.tplSet.noattach,
-            applyAttach: function () {
-                delete this._node.noAttach;
-            },
-            setParent:   function (parent) {
-                this._node.parent = parent;
-            }.bind(self),
-            getParent:   function () {
-                return this._node.parent;
-            }.bind(self),
-            getInstance: function () {
-                return this;
-            }.bind(self),
-            run:         function (fragment, keep, parent, data, beforeEl) {
-                if (data) {
-                    obj = data;
-                }
-                if (this._node.noAttach === undefined) {
-                    var placeholder = fragment.querySelector('#' + this._node.id) || fragment;
-                    if (placeholder) {
-                        return setElement.call(self, placeholder, keep, parent, obj, beforeEl);
-                    }
-                }
-            }
-        };
+    function ElementInstance(data, node, children, obj) {
+        var tagName = node.tagName;
+        this._obj    = obj;
+        this._node  = data || {};
+        this.id     = this._node.id = node.id;
+        this._node.template       = node.template;
+        this._node.noAttach = _decoders[tagName].noAttach || node.data.tplSet.noattach;
         if (children) {
-            params.children = children;
+            this.children = children;
         }
-        self._node = self._node || {};
-        utils.merge(self._node, params);
-        self.data  = self._node.data;
+    }
 
-        self.getInstance = function () {
-            return this._node.getInstance.apply(this, arguments)
-        }.bind(this);
+    ElementInstance.prototype.applyAttach = function () {
+        delete this._node.noAttach;
+    };
+    ElementInstance.prototype.setParent   = function (parent) {
+        this._node.parent = parent;
+    };
+    ElementInstance.prototype.getParent   = function () {
+        return this._node.parent;
+    };
+    ElementInstance.prototype.getInstance = function () {
+        return this;
+    };
 
-        self.run = function () {
-            return this._node.run.apply(this, arguments)
-        }.bind(this);
-
-        self.applyAttach = function () {
-            return this._node.applyAttach.apply(this, arguments)
-        }.bind(this);
+    ElementInstance.prototype.run = function (fragment, keep, parent, data, beforeEl) {
+        if (data) {
+            this._obj = data;
+        }
+        if (this._node.noAttach === undefined) {
+            var placeholder = fragment.querySelector('#' + this._node.id) || fragment;
+            if (placeholder) {
+                return setElement.call(this, placeholder, keep, parent, this._obj, beforeEl);
+            }
+        }
 
     }
 
@@ -632,7 +632,7 @@ define('widget/dom',[
         root.children.forEach(function (node) {
             var name        = node.data.name,
                 contextData = (obj[name]) ? obj[name] : obj,
-                scope       = {};
+                scope;
 
             if (node.children &&
                 node.children.length > 0) {
@@ -643,8 +643,7 @@ define('widget/dom',[
             if (tagName) {
                 var data = _decoders[tagName].decode(node, children);
                 if (data) {
-                    scope._node = data;
-                    setParams.call(scope, node, children, contextData);
+                    scope = new ElementInstance(data, node, children, contextData);
 
                 }
                 if (name !== undefined) {
@@ -654,9 +653,11 @@ define('widget/dom',[
 
             } else if (name) {
                 context       = context || {};
-                scope._node   = {
-                    id:   node.id,
-                    data: node.data
+                scope         = {
+                    _node: {
+                        id:   node.id,
+                        data: node.data
+                    }
                 }
                 context[name] = scope;
             }
@@ -667,12 +668,12 @@ define('widget/dom',[
     function runEls(children, fragment, data) {
         if (children) {
             Object.keys(children).forEach(function (key) {
-                if (children[key]._node.run !== undefined) {
-                    children[key]._node.run.call(children[key], fragment, false, false, data);
+                if (children[key].run !== undefined) {
+                    children[key].run.call(children[key], fragment, false, false, data);
                 }
-                if (children[key]._node.el === undefined && children[key]._node.template === undefined) {
-                    children[key]._node.el = fragment.querySelector('#' + children[key]._node.id);
-                    children[key]._node.el.removeAttribute('id');
+                if (children[key].el === undefined && children[key]._node.template === undefined) {
+                    children[key].el = fragment.querySelector('#' + children[key]._node.id);
+                    children[key].el.removeAttribute('id');
                 }
             });
         }
@@ -1343,29 +1344,21 @@ define('widget/parsers/deepBindings',[
     }
     return deepBindings;
 });
-/**
- * Created by guntars on 11/11/14.
- */
-define('widget/parsers/setChildren',[
-    '../dom',
-    '../utils',
-    './applyEvents',
-    './setBinders',
-    './deepBindings'
-], function (dom, utils, applyEvents, setBinders, deepBindings) {
+define('widget/parsers/applyElement',[
+    '../dom'
+], function (dom) {
     //Applying dom.Element to template elements.
     //
     //      @private applyElement
     //      @param {Object} elements
     function applyElement(elements, params) {
         Object.keys(elements).forEach(function (key) {
-
             var element = elements[key],
                 node    = element._node;
             if (typeof element == 'string') {
             } else if (['cp'].indexOf(node.data.type) !== -1) {
                 if (node.children && !element.children) {
-                    element.children = node.children;
+                    //element.children = node.children;
                 }
             } else if (element instanceof  dom.Element !== true &&
                        (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1 || node.data.type === undefined)) {
@@ -1387,6 +1380,20 @@ define('widget/parsers/setChildren',[
         }.bind(this));
         return elements;
     }
+
+    return applyElement
+});
+/**
+ * Created by guntars on 11/11/14.
+ */
+define('widget/parsers/setChildren',[
+    '../dom',
+    '../utils',
+    './applyEvents',
+    './setBinders',
+    './deepBindings',
+    './applyElement'
+], function (dom, utils, applyEvents, setBinders, deepBindings, applyElement) {
 
     function setChildren(elements, parentChildren, data, params) {
         if (Object.keys(data).length === 0) {
@@ -1418,6 +1425,7 @@ define('widget/parsers/setChildren',[
                     else {
                         dom.replace(child, parentChild, data);
                     }
+
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
                     }
@@ -1428,7 +1436,6 @@ define('widget/parsers/setChildren',[
                        child._node.data.dataset.bind === undefined) {
                 this.nodes[key].call(this, child, data);
             }
-
             if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
                 this.elReady[key].call(this, child, data);
             }
@@ -1691,6 +1698,7 @@ define('widget/parsers/setRoutes',[
         }
 
         if (force) {
+            delete cp._created;
             if (cp._matches) {
                 cp._matches.remove();
             }
@@ -1707,10 +1715,14 @@ define('widget/parsers/setRoutes',[
     }
 
     function matchRoute(children, match, parent) {
+
         var names = Object.keys(children);
+
         names.forEach(function (name) {
             var child = children[name];
-            var route = (child._node !== undefined) ? child._node.data.route : undefined;
+            var route = (child._node !== undefined &&
+                         child._node.data !== undefined) ? child._node.data.route : undefined;
+
             if (route !== undefined && child._node.data.type !== 'cp') {
                 var matches    = match(route, function (match) {
                     if (child.children !== undefined) {
@@ -1732,6 +1744,7 @@ define('widget/parsers/setRoutes',[
                         destroyComponent(child);
                     } else {
                         applyToChildren.call(this, child.children, function (cp, instance) {
+
                             var data    = cp._node.data,
                                 dataSet = data.dataset;
 
@@ -1743,24 +1756,20 @@ define('widget/parsers/setRoutes',[
 
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
-
                             }
 
                         });
                     }
-
                     if (child.el === undefined) {
                         child.applyAttach();
-
                         dom.add(child, parent, false);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
                                 instance.to.apply(instance, args.concat(params));
                             }
-
-                            if (!cp.el && instance && instance._match) {
-
+                            if (!cp._created && instance && instance._match) {
+                                cp._created       = true;
                                 if (cp._routeHandlers !== undefined && cp._routeHandlers.length > 0) {
                                     cp._routeHandlers.forEach(function (handler) {
                                         handler.remove();
@@ -1805,7 +1814,6 @@ define('widget/parsers/setRoutes',[
                         }
                     }.bind(this));
                 }.bind(this));
-
             } else if (child.children !== undefined && child._node.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
             } else if (child.instance !== undefined) {
@@ -1972,7 +1980,7 @@ define('widget/Constructor',[
         //              }
         //          }
         //      },
-        elOnChange:      {},
+        elOnChange:   {},
         // Running when Constructor is initialised
         //
         //      @method init
@@ -2120,7 +2128,7 @@ define('widget/Constructor',[
         //  @param {Element} el
         //  @param {Object} data
         setChildren:  function (el, data) {
-            var name = el._node.name;
+            var name                              = el._node.name;
             if (this.children[name] !== undefined && this.children[name].el !== undefined) {
                 dom.detach(this.children[name]); //.detach();
             }
@@ -2129,9 +2137,8 @@ define('widget/Constructor',[
             if (el._node.data.type !== 'cp') {
                 this.children[name] = new dom.Element(el);
             }
-
             this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
-            this.children[name].el          = el.run(this.el, false, false, data);
+            this.children[name].el                = el.run(this.el, false, false, data);
 
             if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
                 this.elReady[name].call(this, this.children[name], data);
@@ -2185,7 +2192,7 @@ define('widget/Constructor',[
                     var cp             = new Component(options, options.children, options.data);
                     instance.instance  = cp;
                     instance.eventBus  = cp.eventBus;
-                    instance.children  = instance._node.children = cp.children;
+                    instance.children  = cp.children;
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {

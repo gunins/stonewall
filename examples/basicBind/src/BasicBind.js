@@ -22,19 +22,22 @@ define([
                     test: {
                         value: 'Test Value',
                         badge: badge++
-                    }
+                    },
+                    item: 'blah1'
                 },
                 {
                     test: {
                         value: 'Test Inner',
                         badge: badge++
-                    }
+                    },
+                    item: 'blah2'
                 },
                 {
                     test: {
                         value: 'Test Value1',
                         badge: badge++
-                    }
+                    },
+                    item: 'blah3'
                 }
             ]
         }
@@ -72,7 +75,8 @@ define([
                 test: {
                     value: 'Test Value New',
                     badge: badge++
-                }
+                },
+                item: 'blah4'
             });
         }, 3000);
         setTimeout(function () {
@@ -80,7 +84,8 @@ define([
                 test: {
                     value: 'Test Value v',
                     badge: badge++
-                }
+                },
+                item: 'blah5'
             });
         }, 4000);
 
@@ -89,12 +94,14 @@ define([
                 test: {
                     value: 'Test Value Third',
                     badge: badge++
-                }
+                },
+                item: 'blah6'
             }, {
                 test: {
                     value: 'Test Value Fourth',
                     badge: badge++
-                }
+                },
+                item: 'blah7'
             });
         }, 5000);
 

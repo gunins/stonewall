@@ -8,7 +8,6 @@ define([
     return Constructor.extend({
         template: template,
         init: function () {
-            console.log('tableInit')
         },
         events: {
             tbody: [

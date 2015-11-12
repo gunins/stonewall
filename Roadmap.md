@@ -1,7 +1,4 @@
 ## Roadmap
 
-- Adding Router Support with nested routes
-- Proper remove Components (Clean up all Event Handlers)
-- Data Array binding supporting Index
-- Css styling support in Components
-- Web Workers support in messaging
+- in loadCss Adding compiled version in production
+- Adding proper parent child selection in data bindings (for arrays)
