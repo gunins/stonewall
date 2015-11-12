@@ -54,7 +54,7 @@ define(function () {
     }
 
     function isArray(obj) {
-        return toString.call(obj) === '[object Array]';
+        return (Array.isArray) ? Array.isArray(obj) : toString.call(obj) === '[object Array]';
     }
 
     return {
