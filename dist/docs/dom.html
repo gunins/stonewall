@@ -315,11 +315,7 @@
             
             <div class="content"><div class='highlight'><pre>        text:            <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">node, text</span>) </span>{
             <span class="hljs-keyword">if</span> (node &amp;&amp; node.el) {
-                <span class="hljs-keyword">if</span> (text !== <span class="hljs-literal">undefined</span>) {
-                    node.el.innerHTML = text;
-                } <span class="hljs-keyword">else</span> {
-                    <span class="hljs-keyword">return</span> node.el.innerHTML
-                }
+                node.el.innerHTML = text;
             }
         },</pre></div></div>
             
