@@ -136,9 +136,12 @@ define([
         } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cp.remove !== <span class="hljs-literal">undefined</span>) {
             cp.remove();
         }
-
         <span class="hljs-keyword">if</span> (cp.el) {
-            cp.el.remove();
+            <span class="hljs-keyword">if</span> (cp.el.remove) {
+                cp.el.remove();
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cp.el.parentNode) {
+                cp.el.parentNode.removeChild(cp.el);
+            }
             <span class="hljs-keyword">delete</span> cp.el;
         }
 

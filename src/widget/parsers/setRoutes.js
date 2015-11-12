@@ -18,9 +18,12 @@ define([
         } else if (cp.remove !== undefined) {
             cp.remove();
         }
-
         if (cp.el) {
-            cp.el.remove();
+            if (cp.el.remove) {
+                cp.el.remove();
+            } else if (cp.el.parentNode) {
+                cp.el.parentNode.removeChild(cp.el);
+            }
             delete cp.el;
         }
 

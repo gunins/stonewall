@@ -22,7 +22,7 @@ define('widget/dom',[
         _after:          function (parent, child, data) {
             if (child._node !== undefined) {
                 child.placeholder = parent.el.querySelector('#' + child._node.id) ||
-                                    createPlaceholder(child._node.data.tag || child.el.tagName);
+                    createPlaceholder(child._node.data.tag || child.el.tagName);
             } else {
                 child.placeholder = createPlaceholder(child.el.tagName);
             }
@@ -71,7 +71,7 @@ define('widget/dom',[
         //      @param {dom.Element} child
         insertBefore:    function (parent, child, index) {
             var parentEl = parent.el;
-            var childEl  = child.el;
+            var childEl = child.el;
             if (parentEl !== undefined && childEl !== undefined) {
                 if (parentEl.childNodes[index] !== undefined) {
                     parentEl.insertBefore(childEl, parentEl.childNodes[index]);
@@ -96,7 +96,7 @@ define('widget/dom',[
         },
         add:             function (el, fragment, parent, data, index) {
             el.placeholder = fragment.querySelector('#' + el._node.id) ||
-                             createPlaceholder(el._node.data.tag || el.el.tagName);
+                createPlaceholder(el._node.data.tag || el.el.tagName);
 
             el.el = el.run.call(el, fragment, false, parent, data, index);
 
@@ -255,17 +255,17 @@ define('widget/dom',[
         //      @param {Object} context
         //      @return {Object} { remove() }
         on:              function (element, ev, cb, context) {
-            var args   = Array.prototype.slice.call(arguments, 4, arguments.length),
-                el     = element.el,
+            var args = Array.prototype.slice.call(arguments, 4, arguments.length),
+                el = element.el,
                 events = ev.split(' '),
-                fn     = function (e) {
+                fn = function (e) {
                     cb.apply(context || this, [e, element].concat(args));
                 };
 
             events.forEach(function (event) {
                 el.addEventListener(event, fn);
             });
-            var evt    = {
+            var evt = {
                 remove: function () {
                     events.forEach(function (event) {
                         el.removeEventListener(event, fn);
@@ -285,7 +285,11 @@ define('widget/dom',[
                 el._events.shift();
             }
             if (el.el !== undefined) {
-                el.el.remove();
+                if (el.el.remove) {
+                    el.el.remove();
+                } else if (el.el.parentNode) {
+                    el.el.parentNode.removeChild(el.el);
+                }
             }
         },
         // executes when element attached to Dom
@@ -299,7 +303,7 @@ define('widget/dom',[
             if (el.el !== undefined) {
                 var attached = false,
                     handler;
-                var step     = function () {
+                var step = function () {
                     if (attached) {
                         while (handlers.length > 0) {
                             handler = handlers[0];
@@ -329,9 +333,9 @@ define('widget/dom',[
     //     @method Element
     //     @param {Object} node
     function Element(node) {
-        var root     = node._node;
+        var root = node._node;
         this._events = [];
-        this._node   = root;
+        this._node = root;
         if (!this.el) {
             if (root && root.el) {
                 this.el = root.el;
@@ -352,17 +356,17 @@ define('widget/dom',[
             this.children = root.children;
         }
         if (root) {
-            this.run         = root.run;
+            this.run = root.run;
             this.applyAttach = root.applyAttach;
-            this.getParent   = root.getParent;
-            this.setParent   = root.setParent;
+            this.getParent = root.getParent;
+            this.setParent = root.setParent;
         }
 
     }
 
     utils.extend(Element.prototype, {
         clone:           function () {
-            var extend     = utils.extend({}, this);
+            var extend = utils.extend({}, this);
             extend._events = [];
             return extend;
         },
@@ -1680,9 +1684,12 @@ define('widget/parsers/setRoutes',[
         } else if (cp.remove !== undefined) {
             cp.remove();
         }
-
         if (cp.el) {
-            cp.el.remove();
+            if (cp.el.remove) {
+                cp.el.remove();
+            } else if (cp.el.parentNode) {
+                cp.el.parentNode.removeChild(cp.el);
+            }
             delete cp.el;
         }
 
