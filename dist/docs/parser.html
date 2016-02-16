@@ -168,6 +168,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
                     <span class="hljs-keyword">return</span> Widget;
                 });
             req([moduleName], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Widget</span>) </span>{
+                <span class="hljs-built_in">console</span>.log(Widget,<span class="hljs-string">'Show Widget!!!'</span>)
                 onLoad(Widget);
             });
         },

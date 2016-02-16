@@ -158,7 +158,7 @@ Basic Usage example</p>
     <span class="hljs-string">'./parsers/setRoutes'</span>,
     <span class="hljs-string">'./parsers/applyEvents'</span>
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents</span>) </span>{
-<span class="hljs-pi">    'use strict'</span>;
+<span class="hljs-meta">    'use strict'</span>;
     <span class="hljs-keyword">var</span> context = {};</pre></div></div>
             
         </li>
@@ -355,9 +355,9 @@ Usage Example</p>
               </div>
               <p>Running when Constructor is initialised</p>
 <pre><code> @method init
- @param {<span class="hljs-built_in">Object</span>} data (comes from template data attributes)
+ @param {<span class="hljs-built_in">Object</span>} data (comes <span class="hljs-keyword">from</span> template data attributes)
  @param {<span class="hljs-built_in">Object</span>} children (comes placeholder content
- from template)
+ <span class="hljs-keyword">from</span> template)
  @param {<span class="hljs-built_in">Object</span>} datatSet (data passing <span class="hljs-keyword">if</span> component is
  <span class="hljs-keyword">in</span> template binders)
 </code></pre>
@@ -377,9 +377,9 @@ Usage Example</p>
               </div>
               <p>Running before Constructor is initialised</p>
 <pre><code> @method beforeInit
- @param {<span class="hljs-built_in">Object</span>} data (comes from template data attributes)
+ @param {<span class="hljs-built_in">Object</span>} data (comes <span class="hljs-keyword">from</span> template data attributes)
  @param {<span class="hljs-built_in">Object</span>} children (comes placeholder content
- from template)
+ <span class="hljs-keyword">from</span> template)
  @param {<span class="hljs-built_in">Object</span>} datatSet (data passing <span class="hljs-keyword">if</span> component is
  <span class="hljs-keyword">in</span> template binders)
 </code></pre>
@@ -405,7 +405,7 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        loadCss:      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">url</span>) </span>{
             <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === -<span class="hljs-number">1</span>) {
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === <span class="hljs-number">-1</span>) {
                 <span class="hljs-keyword">this</span>.context._cssReady.push(url);
                 <span class="hljs-keyword">var</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>);
                 linkRef.setAttribute(<span class="hljs-string">"rel"</span>, <span class="hljs-string">"stylesheet"</span>)

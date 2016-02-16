@@ -246,16 +246,16 @@ define([
                                 sortingMethodNames = [<span class="hljs-string">'reverse'</span>, <span class="hljs-string">'sort'</span>];
                             watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">prop, action, newvalue, oldvalue</span>) </span>{
                                 <span class="hljs-keyword">var</span> clonedData = bindedData.slice(<span class="hljs-number">0</span>);
-                                <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
+                                <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
                                     <span class="hljs-keyword">var</span> filter = clonedData.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">item</span>) </span>{
                                         <span class="hljs-keyword">return</span> item.data === newvalue[<span class="hljs-number">0</span>];
                                     });
                                     <span class="hljs-keyword">if</span> (filter.length === <span class="hljs-number">0</span>) {
                                         addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>], (action === <span class="hljs-string">'unshift'</span>) ? <span class="hljs-number">0</span> : clonedData.length);
                                     }
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (removeMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
+                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (removeMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
                                     clonedData.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">binder</span>) </span>{
-                                        <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === -<span class="hljs-number">1</span>) {
+                                        <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === <span class="hljs-number">-1</span>) {
                                             binder.binder.remove();
                                             bindedData.splice(bindedData.indexOf(binder), <span class="hljs-number">1</span>);
                                         }
@@ -266,13 +266,13 @@ define([
                                         <span class="hljs-keyword">if</span> (vals &amp;&amp; vals.length &gt; <span class="hljs-number">0</span>) {
                                             vals.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val</span>) </span>{
                                                 <span class="hljs-keyword">var</span> index = obj[objKey].indexOf(val);
-                                                <span class="hljs-keyword">if</span> (index !== -<span class="hljs-number">1</span>) {
+                                                <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
                                                     addItem.call(<span class="hljs-keyword">this</span>, val, index);
                                                 }
                                             }.bind(<span class="hljs-keyword">this</span>));
                                         }
                                     }
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== -<span class="hljs-number">1</span>) {
+                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
 
                                 }
 
