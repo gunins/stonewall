@@ -16,7 +16,7 @@
         ]
     };
     var paths = {
-        'test': '../../../test/dev',
+        'test': '../../test/dev',
         'templating': '../../../node_modules/richtemplate/dev/templating',
         'coders': '../../../node_modules/richtemplate/dev/coders',
         'widget': '../../../dist/dev/widget',
@@ -35,7 +35,7 @@
     mocha.setup('bdd');
 
     var tests = [
-        {
+      /*  {
             path: ['test/basicTest'],
             name: 'Basic',
             baseUrl: '../../examples/basic/src'
@@ -54,6 +54,11 @@
             path: ['test/elementTest'],
             name: 'Element',
             baseUrl: '../../examples/element/src'
+        },*/
+        {
+            path: ['test/mediatorTest'],
+            name: 'Mediator',
+            baseUrl: '../../src/widget'
         }
     ];
 

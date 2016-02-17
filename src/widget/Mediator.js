@@ -43,7 +43,8 @@
             }
 
             this.id = Symbol();
-            this.channel = null;
+            this.options = {};
+            this._channel = null;
             this.fn = fn;
             this.update(options);
         }
@@ -55,11 +56,35 @@
         update(options = {}) {
             this.fn = options.fn || this.fn;
             this.context = options.context || this.context;
-            this.options = options.options || this.options;
+
+            Object.assign(this.options, options);
+
             if (this.channel && this.options && this.options.priority !== undefined) {
                 this.channel.setPriority(this.id, this.options.priority);
             }
         }
+
+        set channel(channel) {
+            this._channel = channel;
+        }
+
+        get channel() {
+            return this._channel;
+        }
+
+        remove() {
+            let channel = this.channel;
+            if (channel) {
+                channel.removeSubscriber(this.id);
+            }
+        };
+
+        setPriority(priority) {
+            let channel = this.channel;
+            if (channel) {
+                channel.setPriority(this.id, priority);
+            }
+        };
     }
 
     class Channel {
@@ -82,24 +107,15 @@
         // StopPropagation are meant to be used. The other methods should be accessed
         // through the Mediator instance.
 
-        addSubscriber(fn, options, context) {
-            context = context || this._context;
-
-            var subscriber = new Subscriber(fn, options, context);
-
-            if (options && options.priority !== undefined&&options.priority>0) {
-                if (options.priority >= this._subscribers.length) {
-                    options.priority = this._subscribers.length;
-                }
-                this._subscribers.splice(options.priority, 0, subscriber);
-            } else {
-                this._subscribers.push(subscriber);
-            }
-
+        addSubscriber(fn, options, context = this._context) {
+            let subscriber = new Subscriber(fn, options, context);
             subscriber.channel = this;
-            subscriber.remove = function () {
-                this.removeSubscriber(subscriber.id);
-            }.bind(this);
+
+            this._subscribers.push(subscriber);
+
+            if (options && options.priority !== undefined) {
+                this.setPriority(subscriber.id, options.priority);
+            }
 
             context._globalEvents = context._globalEvents || [];
             context._globalEvents.push(subscriber);
@@ -114,29 +130,17 @@
             this.stopped = true;
         };
 
-        getSubscriber(identifier) {
-            var x = 0,
-                y = this._subscribers.length;
-
-            for (x, y; x < y; x++) {
-                if (this._subscribers[x].id === identifier || this._subscribers[x].fn === identifier) {
-                    return this._subscribers[x];
-                }
-            }
-        };
-
         // Channel.setPriority is useful in updating the order in which Subscribers
         // are called, and takes an identifier (subscriber id or named function) and
         // an array index. It will not search recursively through subchannels.
 
         setPriority(identifier, priority) {
-            let oldIndex = this._subscribers.filter(subscriber => (subscriber.id !== identifier || subscriber.fn !== identifier)).length,
-                sub = this._subscribers[oldIndex],
-                firstHalf = this._subscribers.slice(0, oldIndex),
-                lastHalf = this._subscribers.slice(oldIndex + 1);
-
-            this._subscribers = firstHalf.concat(lastHalf);
-            this._subscribers.splice(priority, 0, sub);
+            if (priority < this._subscribers.length) {
+                let subscribers = this._subscribers,
+                    curr = subscribers.filter(subscriber => (subscriber.id === identifier))[0];
+                subscribers.splice(subscribers.indexOf(curr), 1);
+                subscribers.splice(priority, 0, curr);
+            }
         };
 
         addChannel(channel) {
@@ -163,11 +167,12 @@
 
             // Going backwards makes splicing a whole lot easier.
             for (x; x >= 0; x--) {
-                if (this._subscribers[x].fn === identifier || this._subscribers[x].id === identifier) {
+                if (this._subscribers[x].id === identifier) {
                     this._subscribers[x].channel = null;
                     this._subscribers.splice(x, 1);
                 }
             }
+            return this._subscribers.length === 0;
         };
 
         // This will publish arbitrary arguments to a subscriber and then to parent
@@ -201,6 +206,7 @@
 
                 // Check if the callback should be called
                 if (shouldCall) {
+
                     // Check if the subscriber has options and if this include the calls options
                     if (subscriber.options && subscriber.options.calls !== undefined) {
                         // Decrease the number of calls left by one
@@ -284,20 +290,6 @@
             return this.subscribe(channelName, fn, options, context);
         };
 
-        // Returns a subscriber for a given subscriber id / named function and
-        // channel namespace
-
-        getSubscriber(identifier, channelName) {
-            let channel = this.getChannel(channelName || "", true);
-            // We have to check if channel within the hierarchy exists and if it is
-            // an exact match for the requested channel
-            if (channel && channel.namespace === channelName) {
-                return channel.getSubscriber(identifier);
-            } else {
-                return false;
-            }
-
-        };
 
         // Remove a subscriber from a given channel namespace recursively based on
         // a passed-in subscriber id or named function.

@@ -9,6 +9,8 @@ define([
 
     return App.extend({
         AppContainer: Container,
+        init: function () {
+        },
         setContext:   function () {
             return {
                 data: {
