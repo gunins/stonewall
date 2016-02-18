@@ -1,16 +1,8 @@
 /*jslint bitwise: true, nomen: true, plusplus: true, white: true */
 
 /*!
- * Mediator.js Library v0.9.8
- * https://github.com/ajacksified/Mediator.js
+ * Mediator Library v0.9.9
  *
- * Copyright 2013, Jack Lawson
- * MIT Licensed (http://www.opensource.org/licenses/mit-license.php)
- *
- * For more information: http://thejacklawson.com/2011/06/mediators-for-modularized-asynchronous-programming-in-javascript/index.html
- * Project on GitHub: https://github.com/ajacksified/Mediator.js
- *
- * Last update: October 19 2013
  */
 
 (function (global, factory) {
@@ -76,12 +68,6 @@
             }
         }
 
-        remove() {
-            let channel = this.channel;
-            if (channel) {
-                channel.removeSubscriber(this);
-            }
-        };
 
         run(data) {
             if (!this.channel.stopped) {
@@ -112,6 +98,15 @@
             }
         };
 
+        //return event remove method
+        remove() {
+            let channel = this.channel;
+            if (channel) {
+                channel.removeSubscriber(this);
+            }
+        };
+
+        //Dynamic setPriority method
         setPriority(priority) {
             let channel = this.channel;
             if (channel) {
@@ -303,16 +298,11 @@
 
     // Alias some common names for easy interop
     Mediator.prototype.on = Mediator.prototype.subscribe;
-    Mediator.prototype.bind = Mediator.prototype.subscribe;
-    Mediator.prototype.emit = Mediator.prototype.publish;
     Mediator.prototype.trigger = Mediator.prototype.publish;
-    Mediator.prototype.off = Mediator.prototype.remove;
 
     // Finally, expose it all.
 
-    Mediator.Channel = Channel;
-    Mediator.Subscriber = Subscriber;
-    Mediator.version = "0.9.8";
+    Mediator.version = "0.9.9";
 
     return Mediator;
 }));
