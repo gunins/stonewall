@@ -7,7 +7,7 @@ define([
 
 
     describe('Mediator Tests Dev environment', function () {
-        var eventBus, eventBusA, evts;
+        var eventBus, eventBusA;
         beforeEach(function () {
             // runs before each test in this block
             eventBus = new Mediator();
@@ -15,10 +15,8 @@ define([
         });
 
         afterEach(function () {
-            // runs after each test in this block
-            evts.forEach(function (evt) {
-                evt.remove();
-            });
+            eventBus.clear();
+            eventBusA.clear();
         });
         describe('Testing Mediator if events are triggered in proper order', function () {
             it('two eventBuses are subscribe to same events, and triggered only required ones', function () {
@@ -38,7 +36,6 @@ define([
                 });
                 eventBusA.publish('test', test2);
                 eventBus.publish('test', test1);
-                evts = [evt1, evt2]
 
             });
             it('Multiple arguments sent to eventBus', function () {
@@ -53,7 +50,6 @@ define([
                 });
 
                 eventBus.publish('test', test1, test2, test1, test2);
-                evts = [evt1]
 
             });
             it('Update options', function () {
@@ -75,12 +71,12 @@ define([
                         expect(b).to.equal(test1);
                         expect(c).to.equal(test2);
                         expect(d).to.equal(test1);
-                        expect(this).to.undefined;
+                        expect(this.a).to.undefined;
                     }
                 });
 
                 eventBus.publish('test', test2, test1, test2, test1);
-                evt1.update({
+                evt1.options = {
                     fn:      function (a, b, c, d) {
                         expect(a).to.equal(test2);
                         expect(b).to.equal(test1);
@@ -97,11 +93,10 @@ define([
                         b: 2,
                         c: 3
                     }
-                });
+                };
 
                 eventBus.publish('test', test2, test1, test2, test1);
 
-                evts = [evt1]
 
             });
             it('Multiple arguments sent to eventBus', function () {
@@ -116,7 +111,17 @@ define([
                 });
 
                 eventBus.publish('test', test1, test2, test1, test2);
-                evts = [evt1]
+
+            });
+            it('Setting Context', function () {
+                var evt1 = eventBus.subscribe('test', function () {
+                    expect(this.a).to.equal(1);
+                    expect(this.b).to.equal(2);
+                    expect(this.c).to.equal(3);
+
+                }, {}, {a: 1, b: 2, c: 3});
+
+                eventBus.publish('test');
 
             });
             it('Check priority', function (done) {
@@ -145,7 +150,6 @@ define([
 
                 eventBus.publish('test', test1);
 
-                evts = [evt1, evt2, evt3]
 
             });
 
@@ -177,7 +181,6 @@ define([
 
                 eventBus.publish('test', test1);
 
-                evts = [evt1, evt2, evt3]
 
             });
 
@@ -199,7 +202,6 @@ define([
 
                 expect(a).to.equal(2);
 
-                evts = [];
 
             });
             it('Check if once working only once', function () {
@@ -219,7 +221,6 @@ define([
 
                 expect(a).to.equal(1);
 
-                evts = [evt1];
 
             });
             it('Check if options.calls working', function () {
@@ -239,7 +240,6 @@ define([
 
                 expect(a).to.equal(2);
 
-                evts = [evt1];
 
             });
 
@@ -258,7 +258,6 @@ define([
 
                 expect(a).to.equal(2);
                 expect(b).to.equal(1);
-                evts = [evt1, evt2];
             });
 
             it('Check if predictate prevents calling events', function () {
@@ -284,25 +283,22 @@ define([
                 expect(a).to.equal(2);
                 expect(b).to.equal(1);
 
-                evts = [evt1, evt2];
             });
             it('Check if stopPropogation works.', function () {
                 var a = 0, b = 0;
 
                 var evt1 = eventBusA.subscribe('test:extra', function () {
-                    console.log('a')
                     a++;
                 });
 
                 var evt2 = eventBusA.subscribe("test:extra", function (data, channel) {
                     b++;
-                    console.log('b')
                     channel.stopPropagation();
                 }, {
                     predicate: function (data) {
                         return data.From !== data.To;
                     },
-                    priority:0
+                    priority:  0
                 });
 
                 eventBusA.publish('test:extra', {From: 'a', To: 'b'});
@@ -313,7 +309,34 @@ define([
                 expect(a).to.equal(1);
                 expect(b).to.equal(3);
 
-                evts = [evt1, evt2];
+            });
+            it('Check if Context is same in eventBus', function () {
+                var context = {a: '35'};
+                var evtBusB = new Mediator(context);
+
+                var evt1 = evtBusB.subscribe('test:extra', function () {
+                });
+                expect(evt1.context).to.equal(context);
+                expect(context._globalEvents).to.be.length(1)
+
+            });
+
+            it('Check if Context is changed in eventBus', function () {
+                var context = {a: '35'};
+                var contextA = {a: '35'};
+                var evtBusB = new Mediator(context);
+
+                var evt1 = evtBusB.subscribe('test:extra', function () {
+                    alert();
+                }, {}, contextA);
+                expect(evt1.context).to.equal(contextA);
+                expect(contextA._globalEvents).to.be.length(1);
+
+                expect(evt1.context).not.to.equal(context);
+                expect(context._globalEvents).to.be.undefined;
+                evtBusB.clear();
+                evtBusB.publish('test:extra')
+
             });
         });
     });
