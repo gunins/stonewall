@@ -23,7 +23,7 @@
         'widget/dom': '../../../dist/dev/widget/Constructor',
         'widget/utils': '../../../dist/dev/widget/App',
         'watch': '../../../lib/watch/src/watch',
-        'router': '../../../bower_components/urlmanager/dist/prod/router'
+        'router': '../../bower_components/urlmanager/dist/prod/router'
     }
 
     require.config({
@@ -58,6 +58,11 @@
         {
             path: ['test/mediatorTest'],
             name: 'Mediator',
+            baseUrl: '../../src/widget'
+        },
+        {
+            path: ['test/appTest'],
+            name: 'App',
             baseUrl: '../../src/widget'
         }
     ];

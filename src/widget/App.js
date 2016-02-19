@@ -15,7 +15,7 @@
 //          });
 //      });
 define([
-    './mediator',
+    './Mediator',
     'router/Router',
     './utils'
 ], function (Mediator, Router, utils) {
@@ -36,77 +36,82 @@ define([
     //
     //      var app= new App();
     //      app.start(document.body);
-    function App(options) {
-        options    = options || {};
-        var router = new Router(),
-            mapHandler;
+    class App {
+        static extend(options={}){
+            class Surogate extends App{}
+            Object.assign(Surogate.prototype,options);
+            return Surogate;
+        };
+        constructor(options) {
+            options = options || {};
+            var router = new Router(),
+                mapHandler;
 
-        this.beforeInit.apply(this, arguments);
-        this.context = utils.extend(this.setContext.apply(this, arguments), {
-            // Creating `EventBus` More info look in `Mediator` Section
-            eventBus: new Mediator()
-        });
-        if (this.AppContainer !== undefined) {
-            this.appContainer = new this.AppContainer({
-                appContext: this.context
+            this.beforeInit.apply(this, arguments);
+            this.context = utils.extend(this.setContext.apply(this, arguments), {
+                // Creating `EventBus` More info look in `Mediator` Section
+                eventBus: new Mediator()
             });
-            if (this.appContainer._match !== undefined) {
-                mapHandler = this.appContainer._match.bind(this.appContainer);
-            } else {
-                mapHandler = function () {
-
-                }
-            }
-
-            if (options.rootRoute !== undefined) {
-                router.match(function (match) {
-                    match(options.rootRoute, mapHandler);
+            if (this.AppContainer !== undefined) {
+                this.appContainer = new this.AppContainer({
+                    appContext: this.context
                 });
-            } else {
-                router.match(mapHandler);
+                if (this.appContainer._match !== undefined) {
+                    mapHandler = this.appContainer._match.bind(this.appContainer);
+                } else {
+                    mapHandler = function () {
+
+                    }
+                }
+
+                if (options.rootRoute !== undefined) {
+                    router.match(function (match) {
+                        match(options.rootRoute, mapHandler);
+                    });
+                } else {
+                    router.match(mapHandler);
+                }
+
+                this.el = this.appContainer.el;
+                setTimeout(function () {
+                    this.el.classList.add('show');
+                }.bind(this), 100);
+                triggerRoute(router);
+
             }
-
-            this.el           = this.appContainer.el;
-            setTimeout(function () {
-                this.el.classList.add('show');
-            }.bind(this), 100);
-            triggerRoute(router);
-
+            this.init.apply(this, arguments);
         }
-        this.init.apply(this, arguments);
-    }
 
-    // Extending the `App` Class
-    //
-    //      @Static method extend
-    App.extend = utils.fnExtend;
 
-    utils.extend(App.prototype, {
         // Running 'AppContainer' is initialised.
         //
         //      @method beforeInit
-        beforeInit: function () {
-        },
+        beforeInit() {
+        };
+
         // Running after 'AppContainer' is initialised.
         //
         //      @method init
-        init:       function () {
-        },
+        init() {
+        };
+
         // SettingContext for the `App`
         //
         //      @method setContext
-        setContext: function () {
+        setContext() {
             return {};
-        },
+        }
+
         // Starting `App` in provided `Container`
         //
         //      @method start
         //      @param {HTMLElement} container
-        start:      function (container) {
+        start(container) {
             if (container instanceof HTMLElement === true) {
                 container.appendChild(this.el);
             }
         }
-    });
+    }
+    ;
     return App;
 });
