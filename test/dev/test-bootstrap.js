@@ -17,6 +17,7 @@
     };
     var paths = {
         'test': '../../test/dev',
+        'sinon':'../../node_modules/sinon/lib/sinon',
         'templating': '../../../node_modules/richtemplate/dev/templating',
         'coders': '../../../node_modules/richtemplate/dev/coders',
         'widget': '../../../dist/dev/widget',

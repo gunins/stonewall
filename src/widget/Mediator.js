@@ -51,21 +51,21 @@
         };
 
         set context(context) {
+            this.setHook(context);
             this._context = context;
-            this.setGlobalEvents();
         };
 
         get context() {
             return this._context;
         };
 
-        setGlobalEvents() {
-            let context = this.context;
-            context._globalEvents = context._globalEvents || [];
-            if (context._globalEvents.indexOf(this) === -1) {
-                context._globalEvents.push(this);
+        setHook(context) {
+            let channel = this.channel;
+            if (channel) {
+                channel.hook(this, context);
             }
         }
+
         _reduceCalls() {
             // Check if the subscriber has options and if this include the calls options
             if (this.calls !== undefined) {
@@ -108,13 +108,14 @@
     }
 
     class Channel {
-        constructor(namespace, parent, context) {
+        constructor(namespace, parent, context, hook) {
             this.namespace = namespace || "";
             this._subscribers = [];
             this._channels = new Map();
             this._parent = parent;
             this.stopped = false;
             this.context = context;
+            this.hook = hook;
         };
 
 
@@ -165,7 +166,7 @@
 
         setChannel(namespace, readOnly) {
             if (!this.hasChannel(namespace) && !readOnly) {
-                let channel = new Channel((this.namespace ? this.namespace + ':' : '') + namespace, this, this.context);
+                let channel = new Channel((this.namespace ? this.namespace + ':' : '') + namespace, this, this.context, this.hook);
                 this._channels.set(namespace, channel);
                 return channel;
             } else {
@@ -228,11 +229,12 @@
     }
 
     class Mediator {
-        constructor(context = {}) {
+        constructor(context = {}, hook = ()=> {
+        }) {
             if (!(this instanceof Mediator)) {
-                return new Mediator(context);
+                return new Mediator(context, hook);
             }
-            this.channel = new Channel('', false, context);
+            this.channel = new Channel('', false, context, hook);
         }
 
         // A Mediator instance is the interface through which events are registered

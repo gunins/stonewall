@@ -312,7 +312,12 @@ define([
             });
             it('Check if Context is same in eventBus', function () {
                 var context = {a: '35'};
-                var evtBusB = new Mediator(context);
+                var evtBusB = new Mediator(context, function(channel, obj) {
+                    obj._globalEvents = obj._globalEvents || [];
+                    if (obj._globalEvents.indexOf(channel) === -1) {
+                        obj._globalEvents.push(channel);
+                    }
+                });
 
                 var evt1 = evtBusB.subscribe('test:extra', function () {
                 });
@@ -330,7 +335,7 @@ define([
                     alert();
                 }, {}, contextA);
                 expect(evt1.context).to.equal(contextA);
-                expect(contextA._globalEvents).to.be.length(1);
+                expect(contextA._globalEvents).to.be.undefined;
 
                 expect(evt1.context).not.to.equal(context);
                 expect(context._globalEvents).to.be.undefined;

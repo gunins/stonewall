@@ -2,7 +2,7 @@
  * Created by guntars on 11/11/14.
  */
 define([
-    '../dom',
+    'templating/dom',
     '../utils',
     'watch',
     './applyEvents',

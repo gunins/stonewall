@@ -37,25 +37,34 @@ define([
     //      var app= new App();
     //      app.start(document.body);
     class App {
-        static extend(options={}){
-            class Surogate extends App{}
-            Object.assign(Surogate.prototype,options);
-            return Surogate;
+        static extend(options = {}) {
+            class Surrogate extends App {
+            }
+            Object.assign(Surrogate.prototype, options);
+            return Surrogate;
         };
+
         constructor(options) {
             options = options || {};
-            var router = new Router(),
+            let router = new Router(),
                 mapHandler;
 
             this.beforeInit.apply(this, arguments);
-            this.context = utils.extend(this.setContext.apply(this, arguments), {
+            this.context = Object.assign(this.setContext.apply(this, arguments), {
                 // Creating `EventBus` More info look in `Mediator` Section
-                eventBus: new Mediator()
-            });
+                eventBus: new Mediator(this.context, (channel, scope)=> {
+                    scope._globalEvents = scope._globalEvents || [];
+                    if (scope._globalEvents.indexOf(channel) === -1) {
+                        scope._globalEvents.push(channel);
+                    }
+                })
+        });
+
             if (this.AppContainer !== undefined) {
                 this.appContainer = new this.AppContainer({
                     appContext: this.context
                 });
+
                 if (this.appContainer._match !== undefined) {
                     mapHandler = this.appContainer._match.bind(this.appContainer);
                 } else {
@@ -73,9 +82,7 @@ define([
                 }
 
                 this.el = this.appContainer.el;
-                setTimeout(function () {
-                    this.el.classList.add('show');
-                }.bind(this), 100);
+
                 triggerRoute(router);
 
             }
@@ -109,6 +116,11 @@ define([
         start(container) {
             if (container instanceof HTMLElement === true) {
                 container.appendChild(this.el);
+                setTimeout(() => {
+                    this.el.classList.add('show');
+                }, 100);
+            } else {
+                throw Error('Contaner should be a HTML element');
             }
         }
     }

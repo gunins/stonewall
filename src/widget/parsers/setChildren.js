@@ -2,7 +2,7 @@
  * Created by guntars on 11/11/14.
  */
 define([
-    '../dom',
+    'templating/dom',
     '../utils',
     './applyEvents',
     './setBinders',
@@ -13,50 +13,48 @@ define([
     //      @private applyElement
     //      @param {Object} elements
     function applyElement(elements, params) {
-        Object.keys(elements).forEach(function (key) {
-
-            var element = elements[key],
-                node    = element._node;
-            if (typeof element == 'string') {
-            } else if (['cp'].indexOf(node.data.type) !== -1) {
-                if (node.children && !element.children) {
-                    element.children = node.children;
-                }
-            } else if (element instanceof  dom.Element !== true &&
-                       (['pl', 'bd', 'rt'].indexOf(node.data.type) !== -1 || node.data.type === undefined)) {
-                elements[key] = new dom.Element(element);
-                if (node.data.type === 'pl' && node.data.tplSet.bind !== undefined) {
-                    var bind = node.data.tplSet.bind;
-                    Object.keys(bind).forEach(function (attr) {
-                        if (params[bind[attr]] !== undefined) {
-                            if (attr !== 'class') {
-                                elements[key].setAttribute(attr, params[bind[attr]]);
-                            } else {
-                                elements[key].addClass(params[bind[attr]]);
-                            }
+        Object.keys(elements).forEach((key)=> {
+            let instance = elements[key];
+            if (typeof instance !== 'string') {
+                let element = instance.elGroup.getFirst();
+                if (element) {
+                    elements[key] = element;
+                    if (element instanceof dom.Element === true &&
+                        (['pl'].indexOf(element._node.data.type) !== -1)
+                    ) {
+                        let node = element._node,
+                            bind = node.data.tplSet.bind;
+                        if (bind) {
+                        console.log(element, bind, params)
+                            Object.keys(bind).forEach((attr)=> {
+                                if (params[bind[attr]] !== undefined) {
+                                    if (attr !== 'class') {
+                                        element.setAttribute(attr, params[bind[attr]]);
+                                    } else {
+                                        element.addClass(params[bind[attr]]);
+                                    }
+                                }
+                            });
                         }
-                    }.bind(this));
-                }
 
+                    }
+                }
             }
-        }.bind(this));
+        });
         return elements;
     }
 
     function setChildren(elements, parentChildren, data, params) {
-        if (Object.keys(data).length === 0) {
-            data = this.data;
-        }
-        parentChildren = (parentChildren) ? applyElement.call(this, parentChildren, params) : {};
-        elements       = (elements) ? applyElement.call(this, elements, params) : {};
+        elements = (elements) ? applyElement.call(this, elements, params) : {};
         Object.keys(elements).forEach(function (key) {
             var children = elements[key].children;
             if (children !== undefined) {
-                children               = setChildren.call(this, children, parentChildren.children, data, params);
+
+                children = setChildren.call(this, children, parentChildren.children || {}, data, params);
                 elements[key].bindings = setBinders(children);
             }
 
-            var child       = elements[key],
+            var child = elements[key],
                 parentChild = parentChildren[key];
 
             if (parentChild !== undefined) {
@@ -71,7 +69,7 @@ define([
                         dom.text(child, parentChild);
                     }
                     else {
-                        dom.replace(child, parentChild, data);
+                        parentChild.run(child.el);
                     }
                     if (parentChild.children !== undefined) {
                         child.children = parentChild.children
@@ -79,8 +77,8 @@ define([
                 }
 
             } else if (this.nodes[key] !== undefined &&
-                       child._node.data.tplSet.noattach === 'true' &&
-                       child._node.data.dataset.bind === undefined) {
+                child._node.data.tplSet.noattach === 'true' &&
+                child._node.data.dataset.bind === undefined) {
                 this.nodes[key].call(this, child, data);
             }
 

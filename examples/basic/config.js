@@ -1,7 +1,7 @@
 require.config({
     baseUrl: './src',
     templateCoders: [
-        'coders/component/CpCoder',
+        'coders/component/cpCoder',
         'coders/placeholders/plCoder',
         'coders/databind/bdCoder',
         'coders/router/RouterCoder',
@@ -10,7 +10,7 @@ require.config({
 
     ],
     templateDecoders: [
-        'coders/component/CpDecoder',
+        'coders/component/cpDecoder',
         'coders/placeholders/plDecoder',
         'coders/databind/bdDecoder',
         'coders/router/RouterDecoder',
