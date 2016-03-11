@@ -15,7 +15,24 @@ define([
             return {
                 data: {
                     cmp: {
-                        item: 'Binded Item From App'
+                        item: {
+                            inner:'Binded Item From App',
+                            class:'binded'
+
+                        },
+                        list:['a','b','c'],
+                        lista:[
+                            {
+                                innera:'Binded Item From App1',
+                                class:'listIn'
+
+                            },
+                            {
+                                innera:'Binded Item From App2',
+                                class:'listIn2'
+
+                            }
+                        ]
                     }
                 }
             }

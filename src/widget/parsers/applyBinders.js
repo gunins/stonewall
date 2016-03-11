@@ -5,130 +5,102 @@ define([
     'templating/dom',
     '../utils',
     'watch',
+    './setBinders',
     './applyEvents',
     './applyAttribute',
     './elOnchange'
-], function (dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange) {
-    var watch        = WatchJS.watch,
-        unwatch      = WatchJS.unwatch,
+], function (dom, utils, WatchJS, setBinders, applyEvents, applyAttribute, elOnChange) {
+    var watch = WatchJS.watch,
+        unwatch = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
-    function parseBinder(objKey, obj, parent, binder) {
-        var events = this.events[binder._node.name];
+    function parseBinder(objKey, obj, binder) {
+        var events = this.events[binder.data.name];
         if (binder !== undefined) {
             var data = obj[objKey];
-            binder.applyAttach();
 
             if (this.nodes[objKey]) {
-                var childBinder = binder;
-                this.nodes[objKey].call(this, childBinder, parent, data);
+                this.nodes[objKey].call(this, binder, data);
             } else {
                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                    var childBinder = binder; //.clone();
-                    childBinder.add(parent);
-                    childBinder.text(data);
-                    if (this.elReady[childBinder._node.name] !== undefined) {
-                        this.elReady[childBinder._node.name].call(this, childBinder, data);
+                    let element = binder.run(true);
+                    element.text(data);
+                    if (this.elReady[element.data.name] !== undefined) {
+                        this.elReady[element.data.name].call(this, element, data);
                     }
-                    elOnChange.call(this, childBinder, data);
-                    if (childBinder._node.data.tplSet.update === 'true') {
-                        watch(obj, objKey, function () {
-                            childBinder.text(obj[objKey]);
-                            elOnChange.call(this, childBinder, obj[objKey]);
-                        }.bind(this));
+                    elOnChange.call(this, element, data);
+                    if (element.data.tplSet.update === 'true') {
+                        watch(obj, objKey, () => {
+                            element.text(obj[objKey]);
+                            elOnChange.call(this, element, obj[objKey]);
+                        });
                     }
-                    applyEvents.call(this, childBinder, events, data);
+                    applyEvents.call(this, element, events, data);
                 } else if (utils.isArray(data)) {
-                    binder.applyAttach();
 
                     var updateChildren = function () {
-                        var hasParent  = false,
-                            bindedData = [],
-                            addItem    = function (item, index) {
-                                var childBinder = utils.extend({}, binder);//.clone();
-                                var isString = false;
+                        let bindedData = [],
+                            addItem = (item, index)=> {
+                                let isString = false;
                                 if (!utils.isArray(item) && !utils.isObject(item)) {
                                     isString = true;
                                 }
-
-                                childBinder._events = [];
-                                if (!hasParent) {
-                                    childBinder.add(parent);
-                                    if (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    hasParent = binder.getParent();
-                                    bindedData.push({
-                                        binder: childBinder,
-                                        data:   item
-                                    });
-                                } else if (index !== undefined && index <= bindedData.length - 1) {
-                                    childBinder.add(parent, hasParent, false, bindedData[index].binder.el);
-                                    if (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    bindedData.splice(index, 0, {
-                                        binder: childBinder,
-                                        data:   item
-                                    });
-
-                                } else {
-                                    var nextSibling;
-                                    if (index > 0) {
-                                        nextSibling = bindedData[index - 1].binder.el.nextSibling;
-                                    }
-                                    childBinder.add(parent, hasParent, false, nextSibling);
-
-                                    if (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    bindedData.push({
-                                        binder: childBinder,
-                                        data:   item
-                                    });
-
+                                let element = binder.run(true, index);
+                                if (isString) {
+                                    element.text(item);
                                 }
 
-                                applyAttribute.call(this, childBinder, item);
-                                applyBinders.call(this, item, childBinder);
+                                bindedData.push({
+                                    binder: element,
+                                    data:   item
+                                });
 
-                                if (this.elReady[childBinder._node.name]) {
-                                    this.elReady[childBinder._node.name].call(this, childBinder, item);
+
+                                applyAttribute.call(this, element, item);
+                                if (element.children) {
+                                    element.bindings = setBinders(element.children);
+                                    applyBinders.call(this, item, element);
                                 }
 
-                                elOnChange.call(this, childBinder, item);
-                                if (isString && childBinder._node.data.tplSet.update === 'true') {
+
+                                if (this.elReady[element.name]) {
+                                    this.elReady[element.name].call(this, element, item);
+                                }
+
+                                elOnChange.call(this, element, item);
+                                if (isString && element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, function () {
-                                        childBinder.text(item);
-                                        elOnChange.call(this, childBinder, item);
+                                        element.text(item);
+                                        elOnChange.call(this, element, item);
                                     }.bind(this));
                                 }
-                                applyEvents.call(this, childBinder, events, item);
+                                applyEvents.call(this, element, events, item);
+
 
                             };
                         data.forEach(addItem.bind(this));
-                        var update     = binder._node.data.tplSet.update;
+                        let update = binder.data.tplSet.update;
                         if (update === 'true') {
-                            var removeMethodNames  = ['pop', 'shift', 'splice'],
-                                insertMethodNames  = ['push', 'unshift'],
+                            let removeMethodNames = ['pop', 'shift', 'splice'],
+                                insertMethodNames = ['push', 'unshift'],
                                 sortingMethodNames = ['reverse', 'sort'];
-                            watch(obj, objKey, function (prop, action, newvalue, oldvalue) {
-                                var clonedData = bindedData.slice(0);
+                            watch(obj, objKey, (prop, action, newvalue, oldvalue)=> {
+                                let clonedData = bindedData.slice(0);
                                 if (oldvalue === undefined && insertMethodNames.indexOf(action) !== -1) {
-                                    var filter = clonedData.filter(function (item) {
+                                    var filter = clonedData.filter((item)=> {
                                         return item.data === newvalue[0];
                                     });
                                     if (filter.length === 0) {
                                         addItem.call(this, newvalue[0], (action === 'unshift') ? 0 : clonedData.length);
                                     }
                                 } else if (removeMethodNames.indexOf(action) !== -1) {
-                                    clonedData.forEach(function (binder) {
+                                    clonedData.forEach((binder)=> {
                                         if (obj[objKey].indexOf(binder.data) === -1) {
                                             binder.binder.remove();
                                             bindedData.splice(bindedData.indexOf(binder), 1);
                                         }
-                                    }.bind(this));
+                                    });
 
                                     if (action === 'splice') {
                                         var vals = Array.prototype.slice.call(newvalue, 2);
@@ -145,31 +117,37 @@ define([
 
                                 }
 
-                            }.bind(this));
+                            });
                         }
                     }
                     updateChildren.call(this);
 
                 } else if (utils.isObject(data)) {
-                    var childBinder = utils.extend({}, binder);
-                    if (childBinder._node.data.type === 'cp') {
-                        if (childBinder.el === undefined) {
-                            dom.add(childBinder, parent, false, data);
-                        } else {
-                            dom.replace(childBinder, binder, data);
-                        }
+                    let element = binder.run(data);
+
+                    if (element.data.type === 'cp') {
+
+                        //binder = binder.run();
+                        /*  if (binder.el === undefined) {
+                         dom.add(binder, parent, false, data);
+                         } else {
+                         dom.replace(binder, binder, data);
+                         }*/
                     }
                     else {
-                        dom.add(childBinder, parent);
-                        applyEvents.call(this, childBinder, events, data);
-                        applyAttribute.call(this, childBinder, data);
-                        applyBinders.call(this, data, childBinder);
+                        applyEvents.call(this, element, events, data);
+                        applyAttribute.call(this, element, data);
+                        if (element.children) {
+                            element.bindings = setBinders(element.children);
+                            applyBinders.call(this, data, element);
+                        }
+
                     }
 
-                    if (this.elReady[childBinder._node.name]) {
-                        this.elReady[childBinder._node.name].call(this, childBinder, data);
+                    if (this.elReady[element.name]) {
+                        this.elReady[element.name].call(this, element, data);
                     }
-                    elOnChange.call(this, childBinder, data);
+                    elOnChange.call(this, element, data);
 
                 }
             }
@@ -177,34 +155,34 @@ define([
 
     };
 
-    function applyBinders(obj, instance) {
-        var binders = instance.bindings,
-            parent  = instance.el;
-
+    function applyBinders(obj, instance,root) {
+        var binders = instance.bindings;
         if (obj && binders !== undefined) {
-            Object.keys(obj).forEach(function (objKey) {
+            Object.keys(obj).forEach((objKey) => {
                 if (binders[objKey] !== undefined) {
                     //TODO: Investigate, why not always an Array
                     if (binders[objKey].forEach !== undefined) {
-                        binders[objKey].forEach(parseBinder.bind(this, objKey, obj, parent));
+                        binders[objKey].forEach(parseBinder.bind(this, objKey, obj));
                     } else {
-                        parseBinder.call(this, objKey, obj, parent, binders[objKey]);
+                        parseBinder.call(this, objKey, obj, binders[objKey]);
                     }
                 }
-            }.bind(this));
+            });
             if (binders) {
-                Object.keys(binders).forEach(function (binderKey) {
+                Object.keys(binders).forEach((binderKey) => {
                     if (obj[binderKey] === undefined) {
-                        var fn = function (prop, action, newvalue, oldvalue) {
+                        var fn = (prop, action, newvalue, oldvalue) => {
                             if (newvalue !== undefined && oldvalue === undefined) {
-                                binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj, parent));
+                                binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj));
                                 unwatch(obj, binderKey, fn);
                             }
-                        }.bind(this);
+                        }
                         watch(obj, binderKey, fn, 0);
                     }
-                }.bind(this));
+                });
             }
+        }else if(!root) {
+            instance.run(obj)
         }
     }
 

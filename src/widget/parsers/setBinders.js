@@ -4,17 +4,19 @@
 define(function () {
 
     function setBinders(children, ignoreCP) {
-        var bindings = false;
-        Object.keys(children).forEach(function (key) {
-            bindings   = bindings || {};
-            var el     = children[key],
-                ignore = (ignoreCP === true && el._node.data.type === 'cp');
-
-            if (el._node && el._node.bind !== undefined && !ignore) {
-                bindings[el._node.bind] = bindings[el._node.bind] || []
-                bindings[el._node.bind].push(el);
+        let bindings = {};
+        Object.keys(children).forEach((key) => {
+            let el = children[key];
+            console.log(ignoreCP, el.data.type === 'cp')
+            if (el && el.data && el.data.bind !== undefined && el.data.type !== 'cp') {
+                bindings[el.data.bind] = bindings[el.data.bind] || []
+                bindings[el.data.bind].push(el);
+            } else if (!ignoreCP && el.data.type === 'cp') {
+                console.log(el)
+                bindings['__cp__'] = bindings['__cp__'] || []
+                bindings['__cp__'].push(el);
             }
-        }.bind(this));
+        });
         return bindings;
     }
 

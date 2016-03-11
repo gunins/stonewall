@@ -50,8 +50,7 @@ define(function () {
     }
 
     function isObject(obj) {
-        var type = typeof obj;
-        return type === 'function' || type === 'object' && !!obj;
+        return obj === Object(obj);
     }
 
     function isArray(obj) {

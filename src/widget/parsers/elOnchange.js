@@ -3,8 +3,8 @@
  */
 define(function () {
     return function (childBinder, data) {
-        if (this.elOnChange[childBinder._node.name] !== undefined) {
-            this.elOnChange[childBinder._node.name].call(this, childBinder, data);
+        if (this.elOnChange[childBinder.name] !== undefined) {
+            this.elOnChange[childBinder.name].call(this, childBinder, data);
         }
     };
 });

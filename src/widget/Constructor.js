@@ -53,8 +53,8 @@ define([
             this.eventBus = new Mediator(this);
             this.context = (data.appContext !== undefined) ? data.appContext : {};
 
-            if (data.name !== undefined) {
-                this.name = data.name;
+            if (node !== undefined && node.name !== undefined) {
+                this.name = node.name;
             }
 
             this.beforeInit.apply(this, arguments);
@@ -84,13 +84,13 @@ define([
                     name: 'root'
                 });
 
-                this.children = setChildren.call(this, template.children, children||{}, this.data, data);
+                this.children = setChildren.call(this, template.children, children, this.data, data);
 
-                //this.bindings = setBinders.call(this, this.children, true);
+                this.bindings = setBinders.call(this, this.children, true);
                 //setRoutes.call(this, this.children);
 
                 if (this.data) {
-                    //this.applyBinders(this.data, this);
+                    this.applyBinders(this.data, this, true);
                 }
 
             }

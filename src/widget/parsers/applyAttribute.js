@@ -9,8 +9,8 @@ define([
         callWatchers = WatchJS.callWatchers;
 
     function applyAttribute(childBinder, data) {
-        var bind = childBinder._node.data.tplSet.bind,
-            update = childBinder._node.data.tplSet.update;
+        var bind = childBinder.data.tplSet.bind,
+            update = childBinder.data.tplSet.update;
         if (bind) {
             Object.keys(bind).forEach(function (bindItem) {
                 var key = bind[bindItem];
