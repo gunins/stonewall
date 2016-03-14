@@ -90,7 +90,7 @@ define([
                 //setRoutes.call(this, this.children);
 
                 if (this.data) {
-                    this.applyBinders(this.data, this, true);
+                    this.applyBinders(this.data, this);
                 }
 
             }

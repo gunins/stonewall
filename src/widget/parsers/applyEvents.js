@@ -6,7 +6,8 @@ define(function () {
     //      @param {dom.Element} element
     //      @param {Array} events
     //      @param {Object} data
-    function applyEvents(element, events, data) {
+    function applyEvents(element, data) {
+        var events = this.events[element.name];
         if (events !== undefined && element.el !== undefined) {
             events.forEach(function (event) {
                 this._events.push(element.on(event.name, event.action, this, data));

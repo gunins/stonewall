@@ -8,15 +8,15 @@ define([
     './setBinders',
     './applyEvents',
     './applyAttribute',
-    './elOnchange'
-], function (dom, utils, WatchJS, setBinders, applyEvents, applyAttribute, elOnChange) {
+    './elOnchange',
+    './elReady'
+], function (dom, utils, WatchJS, setBinders, applyEvents, applyAttribute, elOnChange,elReady) {
     var watch = WatchJS.watch,
         unwatch = WatchJS.unwatch,
         callWatchers = WatchJS.callWatchers;
     //TODO: This is necessary for Safari and FF, but possible memory leak, need check later.
 
     function parseBinder(objKey, obj, binder) {
-        var events = this.events[binder.data.name];
         if (binder !== undefined) {
             var data = obj[objKey];
 
@@ -26,9 +26,7 @@ define([
                 if (!utils.isArray(data) && !utils.isObject(data)) {
                     let element = binder.run(true);
                     element.text(data);
-                    if (this.elReady[element.data.name] !== undefined) {
-                        this.elReady[element.data.name].call(this, element, data);
-                    }
+                    elReady.call(this, element, data);
                     elOnChange.call(this, element, data);
                     if (element.data.tplSet.update === 'true') {
                         watch(obj, objKey, () => {
@@ -36,7 +34,7 @@ define([
                             elOnChange.call(this, element, obj[objKey]);
                         });
                     }
-                    applyEvents.call(this, element, events, data);
+                    applyEvents.call(this, element, data);
                 } else if (utils.isArray(data)) {
 
                     var updateChildren = function () {
@@ -64,10 +62,7 @@ define([
                                 }
 
 
-                                if (this.elReady[element.name]) {
-                                    this.elReady[element.name].call(this, element, item);
-                                }
-
+                                elReady.call(this, element, data);
                                 elOnChange.call(this, element, item);
                                 if (isString && element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, function () {
@@ -75,7 +70,7 @@ define([
                                         elOnChange.call(this, element, item);
                                     }.bind(this));
                                 }
-                                applyEvents.call(this, element, events, item);
+                                applyEvents.call(this, element, item);
 
 
                             };
@@ -125,17 +120,8 @@ define([
                 } else if (utils.isObject(data)) {
                     let element = binder.run(data);
 
-                    if (element.data.type === 'cp') {
-
-                        //binder = binder.run();
-                        /*  if (binder.el === undefined) {
-                         dom.add(binder, parent, false, data);
-                         } else {
-                         dom.replace(binder, binder, data);
-                         }*/
-                    }
-                    else {
-                        applyEvents.call(this, element, events, data);
+                    if (element.data.type !== 'cp') {
+                        applyEvents.call(this, element, data);
                         applyAttribute.call(this, element, data);
                         if (element.children) {
                             element.bindings = setBinders(element.children);
@@ -144,9 +130,7 @@ define([
 
                     }
 
-                    if (this.elReady[element.name]) {
-                        this.elReady[element.name].call(this, element, data);
-                    }
+                    elReady.call(this, element, data);
                     elOnChange.call(this, element, data);
 
                 }
@@ -155,34 +139,30 @@ define([
 
     };
 
-    function applyBinders(obj, instance,root) {
-        var binders = instance.bindings;
-        if (obj && binders !== undefined) {
-            Object.keys(obj).forEach((objKey) => {
-                if (binders[objKey] !== undefined) {
-                    //TODO: Investigate, why not always an Array
-                    if (binders[objKey].forEach !== undefined) {
-                        binders[objKey].forEach(parseBinder.bind(this, objKey, obj));
+    function applyBinders(obj, instance) {
+        let binders = instance.bindings;
+        if (binders) {
+            if (binders['__cp__'].length > 0) {
+                binders['__cp__'].forEach(binder=>binder.run(obj));
+            }
+            let keys = Object.keys(binders);
+            if (obj && keys.length > 0) {
+                keys.forEach((binderKey) => {
+                    if (obj[binderKey] !== undefined) {
+                        binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj));
                     } else {
-                        parseBinder.call(this, objKey, obj, binders[objKey]);
-                    }
-                }
-            });
-            if (binders) {
-                Object.keys(binders).forEach((binderKey) => {
-                    if (obj[binderKey] === undefined) {
-                        var fn = (prop, action, newvalue, oldvalue) => {
-                            if (newvalue !== undefined && oldvalue === undefined) {
-                                binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj));
-                                unwatch(obj, binderKey, fn);
+                        if (obj[binderKey] === undefined) {
+                            let fn = (prop, action, newvalue, oldvalue) => {
+                                if (newvalue !== undefined && oldvalue === undefined) {
+                                    binders[binderKey].forEach(parseBinder.bind(this, binderKey, obj));
+                                    unwatch(obj, binderKey, fn);
+                                }
                             }
+                            watch(obj, binderKey, fn, 0);
                         }
-                        watch(obj, binderKey, fn, 0);
                     }
                 });
             }
-        }else if(!root) {
-            instance.run(obj)
         }
     }
 

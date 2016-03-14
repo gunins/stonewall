@@ -80,12 +80,11 @@ define([
                     this.nodes[key].call(this, child, data);
                 }
 
-                if (this.elReady[key] !== undefined && (child.el !== undefined || child.instance !== undefined)) {
+                if (this.elReady[key] !== undefined && (child.el !== undefined)) {
                     this.elReady[key].call(this, child, data);
                 }
 
-                var events = this.events[key];
-                applyEvents.call(this, child, events);
+                applyEvents.call(this, child);
 
             });
             return elements
