@@ -98,6 +98,24 @@ define([
             });
         }, 5000);
 
+        setTimeout(function () {
+            data.val.list.reverse();
+        }, 6000);
+
+        setTimeout(function () {
+            data.val.list.sort(function (prev, next) {
+                if (prev.test.badge > next.test.badge) {
+                    return 1;
+                }
+                if (prev.test.badge < next.test.badge) {
+                    return -1;
+                }
+                // a must be equal to b
+                return 0;
+            });
+            console.log(data.val.list)
+        }, 7000);
+
     }
 
     return App.extend({

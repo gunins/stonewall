@@ -5,9 +5,8 @@ define([
     'templating/dom',
     '../utils',
     './applyEvents',
-    './setBinders',
-    './deepBindings'
-], function (dom, utils, applyEvents, setBinders, deepBindings) {
+    './elReady'
+], function (dom, utils, applyEvents, elReady) {
     //Applying dom.Element to template elements.
     //
     //      @private applyElement
@@ -46,20 +45,10 @@ define([
         if (els) {
             let elements = applyElement.call(this, els, params);
             Object.keys(elements).forEach((key)=> {
-                let children = elements[key].children;
-                if (children !== undefined) {
-                    //children = setChildren.call(this, children, parentChildren.children, data, params);
-                    //elements[key].bindings = setBinders(children);
-                }
-
                 let child = elements[key],
                     parentChild = parentChildren[key];
 
                 if (parentChild !== undefined) {
-                 /*   if (parentChild.children !== undefined) {
-                        //parentChild.bindings = deepBindings(parentChild.children);
-                    }*/
-
                     if (this.nodes[key] !== undefined) {
                         this.nodes[key].call(this, child, parentChild, data);
                     } else if (child !== undefined) {
@@ -75,15 +64,10 @@ define([
                     }
 
                 } else if (this.nodes[key] !== undefined &&
-                    child.data.tplSet.noattach === 'true' &&
-                    child.data.dataset.bind === undefined) {
+                    child.data.tplSet.noattach === 'true') {
                     this.nodes[key].call(this, child, data);
                 }
-
-                if (this.elReady[key] !== undefined && (child.el !== undefined)) {
-                    this.elReady[key].call(this, child, data);
-                }
-
+                elReady.call(this, child, data);
                 applyEvents.call(this, child);
 
             });
