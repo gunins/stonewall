@@ -3,75 +3,35 @@
  */
 define([
     'templating/dom',
-    '../utils',
-    './applyEvents',
-    './elReady'
-], function (dom, utils, applyEvents, elReady) {
-    //Applying dom.Element to template elements.
-    //
-    //      @private applyElement
-    //      @param {Object} elements
-    function applyElement(elements, params) {
-        Object.keys(elements).forEach((key)=> {
-            let instance = elements[key];
-            if (typeof instance !== 'string') {
-                let element = instance.elGroup.getFirst();
-                if (element) {
-                    elements[key] = element;
-                    if (element instanceof dom.Element === true &&
-                        (['pl'].indexOf(element.data.type) !== -1)) {
+    './addChildren'
+], function (dom, addChildren) {
 
-                        let bind = element.data.tplSet.bind;
-                        if (bind) {
-                            Object.keys(bind).forEach((attr)=> {
-                                if (params[bind[attr]] !== undefined) {
-                                    if (attr !== 'class') {
-                                        element.setAttribute(attr, params[bind[attr]]);
-                                    } else {
-                                        element.addClass(params[bind[attr]]);
-                                    }
-                                }
-                            });
-                        }
 
-                    }
-                }
-            }
-        });
-        return elements;
-    }
-
-    function setChildren(els, parentChildren = {}, data = {}, params) {
-        if (els) {
-            let elements = applyElement.call(this, els, params);
-            Object.keys(elements).forEach((key)=> {
-                let child = elements[key],
-                    parentChild = parentChildren[key];
+    function setChildren(parentChildren = {}, data = {}) {
+        let elements = this.children;
+        if (elements) {
+            Object.keys(elements).forEach((name)=> {
+                let child = elements[name],
+                    parentChild = parentChildren[name];
 
                 if (parentChild !== undefined) {
-                    if (this.nodes[key] !== undefined) {
-                        this.nodes[key].call(this, child, parentChild, data);
+                    if (this.nodes[name] !== undefined) {
+                        this.nodes[name].call(this, child, parentChild, data);
                     } else if (child !== undefined) {
                         if (typeof parentChild == 'string') {
                             dom.text(child, parentChild);
                         }
                         else {
-                            parentChild.run(child.el);
-                        }
-                        if (parentChild.children !== undefined) {
-                            child.children = parentChild.children
+                            child = parentChild.run(child.el);
                         }
                     }
-
-                } else if (this.nodes[key] !== undefined &&
+                } else if (this.nodes[name] !== undefined &&
                     child.data.tplSet.noattach === 'true') {
-                    this.nodes[key].call(this, child, data);
-                }
-                elReady.call(this, child, data);
-                applyEvents.call(this, child);
 
+                    this.nodes[name].call(this, child, data);
+                }
+                addChildren.call(this, name, child, data);
             });
-            return elements
         }
     }
 

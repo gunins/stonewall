@@ -113,7 +113,6 @@ define([
                 // a must be equal to b
                 return 0;
             });
-            console.log(data.val.list)
         }, 7000);
 
     }

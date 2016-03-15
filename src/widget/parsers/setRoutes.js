@@ -47,8 +47,8 @@ define([
         var names = Object.keys(children);
         names.forEach(function (name) {
             var child = children[name];
-            var route = (child._node !== undefined) ? child._node.data.route : undefined;
-            if (route !== undefined && child._node.data.type !== 'cp') {
+            var route = (child.data !== undefined) ? child.data.route : undefined;
+            if (route !== undefined && child.data.type !== 'cp') {
                 var matches    = match(route, function (match) {
                     if (child.children !== undefined) {
                         matchRoute.call(this, child.children, match, parent);
@@ -69,7 +69,7 @@ define([
                         destroyComponent(child);
                     } else {
                         applyToChildren.call(this, child.children, function (cp, instance) {
-                            var data    = cp._node.data,
+                            var data    = cp.data,
                                 dataSet = data.dataset;
 
                             dataSet.params = params;
@@ -87,9 +87,7 @@ define([
                     }
 
                     if (child.el === undefined) {
-                        child.applyAttach();
-
-                        dom.add(child, parent, false);
+                        child.run(true);
 
                         applyToChildren.call(this, child.children, function (cp, instance) {
                             if (instance && instance.to) {
@@ -143,7 +141,7 @@ define([
                     }.bind(this));
                 }.bind(this));
 
-            } else if (child.children !== undefined && child._node.data.type !== 'cp') {
+            } else if (child.children !== undefined && child.data.type !== 'cp') {
                 matchRoute.call(this, child.children, match, parent);
             } else if (child.instance !== undefined) {
                 var instance = child.instance;

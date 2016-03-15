@@ -17,17 +17,29 @@
 //      });
 define([
     'require',
-    'templating/dom',
-    './utils',
-    './Mediator',
     'templating/Decoder',
+    'templating/dom',
+    './Mediator',
     './parsers/applyAttribute',
     './parsers/setChildren',
     './parsers/applyBinders',
     './parsers/setBinders',
     './parsers/setRoutes',
-    './parsers/applyEvents'
-], function (require, dom, utils, Mediator, Decoder, applyAttribute, setChildren, applyBinders, setBinders, setRoutes, applyEvents) {
+    './parsers/applyElement',
+    './parsers/addChildren'
+], function (
+    require,
+    Decoder,
+    dom,
+    Mediator,
+    applyAttribute,
+    setChildren,
+    applyBinders,
+    setBinders,
+    setRoutes,
+    applyElement,
+    addChildren
+) {
     'use strict';
 
     // Constructor Class
@@ -44,11 +56,14 @@ define([
             return Surrogate;
         };
 
-        constructor(data, children, dataSet, node) {
+        constructor(data, parentChildren, dataSet, node) {
+            //for Backwards compatability
+            this.instance = this;
             this._routes = [];
             this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
+
             //this._node = node;
             this.eventBus = new Mediator(this);
             this.context = (data.appContext !== undefined) ? data.appContext : {};
@@ -60,12 +75,12 @@ define([
             this.beforeInit.apply(this, arguments);
 
 
-            // Remeber remove this
-            if (node && node.getInstance) {
-                var instance = node.getInstance();
-                instance.instance = this;
-                instance.eventBus = this.eventBus;
-            }
+            /*   // Remeber remove this
+             if (node && node.getInstance) {
+             var instance = node.getInstance();
+             instance.instance = this;
+             instance.eventBus = this.eventBus;
+             }*/
 
             if (this.template) {
                 var keys = (dataSet) ? Object.keys(dataSet) : [],
@@ -84,11 +99,12 @@ define([
                     name: 'root'
                 });
 
-                this.children = setChildren.call(this, template.children, children, this.data, data);
+                this.children = applyElement.call(this, template.children, data);
+
+                setChildren.call(this, parentChildren, this.data);
 
                 this.bindings = setBinders.call(this, this.children, true);
-                //setRoutes.call(this, this.children);
-
+                setRoutes.call(this, this.children);
                 if (this.data) {
                     this.applyBinders(this.data, this);
                 }
@@ -193,12 +209,12 @@ define([
             }
 
             var destroy = function (instance) {
-                var keys = Object.keys(instance);
+                let keys = Object.keys(instance);
                 if (keys.length > 0) {
                     keys.forEach(function (key) {
-                        var child = instance[key];
-                        if (child.instance !== undefined && child.instance.destroy !== undefined) {
-                            child.instance.destroy();
+                        let child = instance[key];
+                        if (child !== undefined && child.destroy !== undefined) {
+                            child.destroy();
                         } else if (child.remove !== undefined) {
                             if (child.children) {
                                 destroy(child.children);
@@ -211,6 +227,10 @@ define([
             destroy(this.children);
             this.root.remove();
         };
+
+        remove() {
+            return this.destroy
+        }
 
         setRoutes(instance) {
             if (instance !== undefined) {
@@ -249,27 +269,15 @@ define([
         //  @param {Element} el
         //  @param {Object} data
         setChildren(el, data) {
-            var name = el._node.name;
-            if (this.children[name] !== undefined && this.children[name].el !== undefined) {
-                dom.detach(this.children[name]); //.detach();
-            }
-            el.applyAttach();
-
-            if (el._node.data.type !== 'cp') {
-                this.children[name] = new dom.Element(el);
+            let name = el.data.name;
+            let instance = this.children[name];
+            if (instance !== undefined && instance.el !== undefined) {
+                instance.remove();
             }
 
-            this.children[name].placeholder = this.el.querySelector('#' + el._node.id);
-            this.children[name].el = el.run(this.el, false, false, data);
+            instance = el.run(data);
+            addChildren.call(this, name, instance, data);
 
-            if (this.elReady[name] !== undefined && this.children[name].el !== undefined) {
-                this.elReady[name].call(this, this.children[name], data);
-            }
-
-            var events = this.events[name];
-            applyEvents.call(this, this.children[name], events);
-
-            var instance = this.children[name]._node.data.instance;
             this.setRoutes(instance);
             this.rebind();
         };

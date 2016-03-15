@@ -8,7 +8,7 @@ define(function () {
     //      @param {Object} data
     function applyEvents(element, data) {
         var events = this.events[element.name];
-        if (events !== undefined && element.el !== undefined) {
+        if (events !== undefined && element.el !== undefined&&element.data.type !== 'cp') {
             events.forEach(function (event) {
                 this._events.push(element.on(event.name, event.action, this, data));
             }.bind(this));
