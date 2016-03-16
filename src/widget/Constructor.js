@@ -21,26 +21,45 @@ define([
     'templating/dom',
     './Mediator',
     './parsers/applyAttribute',
-    './parsers/setChildren',
+    './parsers/applyParent',
     './parsers/applyBinders',
     './parsers/setBinders',
     './parsers/setRoutes',
     './parsers/applyElement',
     './parsers/addChildren'
-], function (
-    require,
-    Decoder,
-    dom,
-    Mediator,
-    applyAttribute,
-    setChildren,
-    applyBinders,
-    setBinders,
-    setRoutes,
-    applyElement,
-    addChildren
-) {
+], function (require,
+             Decoder,
+             dom,
+             Mediator,
+             applyAttribute,
+             applyParent,
+             applyBinders,
+             setBinders,
+             setRoutes,
+             applyElement,
+             addChildren) {
     'use strict';
+
+    function destroy(instance) {
+        let keys = Object.keys(instance);
+        if (keys.length > 0) {
+            keys.forEach((key)=> {
+                if (key !== 'root') {
+                    let children = instance[key];
+                    if (children.elGroup !== undefined && children.elGroup.size > 0) {
+                        children.elGroup.forEach(child=> {
+                            if (child !== undefined && child.remove !== undefined) {
+                                if (child.children !== undefined) {
+                                    destroy(child.children);
+                                }
+                                child.remove();
+                            }
+                        })
+                    }
+                }
+            });
+        }
+    }
 
     // Constructor Class
     //
@@ -100,22 +119,19 @@ define([
                 });
 
                 this.children = applyElement.call(this, template.children, data);
-
-                setChildren.call(this, parentChildren, this.data);
-
+                applyParent.call(this, parentChildren, this.data);
                 this.bindings = setBinders.call(this, this.children, true);
-                setRoutes.call(this, this.children);
+
                 if (this.data) {
                     this.applyBinders(this.data, this);
                 }
 
-            }
+                setRoutes.call(this, this.children);
+                addChildren.call(this, 'root', this.root);
 
-            else {
-
+            } else {
                 this.el = document.createElement('div');
             }
-
             this.init.apply(this, arguments);
         }
 
@@ -188,17 +204,14 @@ define([
         //Removing widget from Dom
         //
         //      @method destroy
-        destroy() {
+        destroy(force) {
             this.onDestroy();
-            this.eventBus.remove();
+            this.eventBus.clear();
             while (this._events.length > 0) {
                 this._events[0].remove();
                 this._events.shift();
             }
-            while (this.root._events.length > 0) {
-                this.root._events[0].remove();
-                this.root._events.shift();
-            }
+
             while (this._appliedRoutes.length > 0) {
                 this._appliedRoutes[0].remove();
                 this._appliedRoutes.shift();
@@ -208,28 +221,19 @@ define([
                 this._globalEvents.shift();
             }
 
-            var destroy = function (instance) {
-                let keys = Object.keys(instance);
-                if (keys.length > 0) {
-                    keys.forEach(function (key) {
-                        let child = instance[key];
-                        if (child !== undefined && child.destroy !== undefined) {
-                            child.destroy();
-                        } else if (child.remove !== undefined) {
-                            if (child.children) {
-                                destroy(child.children);
-                            }
-                            child.remove();
-                        }
-                    });
-                }
-            }
             destroy(this.children);
             this.root.remove();
+            if (force && this._matches) {
+                this.matches.remove();
+            }
+            delete this.el;
+            if (this.elGroup !== undefined && this.el !== undefined) {
+                this.elGroup.delete(this.el);
+            }
         };
 
         remove() {
-            return this.destroy
+            this.destroy()
         }
 
         setRoutes(instance) {
@@ -240,14 +244,14 @@ define([
 
         _applyRoutes(matches) {
             while (this._routes.length > 0) {
-                var instance = this._routes[0];
+                let instance = this._routes[0];
                 if (instance && instance._match) {
                     matches.setRoutes(function (routes) {
-                        instance._match.call(instance, function () {
-                            var match = routes.match.apply(routes, arguments);
+                        instance._match.call(instance, (...args)=> {
+                            let match = routes.match.apply(routes, args);
                             this._appliedRoutes.push(match)
                             return match;
-                        }.bind(this));
+                        });
                         routes.run();
                     }.bind(this));
                 }
@@ -275,7 +279,7 @@ define([
                 instance.remove();
             }
 
-            instance = el.run(data);
+            instance = el.run(data || true);
             addChildren.call(this, name, instance, data);
 
             this.setRoutes(instance);

@@ -10,7 +10,9 @@ define([
         applyEvents.call(this, child);
         elReady.call(this, child, data);
         elOnchange.call(this, child, data);
+
         this.children[name] = child;
+        return child;
     }
 
     return addChildren;

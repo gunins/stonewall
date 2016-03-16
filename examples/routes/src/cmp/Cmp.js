@@ -26,6 +26,7 @@ define([
         template:    template,
         init:        function (data) {
             console.log('init'); //, this.el, data);
+            //console.log(this)
         },
         match:       function (match) {
             //console.log(match, 'match');
@@ -57,9 +58,9 @@ define([
         },
         nodes:       {
             footer: function (el) {
-                setTimeout(function () {
+                setTimeout(()=> {
                     this.setChildren(el);
-                }.bind(this), 2000)
+                }, 2000)
             }
         }
     });

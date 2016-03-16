@@ -9,6 +9,9 @@ define([
 
     return Constructor.extend({
         template: template,
+        init(){
+
+        },
         nodes:    {
             panel(el, data){
                 this.setChildren(el, data);
