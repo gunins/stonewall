@@ -49,10 +49,7 @@ define([
                     if (children.elGroup !== undefined && children.elGroup.size > 0) {
                         children.elGroup.forEach(child=> {
                             if (child !== undefined && child.remove !== undefined) {
-                                if (child.children !== undefined) {
-                                    destroy(child.children);
-                                }
-                                child.remove();
+                                child.remove(true);
                             }
                         })
                     }
@@ -208,32 +205,33 @@ define([
             this.onDestroy();
             this.eventBus.clear();
             while (this._events.length > 0) {
-                this._events[0].remove();
-                this._events.shift();
+                this._events.shift().remove();
             }
 
             while (this._appliedRoutes.length > 0) {
-                this._appliedRoutes[0].remove();
-                this._appliedRoutes.shift();
+                this._appliedRoutes.shift().remove();
             }
+
             while (this._globalEvents.length > 0) {
-                this._globalEvents[0].remove();
-                this._globalEvents.shift();
+                this._globalEvents.shift().remove();
             }
 
             destroy(this.children);
-            this.root.remove();
             if (force && this._matches) {
-                this.matches.remove();
+                this._matches.remove();
             }
-            delete this.el;
+
             if (this.elGroup !== undefined && this.el !== undefined) {
                 this.elGroup.delete(this.el);
             }
+            this.root.remove();
+
+            delete this.el;
+
         };
 
-        remove() {
-            this.destroy()
+        remove(...args) {
+            this.destroy(...args);
         }
 
         setRoutes(instance) {
@@ -244,18 +242,17 @@ define([
 
         _applyRoutes(matches) {
             while (this._routes.length > 0) {
-                let instance = this._routes[0];
+                let instance = this._routes.shift();
                 if (instance && instance._match) {
-                    matches.setRoutes(function (routes) {
-                        instance._match.call(instance, (...args)=> {
-                            let match = routes.match.apply(routes, args);
-                            this._appliedRoutes.push(match)
+                    matches.setRoutes((routes)=> {
+                        instance._match((...args)=> {
+                            let match = routes.match(...args);
+                            this._appliedRoutes.push(match);
                             return match;
                         });
                         routes.run();
-                    }.bind(this));
+                    });
                 }
-                this._routes.shift();
             }
             matches.rebind();
         };
@@ -273,8 +270,8 @@ define([
         //  @param {Element} el
         //  @param {Object} data
         setChildren(el, data) {
-            let name = el.data.name;
-            let instance = this.children[name];
+            let name = el.data.name,
+                instance = this.children[name];
             if (instance !== undefined && instance.el !== undefined) {
                 instance.remove();
             }

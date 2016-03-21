@@ -25,11 +25,11 @@ define([
     return Constructor.extend({
         template:    template,
         init:        function (data) {
-            console.log('init'); //, this.el, data);
+            // console.log('init'); //, this.el, data);
             //console.log(this)
         },
         match:       function (match) {
-            //console.log(match, 'match');
+            // console.log(match, 'match');
             match('/:id').to(function (id) {
                 console.log('custom', id);
             })
@@ -44,6 +44,9 @@ define([
         query:       function (params) {
             this.children.input.val(params.getQuery().id || '');
             this.children.inputA.val(params.getQuery().id || '');
+        },
+        onDestroy:function () {
+          // console.log('cpm', this);
         },
         getLocation: function () {
 
