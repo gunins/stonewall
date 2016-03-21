@@ -291,8 +291,8 @@ define([
         // @param {Object} children
         // @param {Object} dataSet (Model for bindings)
         addComponent(Component, options) {
-            var name = options.name;
-            var container = options.container;
+            let name = options.name,
+                container = options.container;
 
             if (name === undefined) {
                 throw ('you have to define data.name for component.')
@@ -301,30 +301,25 @@ define([
             } else if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')
             }
-            var component = this.setComponent(Component, options);
+            let component = this.setComponent(Component, options);
 
-            component.run(options.container);
-            this.children[name] = component;
-            this.setRoutes(component.instance);
+            let instance =component.run(options.container);
+            this.children[name] = instance;
+            this.setRoutes(instance);
             this.rebind();
             return component;
         };
 
         setComponent(Component, options) {
-            var instance = {
-                name:  options.name,
-                _node: {
-                    data: {
-                        tag:  'div',
-                        type: 'cp'
-                    }
+            let instance = {
+                name: options.name,
+                data: {
+                    tag:  'div',
+                    type: 'cp'
                 },
-                run:   function (container) {
+                run:  (container)=> {
                     options.appContext = this.context;
-                    var cp = new Component(options, options.children, options.data);
-                    instance.instance = cp;
-                    instance.eventBus = cp.eventBus;
-                    instance.children = instance._node.children = cp.children;
+                    let cp = new Component(options, options.children, options.data);
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {
@@ -332,8 +327,8 @@ define([
                     } else if (container.el !== undefined) {
                         dom.append(container, cp);
                     }
-                    return cp.el;
-                }.bind(this)
+                    return cp;
+                }
             }
             return instance;
         }

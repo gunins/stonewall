@@ -13,7 +13,7 @@ define([
         Object.keys(elements).forEach((key)=> {
             let instance = elements[key];
             if (typeof instance !== 'string') {
-                let element = instance.elGroup.getFirst();
+                let element = instance.elGroup.first;
                 if (element) {
                     instances[key] = element;
                     if (element instanceof dom.Element === true &&

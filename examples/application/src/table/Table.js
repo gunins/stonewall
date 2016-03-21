@@ -8,20 +8,19 @@ define([
     return Constructor.extend({
         template: template,
         init: function () {
-            console.log('tableInit')
         },
         events: {
             tbody: [
                 {
                     name: 'click',
-                    action: function (e, node) {
-                        node.warning = node.warning || false;
-                        if (!node.warning) {
-                            node.warning = true;
-                            node.addClass('warning');
+                    action: function (e, data) {
+                        data.warning = data.warning || false;
+                        if (!data.warning) {
+                            data.warning = true;
+                            data.addClass('warning');
                         } else {
-                            node.warning = false;
-                            node.removeClass('warning');
+                            data.warning = false;
+                            data.removeClass('warning');
 
                         }
                     }
@@ -29,21 +28,15 @@ define([
             ]
 
         },
-        nodes: {
-            header: function (el, parent) {
-                el.replace(parent);
-                this.applyBinders(this.data, parent);
-            },
-            value: function (el, parent, data) {
-                el.add(parent);
+        elReady: {
+
+            value: function (el, data) {
                 el.text(data.text);
                 el.setStyle('color', data.color);
                 watch(data, "text", function () {
                     el.text(data.text);
                 });
-            }
-        },
-        elReady: {
+            },
             tbody: function (el, data) {
                 el.addClass(data.class);
             }

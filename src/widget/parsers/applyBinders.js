@@ -63,7 +63,7 @@ define([
 
 
                                 applyEvents.call(this, element, item);
-                                elReady.call(this, element, data);
+                                elReady.call(this, element, item);
                                 elOnChange.call(this, element, item);
 
                                 if (isString && element.data.tplSet.update === 'true') {

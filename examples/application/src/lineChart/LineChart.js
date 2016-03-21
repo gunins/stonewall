@@ -9,9 +9,8 @@ define([
         template: template,
         init:     function (data, children) {
         },
-        nodes:    {
-            content: function (el, parent, data) {
-                el.add(parent);
+        elReady:  {
+            content: function (el, data) {
                 el.onDOMAttached().then(function () {
                     var chart = new Chart();
                     chart.start(el, data);

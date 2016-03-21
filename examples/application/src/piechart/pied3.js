@@ -74,8 +74,8 @@ define([
             .style("fill", function (d, i) {
                 return color(i);
             }).each(function (d) {
-                this._current = d;
-            });
+            this._current = d;
+        });
 
         this.g.append("text")
             .attr("transform", function (d) {
@@ -88,8 +88,8 @@ define([
             .text(function (d) {
                 return d.data.age;
             }).each(function (d) {
-                this._current = d;
-            });
+            this._current = d;
+        });
 
     }
     Pie.prototype.redraw = function (data) {
