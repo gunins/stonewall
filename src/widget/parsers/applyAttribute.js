@@ -4,38 +4,33 @@
 define([
     'watch'
 ], function (WatchJS) {
-    var watch = WatchJS.watch,
-        unwatch = WatchJS.unwatch,
-        callWatchers = WatchJS.callWatchers;
+    var watch = WatchJS.watch;
 
     function applyAttribute(childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update;
         if (bind) {
-            Object.keys(bind).forEach(function (bindItem) {
-                var key = bind[bindItem];
-                var dataItem = data[key];
+            Object.keys(bind).forEach((bindItem)=> {
+                let key = bind[bindItem],
+                    dataItem = data[key];
                 if (bindItem === 'class') {
-                    var currClass;
-
-                    function addClass(className) {
-                        if (className !== undefined && className !== '') {
-                            childBinder.addClass(className);
-                            return className;
-                        } else {
-                            return false;
-                        }
-                    }
-
-                    currClass = addClass(dataItem)
+                    let addClass = (className)=> {
+                            if (className !== undefined && className !== '') {
+                                childBinder.addClass(className);
+                                return className;
+                            } else {
+                                return false;
+                            }
+                        },
+                        currClass = addClass(dataItem);
 
                     if (update === 'true') {
-                        watch(data, key, function () {
+                        watch(data, key, ()=> {
                             if (currClass) {
                                 childBinder.removeClass(currClass);
                             }
                             currClass = addClass(data[key]);
-                        }.bind(this));
+                        });
                     }
 
                 } else if (bindItem === 'checked') {
@@ -43,36 +38,36 @@ define([
                         childBinder.el.checked = dataItem;
                     }
                     if (update === 'true') {
-                        watch(data, key, function () {
+                        watch(data, key, ()=> {
                             childBinder.el.checked = data[key];
-                        }.bind(this));
+                        });
                     }
                 } else if (bindItem === 'value') {
                     if (dataItem !== undefined) {
                         childBinder.el.value = dataItem;
                     }
                     if (update === 'true') {
-                        watch(data, key, function () {
+                        watch(data, key, ()=> {
                             childBinder.el.value = data[key];
-                        }.bind(this));
+                        });
                     }
                 } else if (bindItem === 'required') {
                     if (dataItem !== undefined) {
                         childBinder.el.required = dataItem;
                     }
                     if (update === 'true') {
-                        watch(data, key, function () {
+                        watch(data, key, ()=> {
                             childBinder.el.required = data[key];
-                        }.bind(this));
+                        });
                     }
                 } else {
                     if (dataItem !== undefined) {
                         childBinder.setAttribute(bindItem, dataItem);
                     }
                     if (update === 'true') {
-                        watch(data, key, function () {
+                        watch(data, key, ()=> {
                             childBinder.setAttribute(bindItem, data[key]);
-                        }.bind(this));
+                        });
                     }
                 }
 
@@ -80,9 +75,9 @@ define([
                     childBinder.text(data.text);
                 }
                 if (update === 'true') {
-                    watch(data, 'text', function () {
+                    watch(data, 'text', ()=> {
                         childBinder.text(data.text);
-                    }.bind(this));
+                    });
                 }
 
             });

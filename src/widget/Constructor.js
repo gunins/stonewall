@@ -39,6 +39,8 @@ define([
              applyElement,
              addChildren) {
     'use strict';
+
+    //TODO: need better Solution later. Context is too global;
     var context = {};
 
     function destroy(instance) {
@@ -81,7 +83,6 @@ define([
             this._events = [];
             this._globalEvents = [];
 
-            //this._node = node;
             this.eventBus = new Mediator(this);
 
             this.context = context;
@@ -98,7 +99,7 @@ define([
 
 
             if (this.template) {
-                var keys = (dataSet) ? Object.keys(dataSet) : [],
+                let keys = (dataSet) ? Object.keys(dataSet) : [],
                     contextData = (keys.length > 0) ? dataSet : this.context.data;
 
                 if (!this.data && contextData) {
@@ -115,14 +116,14 @@ define([
                 });
 
                 this.children = applyElement(template.children, data);
-                applyParent.call(this, parentChildren, this.data);
-                this.bindings = setBinders.call(this, this.children, true);
+                applyParent(this, parentChildren, this.data);
+                this.bindings = setBinders(this.children, true);
 
                 if (this.data) {
                     this.applyBinders(this.data, this);
                 }
 
-                setRoutes.call(this, this.children);
+                setRoutes(this, this.children);
                 addChildren.call(this, 'root', this.root);
 
             } else {
@@ -301,13 +302,12 @@ define([
             } else if (this.children[name] !== undefined) {
                 throw ('Component using name:' + name + '! already defined.')
             }
-            let component = this.setComponent(Component, options);
-
-            let instance =component.run(options.container);
+            let component = this.setComponent(Component, options),
+                instance = component.run(options.container);
             this.children[name] = instance;
             this.setRoutes(instance);
             this.rebind();
-            return component;
+            return instance;
         };
 
         setComponent(Component, options) {

@@ -16,14 +16,13 @@
 //      });
 define([
     './Mediator',
-    'router/Router',
-    './utils'
-], function (Mediator, Router, utils) {
+    'router/Router'
+], function (Mediator, Router) {
     'use strict';
     function triggerRoute(router) {
         router.start();
         function onHashChange() {
-            var match = window.location.href.match(/#(.*)$/);
+            let match = window.location.href.match(/#(.*)$/);
             router.trigger(match ? match[1] : '');
         };
         window.addEventListener('hashchange', onHashChange, false);
@@ -46,8 +45,7 @@ define([
 
         constructor(options) {
             options = options || {};
-            let router = new Router(),
-                mapHandler;
+            let router = new Router();
 
             this.beforeInit.apply(this, arguments);
             this.context = Object.assign(this.setContext.apply(this, arguments), {
@@ -58,23 +56,18 @@ define([
                         scope._globalEvents.push(channel);
                     }
                 })
-        });
+            });
 
             if (this.AppContainer !== undefined) {
                 this.appContainer = new this.AppContainer({
                     appContext: this.context
                 });
 
-                if (this.appContainer._match !== undefined) {
-                    mapHandler = this.appContainer._match.bind(this.appContainer);
-                } else {
-                    mapHandler = function () {
-
-                    }
-                }
+                let mapHandler = (this.appContainer._match !== undefined) ? this.appContainer._match : ()=> {
+                };
 
                 if (options.rootRoute !== undefined) {
-                    router.match(function (match) {
+                    router.match((match)=> {
                         match(options.rootRoute, mapHandler);
                     });
                 } else {

@@ -106,12 +106,12 @@ define([
         }
     }
 
-    function setRoutes(children) {
-        if (!this._match) {
-            this._match = (match)=> {
-                applyToChildren.call(this, children, child=> matchRoute(child, match));
-                if (this.match) {
-                    this.match(match);
+    function setRoutes(context, children) {
+        if (!context._match) {
+            context._match = (match)=> {
+                applyToChildren(children, child=> matchRoute(child, match));
+                if (context.match) {
+                    context.match(match);
                 }
             }
         }

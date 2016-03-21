@@ -8,7 +8,7 @@ define([
     //
     //      @private applyElement
     //      @param {Object} elements
-    function applyElement(elements, params) {
+    function applyElement(elements = {}, params) {
         let instances = {};
         Object.keys(elements).forEach((key)=> {
             let instance = elements[key];

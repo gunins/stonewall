@@ -29,6 +29,7 @@ define([
                     applyEvents.call(this, element, data);
                     elReady.call(this, element, data);
                     elOnChange.call(this, element, data);
+
                     if (element.data.tplSet.update === 'true') {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
@@ -37,98 +38,93 @@ define([
                     }
                 } else if (utils.isArray(data)) {
 
-                    var updateChildren = function () {
-                        let bindedData = [],
-                            addItem = (item, index)=> {
-                                let isString = false;
-                                if (!utils.isArray(item) && !utils.isObject(item)) {
-                                    isString = true;
-                                }
-                                let element = binder.run(true, index);
-                                if (isString) {
-                                    element.text(item);
-                                }
-
-                                bindedData.push({
-                                    binder: element,
-                                    data:   item
-                                });
-
-
-                                applyAttribute.call(this, element, item);
-                                if (element.children) {
-                                    element.bindings = setBinders(element.children);
-                                    applyBinders.call(this, item, element);
-                                }
-
-
-                                applyEvents.call(this, element, item);
-                                elReady.call(this, element, item);
-                                elOnChange.call(this, element, item);
-
-                                if (isString && element.data.tplSet.update === 'true') {
+                    let bindedData = [],
+                        addItem = (item, index)=> {
+                            let isString = false;
+                            if (!utils.isArray(item) && !utils.isObject(item)) {
+                                isString = true;
+                            }
+                            let element = binder.run(true, index);
+                            if (isString) {
+                                element.text(item);
+                                if (element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, ()=> {
                                         element.text(item);
                                         elOnChange.call(this, element, item);
                                     });
                                 }
+                            }
 
-
-                            };
-                        data.forEach(addItem.bind(this));
-                        let update = binder.data.tplSet.update;
-                        if (update === 'true') {
-                            let removeMethodNames = ['pop', 'shift', 'splice'],
-                                insertMethodNames = ['push', 'unshift'],
-                                sortingMethodNames = ['reverse', 'sort'];
-                            watch(obj, objKey, (prop, action, newValue, oldValue)=> {
-                                let clonedData = bindedData.slice(0);
-                                if (oldValue === undefined && insertMethodNames.indexOf(action) !== -1) {
-                                    let filter = clonedData.filter((item)=> {
-                                        return item.data === newValue[0];
-                                    });
-                                    if (filter.length === 0) {
-                                        addItem.call(this, newValue[0], (action === 'unshift') ? 0 : clonedData.length);
-                                    }
-                                } else if (removeMethodNames.indexOf(action) !== -1) {
-                                    clonedData.forEach((binder)=> {
-                                        if (obj[objKey].indexOf(binder.data) === -1) {
-                                            binder.binder.remove();
-                                            bindedData.splice(bindedData.indexOf(binder), 1);
-                                        }
-                                    });
-
-                                    if (action === 'splice') {
-                                        let vals = Array.prototype.slice.call(newValue, 2);
-                                        if (vals && vals.length > 0) {
-                                            vals.forEach((val)=> {
-                                                let index = obj[objKey].indexOf(val);
-                                                if (index !== -1) {
-                                                    addItem.call(this, val, index);
-                                                }
-                                            });
-                                        }
-                                    }
-                                } else if (sortingMethodNames.indexOf(action) !== -1) {
-                                    data.forEach((value, index)=> {
-                                        let element = clonedData.filter(item=>item.data === value)[0];
-                                        bindedData.splice(index, 0, bindedData.splice(bindedData.indexOf(element), 1)[0]);
-                                        element.binder.changePosition(index);
-
-                                    });
-
-
-                                }
-
+                            bindedData.push({
+                                binder: element,
+                                data:   item
                             });
-                        }
+
+
+                            applyAttribute(element, item);
+                            applyEvents.call(this, element, item);
+                            elReady.call(this, element, item);
+                            elOnChange.call(this, element, item);
+
+                            if (element.children) {
+                                element.bindings = setBinders(element.children);
+                                applyBinders.call(this, item, element);
+                            }
+
+
+                        };
+
+                    data.forEach(addItem);
+
+                    let update = binder.data.tplSet.update;
+                    if (update === 'true') {
+                        let removeMethodNames = ['pop', 'shift', 'splice'],
+                            insertMethodNames = ['push', 'unshift'],
+                            sortingMethodNames = ['reverse', 'sort'];
+                        watch(obj, objKey, (prop, action, newValue, oldValue)=> {
+                            let clonedData = bindedData.slice(0);
+                            if (oldValue === undefined && insertMethodNames.indexOf(action) !== -1) {
+                                let filter = clonedData.filter((item)=> item.data === newValue[0]);
+
+                                if (filter.length === 0) {
+                                    addItem(newValue[0], (action === 'unshift') ? 0 : clonedData.length);
+                                }
+                            } else if (removeMethodNames.indexOf(action) !== -1) {
+                                clonedData.forEach((binder)=> {
+                                    if (obj[objKey].indexOf(binder.data) === -1) {
+                                        binder.binder.remove();
+                                        bindedData.splice(bindedData.indexOf(binder), 1);
+                                    }
+                                });
+
+                                if (action === 'splice') {
+                                    let vals = Array.prototype.slice.call(newValue, 2);
+                                    if (vals && vals.length > 0) {
+                                        vals.forEach((val)=> {
+                                            let index = obj[objKey].indexOf(val);
+                                            if (index !== -1) {
+                                                addItem(val, index);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (sortingMethodNames.indexOf(action) !== -1) {
+                                data.forEach((value, index)=> {
+                                    let element = clonedData.filter(item=>item.data === value)[0];
+                                    bindedData.splice(index, 0, bindedData.splice(bindedData.indexOf(element), 1)[0]);
+                                    element.binder.changePosition(index);
+
+                                });
+                            }
+
+                        });
                     }
-                    updateChildren.call(this);
+
 
                 } else if (utils.isObject(data)) {
                     let element = binder.run(data);
                     if (element.data.type !== 'cp') {
-                        applyAttribute.call(this, element, data);
+                        applyAttribute(element, data);
                         applyEvents.call(this, element, data);
                         elReady.call(this, element, data);
                         elOnChange.call(this, element, data);
@@ -149,7 +145,7 @@ define([
         let binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
-                binders['__cp__'].forEach(binder=>{
+                binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
                     elReady.call(this, component, obj);
                     elOnChange.call(this, component, obj);

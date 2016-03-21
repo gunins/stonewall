@@ -7,36 +7,38 @@ define([
 ], function (dom, addChildren) {
 
 
-    function setChildren(parentChildren = {}, data = {}) {
-        let elements = this.children;
+    function setChildren(context, parentChildren = {}, data = {}) {
+        if (context) {
+            let elements = context.children;
 
-        if (elements) {
-            Object.keys(elements).forEach((name)=> {
-                let add = true,
-                    child = elements[name],
-                    parentChild = parentChildren[name];
-                if (parentChild !== undefined) {
-                    if (this.nodes[name] !== undefined) {
-                        this.nodes[name].call(this, child, parentChild, data);
-                    } else if (child !== undefined) {
-                        if (typeof parentChild == 'string') {
-                            dom.text(child, parentChild);
+            if (elements) {
+                Object.keys(elements).forEach((name)=> {
+                    let add = true,
+                        child = elements[name],
+                        parentChild = parentChildren[name];
+                    if (parentChild !== undefined) {
+                        if (context.nodes[name] !== undefined) {
+                            context.nodes[name].call(context, child, parentChild, data);
+                        } else if (child !== undefined) {
+                            if (typeof parentChild == 'string') {
+                                dom.text(child, parentChild);
+                            }
+                            else {
+                                child = parentChild.run(child.el);
+                            }
                         }
-                        else {
-                            child = parentChild.run(child.el);
-                        }
+                        addChildren.call(context, name, child, data);
+                    } else if (context.nodes[name] !== undefined &&
+                        child.data.tplSet.noattach === 'true') {
+                        context.nodes[name].call(context, child, data);
+                        add = false;
                     }
-                    addChildren.call(this, name, child, data);
-                } else if (this.nodes[name] !== undefined &&
-                    child.data.tplSet.noattach === 'true') {
-                    this.nodes[name].call(this, child, data);
-                    add = false;
-                }
-                if (add) {
-                    addChildren.call(this, name, child, data);
-                }
+                    if (add) {
+                        addChildren.call(context, name, child, data);
+                    }
 
-            });
+                });
+            }
         }
     }
 
