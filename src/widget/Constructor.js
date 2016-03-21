@@ -39,6 +39,7 @@ define([
              applyElement,
              addChildren) {
     'use strict';
+    var context = {};
 
     function destroy(instance) {
         let keys = Object.keys(instance);
@@ -82,7 +83,12 @@ define([
 
             //this._node = node;
             this.eventBus = new Mediator(this);
-            this.context = (data.appContext !== undefined) ? data.appContext : {};
+
+            this.context = context;
+
+            if (data.appContext !== undefined) {
+                Object.assign(this.context, data.appContext);
+            }
 
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
@@ -90,13 +96,6 @@ define([
 
             this.beforeInit.apply(this, arguments);
 
-
-            /*   // Remeber remove this
-             if (node && node.getInstance) {
-             var instance = node.getInstance();
-             instance.instance = this;
-             instance.eventBus = this.eventBus;
-             }*/
 
             if (this.template) {
                 var keys = (dataSet) ? Object.keys(dataSet) : [],
@@ -115,7 +114,7 @@ define([
                     name: 'root'
                 });
 
-                this.children = applyElement.call(this, template.children, data);
+                this.children = applyElement(template.children, data);
                 applyParent.call(this, parentChildren, this.data);
                 this.bindings = setBinders.call(this, this.children, true);
 

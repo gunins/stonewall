@@ -4,20 +4,16 @@
 define([
     'widget/Constructor',
     'templating/parser!./_list.html',
-    'watch'
-], function (Constructor, template, WatchJS) {
-    var watch = WatchJS.watch;
+], function (Constructor, template) {
     return Constructor.extend({
         template: template,
-        init: function () {
-        },
-        elReady: {
-            items: function (el, data) {
-                watch(data.item, 'remove', function () {
-                     el.remove();
-                    var index = this.data.items.indexOf(data);
-                    this.data.items.splice(index, 1);
-                }.bind(this));
+        elReady:  {
+            item: function (el, data) {
+                var items = this.data.items;
+                el.eventBus.subscribe('remove', function () {
+                    var index = items.indexOf(data);
+                    items.splice(index, 1);
+                });
             }
         }
     });

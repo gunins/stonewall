@@ -2,49 +2,44 @@
  * Created by guntars on 28/10/14.
  */
 define({
-    tasks: {
+    tasks:     {
         items: [
             {
-                item: {
-                    value: 'task1',
-                    completed: {
-                        checked: false
-                    }
+                value:     'task1',
+                completed: {
+                    checked: false
                 },
+
                 show: 'show'
             },
             {
-                item: {
-                    value: 'task2',
-                    completed: {
-                        checked: true
-                    }
+                value:     'task2',
+                completed: {
+                    checked: true
                 },
-                show: 'show'
+                show:      'show'
             },
             {
-                item: {
-                    value: 'task3',
-                    completed: {
-                        checked: false
-                    }
+                value:     'task3',
+                completed: {
+                    checked: false
                 },
-                show: 'show'
+                show:      'show'
             }
         ]
     },
     selection: {
         buttons: [
             {
-                text: 'All',
+                text:  'All',
                 class: 'active'
             },
             {
-                text: 'Active',
+                text:  'Active',
                 class: 'none'
             },
             {
-                text: 'Completed',
+                text:  'Completed',
                 class: 'none'
             },
 

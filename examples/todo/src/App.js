@@ -10,23 +10,21 @@ define([
     var watch = WatchJS.watch;
 
 
-
     return App.extend({
 
-        init: function () {
+        init:         function () {
             this.context.eventBus.subscribe('itemShow', this.itemShow.bind(this));
             this.context.eventBus.subscribe('addRecord', this.addRecord.bind(this));
         },
         AppContainer: Container,
-        setContext: function () {
+        setContext:   function () {
             return {
                 data: data
             }
         },
-        itemShow: function (selection) {
+        itemShow:     function (selection) {
             data.tasks.items.forEach(function (node) {
-
-                var checked = node.item.completed.checked;
+                var checked = node.completed.checked;
                 switch (selection) {
                     case 'Active':
                         if (checked !== true) {
@@ -49,17 +47,15 @@ define([
                 }
             });
         },
-        addRecord: function (record) {
+        addRecord:    function (record) {
             var item = {
-                item: {
-                    value: record,
-                    completed: {
-                        checked: false
-                    }
+                value:     record,
+                completed: {
+                    checked: false
                 },
-                show: 'show'
+                show:      'show'
             };
-            data.tasks.items.push(item);
+            data.tasks.items.unshift(item);
         }
     });
 });

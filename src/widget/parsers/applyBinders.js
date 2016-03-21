@@ -127,13 +127,11 @@ define([
 
                 } else if (utils.isObject(data)) {
                     let element = binder.run(data);
-
                     if (element.data.type !== 'cp') {
-                        applyEvents.call(this, element, data);
                         applyAttribute.call(this, element, data);
+                        applyEvents.call(this, element, data);
                         elReady.call(this, element, data);
                         elOnChange.call(this, element, data);
-
                         if (element.children) {
                             element.bindings = setBinders(element.children);
                             applyBinders.call(this, data, element);
@@ -151,7 +149,11 @@ define([
         let binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
-                binders['__cp__'].forEach(binder=>binder.run(obj));
+                binders['__cp__'].forEach(binder=>{
+                    let component = binder.run(obj);
+                    elReady.call(this, component, obj);
+                    elOnChange.call(this, component, obj);
+                });
             }
             let keys = Object.keys(binders);
             if (obj && keys.length > 0) {

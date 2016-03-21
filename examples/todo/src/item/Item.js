@@ -7,19 +7,18 @@ define([
 ], function (Constructor, template) {
     return Constructor.extend({
         template: template,
-        events: {
-            delete: [
+        events:   {
+            delete:    [
                 {
-                    name: 'click',
+                    name:   'click',
                     action: function () {
-                        this.data.remove = true
-                        this.destroy();
+                        this.eventBus.publish('remove', this.data);
                     }
                 }
             ],
             completed: [
                 {
-                    name: 'click',
+                    name:   'click',
                     action: function (e, el, data) {
                         data.checked = !data.checked;
                     }
