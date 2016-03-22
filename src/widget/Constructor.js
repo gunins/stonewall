@@ -27,17 +27,17 @@ define([
     './parsers/setRoutes',
     './parsers/applyElement',
     './parsers/addChildren'
-], function (require,
-             Decoder,
-             dom,
-             Mediator,
-             applyAttribute,
-             applyParent,
-             applyBinders,
-             setBinders,
-             setRoutes,
-             applyElement,
-             addChildren) {
+], function(require,
+            Decoder,
+            dom,
+            Mediator,
+            applyAttribute,
+            applyParent,
+            applyBinders,
+            setBinders,
+            setRoutes,
+            applyElement,
+            addChildren) {
     'use strict';
 
     //TODO: need better Solution later. Context is too global;
@@ -76,7 +76,7 @@ define([
         };
 
         constructor(data, parentChildren, dataSet, node) {
-            //for Backwards compatability
+            //TODO: for Backwards compatability later need to remove
             this.instance = this;
             this._routes = [];
             this._appliedRoutes = [];
@@ -116,6 +116,7 @@ define([
                 });
 
                 this.children = applyElement(template.children, data);
+                setRoutes(this, this.children);
                 applyParent(this, parentChildren, this.data);
                 this.bindings = setBinders(this.children, true);
 
@@ -123,8 +124,7 @@ define([
                     this.applyBinders(this.data, this);
                 }
 
-                setRoutes(this, this.children);
-                addChildren.call(this, 'root', this.root);
+                addChildren(this, 'root', this.root);
 
             } else {
                 this.el = document.createElement('div');
@@ -277,7 +277,7 @@ define([
             }
 
             instance = el.run(data || true);
-            addChildren.call(this, name, instance, data);
+            addChildren(this, name, instance, data);
 
             this.setRoutes(instance);
             this.rebind();
@@ -332,8 +332,22 @@ define([
             }
             return instance;
         }
+
+        // Running when Constructor is initialised
+        //
+        //      @method applyBinders
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        // Applying Binders manually, if use nodes function
+        //
+        //      @method applyBinders
+        applyBinders(...args) {
+           return applyBinders(this, ...args);
+        }
     }
-    ;
     Object.assign(Constructor.prototype, {
         // `nodes` Object override default methods to Elements.
         // Usage Example
@@ -360,7 +374,7 @@ define([
         //                  }
         //              }
         //          ]
-        events:       {},
+        events:     {},
         // Applying extra methods to Element
         // Usage Example
         //
@@ -371,7 +385,7 @@ define([
         //              }
         //          }
         //      },
-        elReady:      {},
+        elReady:    {},
         // Applying methods to element when data is changed to Element
         // Usage Example
         //
@@ -382,19 +396,7 @@ define([
         //              }
         //          }
         //      },
-        elOnChange:   {},
-        // Running when Constructor is initialised
-        //
-        //      @method init
-        //      @param {Object} data (comes from template data attributes)
-        //      @param {Object} children (comes placeholder content
-        //      from template)
-        //      @param {Object} datatSet (data passing if component is
-        //      in template binders)
-        // Applying Binders manually, if use nodes function
-        //
-        //      @method applyBinders
-        applyBinders: applyBinders
+        elOnChange: {}
     });
 
 

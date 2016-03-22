@@ -6,12 +6,12 @@ define([
     './elReady',
     './elOnchange'
 ], function (applyEvents, elReady, elOnchange) {
-    function addChildren(name, child, data) {
-        applyEvents.call(this, child);
-        elReady.call(this, child, data);
-        elOnchange.call(this, child, data);
+    function addChildren(context, name, child, data) {
+        applyEvents(context, child);
+        elReady(context, child, data);
+        elOnchange(context, child, data);
 
-        this.children[name] = child;
+        context.children[name] = child;
         return child;
     }
 

@@ -1,10 +1,10 @@
 /**
  * Created by guntars on 11/07/15.
  */
-define(function () {
-    return function (childBinder, data) {
-        if (this.elOnChange[childBinder.name] !== undefined) {
-            this.elOnChange[childBinder.name].call(this, childBinder, data);
+define(function() {
+    return function(context, childBinder, data) {
+        if (context.elOnChange[childBinder.name] !== undefined) {
+            context.elOnChange[childBinder.name].call(context, childBinder, data);
         }
     };
 });

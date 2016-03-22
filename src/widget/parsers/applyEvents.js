@@ -6,12 +6,12 @@ define(function () {
     //      @param {dom.Element} element
     //      @param {Array} events
     //      @param {Object} data
-    function applyEvents(element, data) {
-        var events = this.events[element.name];
+    function applyEvents(context, element, data) {
+        var events = context.events[element.name];
         if (events !== undefined && element.el !== undefined&&element.data.type !== 'cp') {
-            events.forEach(function (event) {
-                this._events.push(element.on(event.name, event.action, this, data));
-            }.bind(this));
+            events.forEach((event)=> {
+                context._events.push(element.on(event.name, event.action, context, data));
+            });
         }
     }
 

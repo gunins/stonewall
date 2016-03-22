@@ -27,14 +27,14 @@ define([
                                 child = parentChild.run(child.el);
                             }
                         }
-                        addChildren.call(context, name, child, data);
+                        addChildren(context, name, child, data);
                     } else if (context.nodes[name] !== undefined &&
                         child.data.tplSet.noattach === 'true') {
                         context.nodes[name].call(context, child, data);
                         add = false;
                     }
                     if (add) {
-                        addChildren.call(context, name, child, data);
+                        addChildren(context, name, child, data);
                     }
 
                 });
