@@ -6,11 +6,9 @@ define([
     '../utils',
     'watch',
     './setBinders',
-    './applyEvents',
-    './applyAttribute',
-    './elOnchange',
-    './elReady'
-], function(dom, utils, WatchJS, setBinders, applyEvents, applyAttribute, elOnChange, elReady) {
+    './addChildren',
+    './applyAttribute'
+], function(dom, utils, WatchJS, setBinders, addChildren, applyAttribute) {
     var watch = WatchJS.watch,
         unwatch = WatchJS.unwatch;
 
@@ -24,14 +22,14 @@ define([
                 if (!utils.isArray(data) && !utils.isObject(data)) {
                     let element = binder.run(true);
                     element.text(data);
-                    applyEvents(context, element, data);
-                    elReady(context, element, data);
-                    elOnChange(context, element, data);
+                    addChildren.applyEvents(context, element, data);
+                    addChildren.elReady(context, element, data);
+                    addChildren.elOnChange(context, element, data);
 
                     if (element.data.tplSet.update === 'true') {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
-                            elOnChange(context, element, obj[objKey]);
+                            addChildren.elOnChange(context, element, obj[objKey]);
                         });
                     }
                 } else if (utils.isArray(data)) {
@@ -48,7 +46,7 @@ define([
                                 if (element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, ()=> {
                                         element.text(item);
-                                        elOnChange(context, element, item);
+                                        addChildren.elOnChange(context, element, item);
                                     });
                                 }
                             }
@@ -60,9 +58,9 @@ define([
 
 
                             applyAttribute(element, item);
-                            applyEvents(context, element, item);
-                            elReady(context, element, item);
-                            elOnChange(context, element, item);
+                            addChildren.applyEvents(context, element, item);
+                            addChildren.elReady(context, element, item);
+                            addChildren.elOnChange(context, element, item);
 
                             if (element.children) {
                                 element.bindings = setBinders(element.children);
@@ -123,9 +121,9 @@ define([
                     let element = binder.run(data);
                     if (element.data.type !== 'cp') {
                         applyAttribute(element, data);
-                        applyEvents(context, element, data);
-                        elReady(context, element, data);
-                        elOnChange(context, element, data);
+                        addChildren.applyEvents(context, element, data);
+                        addChildren.elReady(context, element, data);
+                        addChildren.elOnChange(context, element, data);
                         if (element.children) {
                             element.bindings = setBinders(element.children);
                             applyBinders(context, data, element);
@@ -145,8 +143,8 @@ define([
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
-                    elReady(context, component, obj);
-                    elOnChange(context, component, obj);
+                    addChildren.elReady(context, component, obj);
+                    addChildren.elOnChange(context, component, obj);
                 });
             }
             let keys = Object.keys(binders);
