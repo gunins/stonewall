@@ -4,14 +4,14 @@
 define([
     'widget/Constructor',
     'templating/parser!./_item.html'
-], function (Constructor, template) {
+], function(Constructor, template) {
     return Constructor.extend({
         template: template,
         events:   {
             delete:    [
                 {
                     name:   'click',
-                    action: function () {
+                    action: function() {
                         this.eventBus.publish('remove', this.data);
                     }
                 }
@@ -19,8 +19,10 @@ define([
             completed: [
                 {
                     name:   'click',
-                    action: function (e, el, data) {
+                    action: function(e, el, data) {
                         data.checked = !data.checked;
+                        this.context.eventBus.publish('itemShow', false);
+
                     }
                 }
             ]

@@ -34,18 +34,18 @@
               </a>
             
               
-              <a class="source" href="dom.html">
-                dom.js
-              </a>
-            
-              
-              <a class="source" href="mediator.html">
-                mediator.js
+              <a class="source" href="Mediator.html">
+                Mediator.js
               </a>
             
               
               <a class="source" href="parser.html">
                 parser.js
+              </a>
+            
+              
+              <a class="source" href="addChildren.html">
+                addChildren.js
               </a>
             
               
@@ -59,28 +59,18 @@
               </a>
             
               
-              <a class="source" href="applyEvents.html">
-                applyEvents.js
+              <a class="source" href="applyElement.html">
+                applyElement.js
               </a>
             
               
-              <a class="source" href="deepBindings.html">
-                deepBindings.js
-              </a>
-            
-              
-              <a class="source" href="elOnchange.html">
-                elOnchange.js
+              <a class="source" href="applyParent.html">
+                applyParent.js
               </a>
             
               
               <a class="source" href="setBinders.html">
                 setBinders.js
-              </a>
-            
-              
-              <a class="source" href="setChildren.html">
-                setChildren.js
               </a>
             
               
@@ -120,165 +110,131 @@
  * Created by guntars on 11/11/14.
  */</span>
 define([
-    <span class="hljs-string">'../dom'</span>,
+    <span class="hljs-string">'templating/dom'</span>
 ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom</span>) </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroyComponent</span>(<span class="hljs-params">cp, force</span>) </span>{
-        <span class="hljs-keyword">var</span> children = cp.children;
-        <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
-                destroyComponent(children[key], <span class="hljs-literal">true</span>);
-            });
-        }
-        <span class="hljs-keyword">var</span> instance = cp.instance;
-        <span class="hljs-keyword">if</span> (instance) {
-            instance.destroy();
-        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cp.remove !== <span class="hljs-literal">undefined</span>) {
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroyComponent</span>(<span class="hljs-params">cp</span>) </span>{
+        <span class="hljs-keyword">if</span> (cp.remove !== <span class="hljs-literal">undefined</span>) {
             cp.remove();
         }
-        <span class="hljs-keyword">if</span> (cp.el) {
-            <span class="hljs-keyword">if</span> (cp.el.remove) {
-                cp.el.remove();
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cp.el.parentNode) {
-                cp.el.parentNode.removeChild(cp.el);
-            }
-            <span class="hljs-keyword">delete</span> cp.el;
-        }
 
-        <span class="hljs-keyword">if</span> (force) {
-            <span class="hljs-keyword">if</span> (cp._matches) {
-                cp._matches.remove();
-            }
-        }
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyToChildren</span>(<span class="hljs-params">children, cb</span>) </span>{
         <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name</span>) </span>{
-                <span class="hljs-keyword">var</span> cp = children[name];
-                cb.call(<span class="hljs-keyword">this</span>, cp, cp.instance);
-            }.bind(<span class="hljs-keyword">this</span>));
+            <span class="hljs-built_in">Object</span>.keys(children).forEach((name)=&gt; {
+                <span class="hljs-keyword">let</span> cp = children[name];
+                <span class="hljs-keyword">if</span> (cp.elGroup &amp;&amp; cp.elGroup.size &gt; <span class="hljs-number">0</span>) {
+                    cp.elGroup.forEach((item)=&gt; cb(item));
+                } <span class="hljs-keyword">else</span> {
+                    cb(cp);
+                }
+            });
         }
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchRoute</span>(<span class="hljs-params">children, match, parent</span>) </span>{
-        <span class="hljs-keyword">var</span> names = <span class="hljs-built_in">Object</span>.keys(children);
-        names.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name</span>) </span>{
-            <span class="hljs-keyword">var</span> child = children[name];
-            <span class="hljs-keyword">var</span> route = (child._node !== <span class="hljs-literal">undefined</span>) ? child._node.data.route : <span class="hljs-literal">undefined</span>;
-            <span class="hljs-keyword">if</span> (route !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.type !== <span class="hljs-string">'cp'</span>) {
-                <span class="hljs-keyword">var</span> matches    = match(route, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
-                    <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span>) {
-                        matchRoute.call(<span class="hljs-keyword">this</span>, child.children, match, parent);
-                    }
-                }.bind(<span class="hljs-keyword">this</span>));
-                child._matches = matches;
-                matches.to(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                    <span class="hljs-keyword">var</span> args   = [].slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">0</span>);
-                    <span class="hljs-keyword">var</span> params = args.pop();
-                    <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
-                        <span class="hljs-keyword">var</span> id = params.getLocation() + <span class="hljs-string">'_'</span> + args.join(<span class="hljs-string">'_'</span>);
-                    }
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchRoute</span>(<span class="hljs-params">child, match</span>) </span>{
+        <span class="hljs-keyword">let</span> route = (child.data !== <span class="hljs-literal">undefined</span>) ? child.data.route : <span class="hljs-literal">undefined</span>;
 
-                    <span class="hljs-keyword">if</span> (child.el !== <span class="hljs-literal">undefined</span> &amp;&amp; child.sessId !== id &amp;&amp; id !== <span class="hljs-literal">undefined</span>) {
-                        <span class="hljs-comment">/*  applyToChildren.call(this, child.children, function (deepChild) {
-                         destroyComponent(deepChild, true);
-                         }.bind(this));*/</span>
-                        destroyComponent(child);
-                    } <span class="hljs-keyword">else</span> {
-                        applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">cp, instance</span>) </span>{
-                            <span class="hljs-keyword">var</span> data    = cp._node.data,
-                                dataSet = data.dataset;
+        <span class="hljs-keyword">if</span> (route !== <span class="hljs-literal">undefined</span> &amp;&amp; child.data.type !== <span class="hljs-string">'cp'</span> &amp;&amp; child.name !== <span class="hljs-string">'root'</span>) {
+            <span class="hljs-keyword">let</span> id, childMatch,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Need add return match in router, for better readability</p>
 
-                            dataSet.params = params;
-
-                            <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
-                                dataSet.link = args;
-                            }
-
-                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
-                                instance.to.apply(instance, args.concat(params));
-
-                            }
-
-                        });
-                    }
-
-                    <span class="hljs-keyword">if</span> (child.el === <span class="hljs-literal">undefined</span>) {
-                        child.applyAttach();
-
-                        dom.add(child, parent, <span class="hljs-literal">false</span>);
-
-                        applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">cp, instance</span>) </span>{
-                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
-                                instance.to.apply(instance, args.concat(params));
-                            }
-
-                            <span class="hljs-keyword">if</span> (!cp.el &amp;&amp; instance &amp;&amp; instance._match) {
-
-                                <span class="hljs-keyword">if</span> (cp._routeHandlers !== <span class="hljs-literal">undefined</span> &amp;&amp; cp._routeHandlers.length &gt; <span class="hljs-number">0</span>) {
-                                    cp._routeHandlers.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">handler</span>) </span>{
-                                        handler.remove();
-                                    });
-                                    <span class="hljs-keyword">delete</span> cp._routeHandlers;
-                                }
-                                matches.setRoutes(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routes</span>) </span>{
-                                    instance._match.call(instance, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">route</span>) </span>{
-                                        <span class="hljs-keyword">var</span> match         = routes.match.call(routes, route);
-                                        cp._routeHandlers = cp._routeHandlers || [];
-                                        cp._routeHandlers.push(match);
-                                        <span class="hljs-keyword">return</span> match
-                                    });
-                                    routes.run();
-                                }.bind(<span class="hljs-keyword">this</span>));
-                                instance._reRoute = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                                    instance._applyRoutes(matches);
-                                };
-                            }
-                        });
-                        <span class="hljs-keyword">if</span> (id) {
-                            child.sessId = id;
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                matches = match(route, match=&gt; {
+                    childMatch = match;
+                });
+            matches.to((...args)=&gt; {
+                <span class="hljs-keyword">let</span> params = args.pop();
+                id = (args.length &gt; <span class="hljs-number">0</span>) ? params.getLocation() + <span class="hljs-string">'_'</span> + args.join(<span class="hljs-string">'_'</span>) : <span class="hljs-literal">undefined</span>;
+                <span class="hljs-keyword">if</span> (child.elGroup &amp;&amp; child.elGroup.size === <span class="hljs-number">0</span>) {
+                    child = child.run(<span class="hljs-literal">true</span>);
+                    applyToChildren(child.children, (instance)=&gt; {
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
+                            instance.to(...args.concat(params));
                         }
 
-                    } <span class="hljs-keyword">else</span> {
-                        dom.attach(child);
-                    }
-                }.bind(<span class="hljs-keyword">this</span>));
-                matches.leave(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                    applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">cp, instance</span>) </span>{
-                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.leave !== <span class="hljs-literal">undefined</span>) {
-                            instance.leave();
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; !instance._match) {
+                            matchRoute(instance, childMatch);
+                        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (instance &amp;&amp; instance._match) {
+                            matches.setRoutes((routes)=&gt; {
+                                instance._match((...args)=&gt; {
+                                    <span class="hljs-keyword">let</span> match = routes.match(...args);
+                                    instance._appliedRoutes.push(match);
+                                    <span class="hljs-keyword">return</span> match;
+                                });
+                                routes.run();
+                            });
+
+                            instance._reRoute = ()=&gt; {
+                                instance._applyRoutes(matches);
+                            };
                         }
-                    }.bind(<span class="hljs-keyword">this</span>));
+
+                    });
+
+                } <span class="hljs-keyword">else</span> {
+                    applyToChildren(child.children, (instance)=&gt; {
+                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
+                            instance.to.apply(instance, args.concat(params));
+                        }
+                    });
+                    dom.attach(child);
+                }
+
+            });
+
+            matches.leave(()=&gt; {
+                applyToChildren(child.children, (instance)=&gt; {
+                    <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.leave !== <span class="hljs-literal">undefined</span>) {
+                        instance.leave();
+                    }
+                });
+                <span class="hljs-keyword">if</span> (!id) {
                     dom.detach(child);
-                }.bind(<span class="hljs-keyword">this</span>));
+                } <span class="hljs-keyword">else</span> {
+                    destroyComponent(child);
+                }
+            });
 
-                matches.query(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
-                    applyToChildren.call(<span class="hljs-keyword">this</span>, child.children, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">cp, instance</span>) </span>{
-                        <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
-                            instance.query(params);
-                        }
-                    }.bind(<span class="hljs-keyword">this</span>));
-                }.bind(<span class="hljs-keyword">this</span>));
+            matches.query((params)=&gt; {
+                applyToChildren(child.children, (instance)=&gt; {
+                    <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
+                        instance.query(params);
+                    }
+                });
+            });
 
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; child._node.data.type !== <span class="hljs-string">'cp'</span>) {
-                matchRoute.call(<span class="hljs-keyword">this</span>, child.children, match, parent);
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.instance !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">var</span> instance = child.instance;
-                instance._match.call(instance, match);
-            }
-        }.bind(<span class="hljs-keyword">this</span>));
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; child.data.type !== <span class="hljs-string">'cp'</span>) {
+            applyToChildren(child.children, child=&gt; matchRoute(child, match));
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.elGroup &amp;&amp; child.elGroup.size &gt; <span class="hljs-number">0</span>) {
+            child.elGroup.forEach((instance)=&gt; {
+                <span class="hljs-keyword">if</span> (child.data.type === <span class="hljs-string">'cp'</span> &amp;&amp; instance._match) {
+                    instance._match(match);
+                }
+            })
+        }
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRoutes</span>(<span class="hljs-params">children</span>) </span>{
-        <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._match) {
-            <span class="hljs-keyword">var</span> parent  = <span class="hljs-keyword">this</span>.el;
-            <span class="hljs-keyword">this</span>._match = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
-                matchRoute.call(<span class="hljs-keyword">this</span>, children, match, parent);
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.match) {
-                    <span class="hljs-keyword">this</span>.match.call(<span class="hljs-keyword">this</span>, match);
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRoutes</span>(<span class="hljs-params">context, children</span>) </span>{
+        <span class="hljs-keyword">if</span> (!context._match) {
+            context._match = (match)=&gt; {
+                applyToChildren(children, child=&gt; matchRoute(child, match));
+                <span class="hljs-keyword">if</span> (context.match) {
+                    context.match(match);
                 }
-            }.bind(<span class="hljs-keyword">this</span>)
+            }
         }
     };
 

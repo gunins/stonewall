@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>mediator.js</title>
+  <title>Mediator.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -34,18 +34,18 @@
               </a>
             
               
-              <a class="source" href="dom.html">
-                dom.js
-              </a>
-            
-              
-              <a class="source" href="mediator.html">
-                mediator.js
+              <a class="source" href="Mediator.html">
+                Mediator.js
               </a>
             
               
               <a class="source" href="parser.html">
                 parser.js
+              </a>
+            
+              
+              <a class="source" href="addChildren.html">
+                addChildren.js
               </a>
             
               
@@ -59,28 +59,18 @@
               </a>
             
               
-              <a class="source" href="applyEvents.html">
-                applyEvents.js
+              <a class="source" href="applyElement.html">
+                applyElement.js
               </a>
             
               
-              <a class="source" href="deepBindings.html">
-                deepBindings.js
-              </a>
-            
-              
-              <a class="source" href="elOnchange.html">
-                elOnchange.js
+              <a class="source" href="applyParent.html">
+                applyParent.js
               </a>
             
               
               <a class="source" href="setBinders.html">
                 setBinders.js
-              </a>
-            
-              
-              <a class="source" href="setChildren.html">
-                setChildren.js
               </a>
             
               
@@ -101,7 +91,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>mediator.js</h1>
+                  <h1>Mediator.js</h1>
               </div>
           </li>
         
@@ -119,16 +109,8 @@
             <div class="content"><div class='highlight'><pre><span class="hljs-comment">/*jslint bitwise: true, nomen: true, plusplus: true, white: true */</span>
 
 <span class="hljs-comment">/*!
- * Mediator.js Library v0.9.8
- * https://github.com/ajacksified/Mediator.js
+ * Mediator Library v0.9.9
  *
- * Copyright 2013, Jack Lawson
- * MIT Licensed (http://www.opensource.org/licenses/mit-license.php)
- *
- * For more information: http://thejacklawson.com/2011/06/mediators-for-modularized-asynchronous-programming-in-javascript/index.html
- * Project on GitHub: https://github.com/ajacksified/Mediator.js
- *
- * Last update: October 19 2013
  */</span>
 
 (<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">global, factory</span>) </span>{
@@ -197,20 +179,21 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>We’ll generate guids for class instances for easy referencing later on.
-Subscriber instances will have an id that can be refernced for quick
-lookups.</p>
+              <p>Subscribers are instances of Mediator Channel registrations. We generate
+an object instance so that it can be updated later on without having to
+unregister and re-register. Subscribers are constructed with a function
+to be called, options object, and context.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">guidGenerator</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">var</span> S4 = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">return</span> (((<span class="hljs-number">1</span> + <span class="hljs-built_in">Math</span>.random()) * <span class="hljs-number">0x10000</span>) | <span class="hljs-number">0</span>).toString(<span class="hljs-number">16</span>).substring(<span class="hljs-number">1</span>);
-        };
-
-        <span class="hljs-keyword">return</span> (S4() + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + <span class="hljs-string">"-"</span> + S4() + S4() + S4());
-    }</pre></div></div>
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Subscriber</span> </span>{
+        <span class="hljs-keyword">constructor</span>(fn, options, context = {}, channel = <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">this</span>.fn = fn;
+            <span class="hljs-keyword">this</span>.channel = channel;
+            <span class="hljs-keyword">this</span>.context = context;
+            <span class="hljs-keyword">this</span>.options = options;
+        };</pre></div></div>
             
         </li>
         
@@ -221,27 +204,40 @@ lookups.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Subscribers are instances of Mediator Channel registrations. We generate
-an object instance so that it can be updated later on without having to
-unregister and re-register. Subscribers are constructed with a function
-to be called, options object, and context.</p>
+              <p>Mediator.update on a subscriber instance can update its function,context,
+or options object. It takes in an object and looks for fn, context, or
+options keys.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Subscriber</span>(<span class="hljs-params">fn, options, context</span>) </span>{
-        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Subscriber)) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Subscriber(fn, options, context);
+            <div class="content"><div class='highlight'><pre>        update(options = {}) {
+            <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">this</span>, options);
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.channel) {
+                <span class="hljs-keyword">this</span>.setPriority(<span class="hljs-keyword">this</span>.priority);
+            }
+        };
+
+        set options(options) {
+            <span class="hljs-keyword">this</span>.update(options);
+        };
+
+        set context(context) {
+            <span class="hljs-keyword">this</span>.setHook(context);
+            <span class="hljs-keyword">this</span>._context = context;
+        };
+
+        get context() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._context;
+        };
+
+        setHook(context) {
+            <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">this</span>.channel;
+            <span class="hljs-keyword">if</span> (channel) {
+                channel.hook(<span class="hljs-keyword">this</span>, context);
+            }
         }
 
-        <span class="hljs-keyword">this</span>.id      = guidGenerator();
-        <span class="hljs-keyword">this</span>.fn      = fn;
-        <span class="hljs-keyword">this</span>.options = options;
-        <span class="hljs-keyword">this</span>.context = context;
-        <span class="hljs-keyword">this</span>.channel = <span class="hljs-literal">null</span>;
-    }
-
-    Subscriber.prototype = {</pre></div></div>
+        _reduceCalls() {</pre></div></div>
             
         </li>
         
@@ -252,36 +248,11 @@ to be called, options object, and context.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Mediator.update on a subscriber instance can update its function,context,
-or options object. It takes in an object and looks for fn, context, or
-options keys.</p>
+              <p>Check if the subscriber has options and if this include the calls options</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-        update: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">options</span>) </span>{
-            <span class="hljs-keyword">if</span> (options) {
-                <span class="hljs-keyword">this</span>.fn      = options.fn || <span class="hljs-keyword">this</span>.fn;
-                <span class="hljs-keyword">this</span>.context = options.context || <span class="hljs-keyword">this</span>.context;
-                <span class="hljs-keyword">this</span>.options = options.options || <span class="hljs-keyword">this</span>.options;
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.channel &amp;&amp; <span class="hljs-keyword">this</span>.options &amp;&amp; <span class="hljs-keyword">this</span>.options.priority !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">this</span>.channel.setPriority(<span class="hljs-keyword">this</span>.id, <span class="hljs-keyword">this</span>.options.priority);
-                }
-            }
-        }
-    };
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Channel</span>(<span class="hljs-params">namespace, parent, context</span>) </span>{
-        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Channel)) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Channel(namespace, parent, context);
-        }
-        <span class="hljs-keyword">this</span>.namespace    = namespace || <span class="hljs-string">""</span>;
-        <span class="hljs-keyword">this</span>._subscribers = [];
-        <span class="hljs-keyword">this</span>._channels    = {};
-        <span class="hljs-keyword">this</span>._parent      = parent;
-        <span class="hljs-keyword">this</span>.stopped      = <span class="hljs-literal">false</span>;
-        <span class="hljs-keyword">this</span>._context     = context||{};
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.calls !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
             
         </li>
         
@@ -292,22 +263,11 @@ options keys.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>A Mediator channel holds a list of sub-channels and subscribers to be fired
-when Mediator.publish is called on the Mediator instance. It also contains
-some methods to manipulate its lists of data; only setPriority and
-StopPropagation are meant to be used. The other methods should be accessed
-through the Mediator instance.</p>
+              <p>Decrease the number of calls left by one</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-    Channel.prototype = {
-        addSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fn, options, context</span>) </span>{
-            context = context || <span class="hljs-keyword">this</span>._context;
-
-            <span class="hljs-keyword">var</span> subscriber = <span class="hljs-keyword">new</span> Subscriber(fn, options, context);
-
-            <span class="hljs-keyword">if</span> (options &amp;&amp; options.priority !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">this</span>.calls--;</pre></div></div>
             
         </li>
         
@@ -318,36 +278,15 @@ through the Mediator instance.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Cheap hack to either parse as an int or turn it into 0. Runs faster
-in many browsers than parseInt with the benefit that it won’t
-return a NaN.</p>
+              <p>Once the number of calls left reaches zero or less we need to remove the subscriber</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                options.priority = options.priority &gt;&gt; <span class="hljs-number">0</span>;
-
-                <span class="hljs-keyword">if</span> (options.priority &lt; <span class="hljs-number">0</span>) {
-                    options.priority = <span class="hljs-number">0</span>;
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.calls &lt; <span class="hljs-number">1</span>) {
+                    <span class="hljs-keyword">this</span>.remove();
                 }
-                <span class="hljs-keyword">if</span> (options.priority &gt;= <span class="hljs-keyword">this</span>._subscribers.length) {
-                    options.priority = <span class="hljs-keyword">this</span>._subscribers.length - <span class="hljs-number">1</span>;
-                }
-
-                <span class="hljs-keyword">this</span>._subscribers.splice(options.priority, <span class="hljs-number">0</span>, subscriber);
-            } <span class="hljs-keyword">else</span> {
-                <span class="hljs-keyword">this</span>._subscribers.push(subscriber);
             }
-
-            subscriber.channel = <span class="hljs-keyword">this</span>;
-            subscriber.remove  = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">this</span>.removeSubscriber(subscriber.id);
-            }.bind(<span class="hljs-keyword">this</span>);
-
-            context._globalEvents = context._globalEvents || [];
-            context._globalEvents.push(subscriber);
-
-            <span class="hljs-keyword">return</span> subscriber;
-        },</pre></div></div>
+        };</pre></div></div>
             
         </li>
         
@@ -358,26 +297,16 @@ return a NaN.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>The channel instance is passed as an argument to the mediator subscriber,
-and further subscriber propagation can be called with
-channel.StopPropagation().</p>
+              <p>return event remove method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        stopPropagation: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">true</span>;
-        },
-
-        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier</span>) </span>{
-            <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>,
-                y = <span class="hljs-keyword">this</span>._subscribers.length;
-
-            <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier) {
-                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._subscribers[x];
-                }
+            <div class="content"><div class='highlight'><pre>        remove() {
+            <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">this</span>.channel;
+            <span class="hljs-keyword">if</span> (channel) {
+                channel.removeSubscriber(<span class="hljs-keyword">this</span>);
             }
-        },</pre></div></div>
+        };</pre></div></div>
             
         </li>
         
@@ -388,48 +317,21 @@ channel.StopPropagation().</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Channel.setPriority is useful in updating the order in which Subscribers
-are called, and takes an identifier (subscriber id or named function) and
-an array index. It will not search recursively through subchannels.</p>
+              <p>Dynamic setPriority method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-        setPriority: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier, priority</span>) </span>{
-            <span class="hljs-keyword">var</span> oldIndex = <span class="hljs-number">0</span>,
-                x        = <span class="hljs-number">0</span>,
-                sub, firstHalf, lastHalf, y;
-
-            <span class="hljs-keyword">for</span> (x = <span class="hljs-number">0</span>, y = <span class="hljs-keyword">this</span>._subscribers.length; x &lt; y; x++) {
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].id === identifier || <span class="hljs-keyword">this</span>._subscribers[x].fn === identifier) {
-                    <span class="hljs-keyword">break</span>;
-                }
-                oldIndex++;
+            <div class="content"><div class='highlight'><pre>        setPriority(priority) {
+            <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">this</span>.channel;
+            <span class="hljs-keyword">if</span> (channel) {
+                channel.setPriority(<span class="hljs-keyword">this</span>, priority);
             }
+        };
 
-            sub       = <span class="hljs-keyword">this</span>._subscribers[oldIndex];
-            firstHalf = <span class="hljs-keyword">this</span>._subscribers.slice(<span class="hljs-number">0</span>, oldIndex);
-            lastHalf  = <span class="hljs-keyword">this</span>._subscribers.slice(oldIndex + <span class="hljs-number">1</span>);
-
-            <span class="hljs-keyword">this</span>._subscribers = firstHalf.concat(lastHalf);
-            <span class="hljs-keyword">this</span>._subscribers.splice(priority, <span class="hljs-number">0</span>, sub);
-        },
-
-        addChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
-            <span class="hljs-keyword">this</span>._channels[channel] = <span class="hljs-keyword">new</span> Channel((<span class="hljs-keyword">this</span>.namespace ? <span class="hljs-keyword">this</span>.namespace + <span class="hljs-string">':'</span> : <span class="hljs-string">''</span>) +
-                                                  channel, <span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>._context);
-        },
-
-        hasChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels.hasOwnProperty(channel);
-        },
-
-        returnChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channel</span>) </span>{
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels[channel];
-        },
-
-        removeSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier</span>) </span>{
-            <span class="hljs-keyword">var</span> x = <span class="hljs-keyword">this</span>._subscribers.length - <span class="hljs-number">1</span>;</pre></div></div>
+        run(data) {
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.channel.stopped
+                &amp;&amp; !(<span class="hljs-keyword">typeof</span> <span class="hljs-keyword">this</span>.predicate === <span class="hljs-string">"function"</span>
+                &amp;&amp; !<span class="hljs-keyword">this</span>.predicate.apply(<span class="hljs-keyword">this</span>.context, data))) {</pre></div></div>
             
         </li>
         
@@ -440,14 +342,11 @@ an array index. It will not search recursively through subchannels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>If we don’t pass in an id, we’re clearing all</p>
+              <p>Check if the callback should be called</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (!identifier) {
-                <span class="hljs-keyword">this</span>._subscribers = [];
-                <span class="hljs-keyword">return</span>;
-            }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">this</span>._reduceCalls();</pre></div></div>
             
         </li>
         
@@ -458,17 +357,26 @@ an array index. It will not search recursively through subchannels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Going backwards makes splicing a whole lot easier.</p>
+              <p>Execute function.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (x; x &gt;= <span class="hljs-number">0</span>; x--) {
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers[x].fn === identifier || <span class="hljs-keyword">this</span>._subscribers[x].id === identifier) {
-                    <span class="hljs-keyword">this</span>._subscribers[x].channel = <span class="hljs-literal">null</span>;
-                    <span class="hljs-keyword">this</span>._subscribers.splice(x, <span class="hljs-number">1</span>);
-                }
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">this</span>.fn.apply(<span class="hljs-keyword">this</span>.context, data)
             }
-        },</pre></div></div>
+        };
+
+    }
+
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Channel</span> </span>{
+        <span class="hljs-keyword">constructor</span>(namespace, parent, context, hook) {
+            <span class="hljs-keyword">this</span>.namespace = namespace || <span class="hljs-string">""</span>;
+            <span class="hljs-keyword">this</span>._subscribers = [];
+            <span class="hljs-keyword">this</span>._channels = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>();
+            <span class="hljs-keyword">this</span>._parent = parent;
+            <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">false</span>;
+            <span class="hljs-keyword">this</span>.context = context;
+            <span class="hljs-keyword">this</span>.hook = hook;
+        };</pre></div></div>
             
         </li>
         
@@ -479,18 +387,18 @@ an array index. It will not search recursively through subchannels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>This will publish arbitrary arguments to a subscriber and then to parent
-channels.</p>
+              <p>A Mediator channel holds a list of sub-channels and subscribers to be fired
+when Mediator.publish is called on the Mediator instance. It also contains
+some methods to manipulate its lists of data; only setPriority and
+StopPropagation are meant to be used. The other methods should be accessed
+through the Mediator instance.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-        publish: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
-            <span class="hljs-keyword">var</span> x          = <span class="hljs-number">0</span>,
-                y          = <span class="hljs-keyword">this</span>._subscribers.length,
-                shouldCall = <span class="hljs-literal">false</span>,
-                subscriber, l,
-                subsBefore, subsAfter;</pre></div></div>
+        addSubscriber(fn, options, context = <span class="hljs-keyword">this</span>.context) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Subscriber(fn, options, context, <span class="hljs-keyword">this</span>);
+        };</pre></div></div>
             
         </li>
         
@@ -501,11 +409,15 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Priority is preserved in the _subscribers index.</p>
+              <p>The channel instance is passed as an argument to the mediator subscriber,
+and further subscriber propagation can be called with
+channel.StopPropagation().</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        stopPropagation() {
+            <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">true</span>;
+        };</pre></div></div>
             
         </li>
         
@@ -516,17 +428,62 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>By default set the flag to false</p>
+              <p>Channel.setPriority is useful in updating the order in which Subscribers
+are called, and takes an identifier (subscriber id or named function) and
+an array index. It will not search recursively through subchannels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                shouldCall = <span class="hljs-literal">false</span>;
-                subscriber = <span class="hljs-keyword">this</span>._subscribers[x];
+            <div class="content"><div class='highlight'><pre>
+        setPriority(subscriber, priority) {
+            <span class="hljs-keyword">let</span> subscribers = <span class="hljs-keyword">this</span>._subscribers,
+                index = subscribers.indexOf(subscriber);
 
-                <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.stopped) {
-                    subsBefore = <span class="hljs-keyword">this</span>._subscribers.length;
-                    <span class="hljs-keyword">if</span> (subscriber.options !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">typeof</span> subscriber.options.predicate === <span class="hljs-string">"function"</span>) {
-                        <span class="hljs-keyword">if</span> (subscriber.options.predicate.apply(subscriber.context, data)) {</pre></div></div>
+            <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
+                subscribers.splice(subscribers.indexOf(subscriber), <span class="hljs-number">1</span>);
+            }
+
+            <span class="hljs-keyword">if</span> (priority !== <span class="hljs-literal">undefined</span> &amp;&amp; priority &lt; <span class="hljs-keyword">this</span>._subscribers.length) {
+                subscribers.splice(priority, <span class="hljs-number">0</span>, subscriber);
+            } <span class="hljs-keyword">else</span> {
+                subscribers.push(subscriber);
+            }
+        };
+
+        hasChannel(channel) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels.has(channel);
+        };
+
+        getChannel(channel) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._channels.get(channel);
+        };
+
+        setChannel(namespace, readOnly) {
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.hasChannel(namespace) &amp;&amp; !readOnly) {
+                <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">new</span> Channel((<span class="hljs-keyword">this</span>.namespace ? <span class="hljs-keyword">this</span>.namespace + <span class="hljs-string">':'</span> : <span class="hljs-string">''</span>) + namespace, <span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.context, <span class="hljs-keyword">this</span>.hook);
+                <span class="hljs-keyword">this</span>._channels.set(namespace, channel);
+                <span class="hljs-keyword">return</span> channel;
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getChannel(namespace)
+            }
+        };
+
+        returnChannel(channels, readOnly) {
+            <span class="hljs-keyword">if</span> (channels &amp;&amp; channels.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">let</span> channel = channels.shift(),
+                    returnChannel = <span class="hljs-keyword">this</span>.setChannel(channel, readOnly);
+                <span class="hljs-keyword">if</span> (returnChannel &amp;&amp; channels.length &gt; <span class="hljs-number">0</span>) {
+                    <span class="hljs-keyword">return</span> returnChannel.returnChannel(channels, readOnly);
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">return</span> returnChannel;
+                }
+            }
+        };
+
+
+        removeSubscriber(subscriber) {
+            <span class="hljs-keyword">let</span> subscribers = <span class="hljs-keyword">this</span>._subscribers,
+                index = subscribers.indexOf(subscriber);</pre></div></div>
             
         </li>
         
@@ -537,13 +494,31 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>The predicate matches, the callback function should be called</p>
+              <p>If we don’t pass in an value, we’re clearing all</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                            shouldCall = <span class="hljs-literal">true</span>;
-                        }
-                    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (!subscriber) {
+                subscribers.splice(<span class="hljs-number">0</span>, subscribers.length);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
+                subscribers.splice(index, <span class="hljs-number">1</span>);
+            }
+
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._subscribers.length === <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-keyword">this</span>._parent) {
+                <span class="hljs-keyword">this</span>._parent.removeChannel(<span class="hljs-keyword">this</span>);
+            }
+        };
+
+        removeChannel(channel) {
+            <span class="hljs-keyword">if</span> (channel === <span class="hljs-keyword">this</span>.getChannel(channel.namespace)) {
+                <span class="hljs-keyword">this</span>._channels.delete(channel.namespace);
+            }
+        };
+
+        clear() {
+            <span class="hljs-keyword">this</span>._channels.forEach(channel=&gt;channel.clear());
+            <span class="hljs-keyword">this</span>.removeSubscriber();
+        };</pre></div></div>
             
         </li>
         
@@ -554,13 +529,13 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>There is no predicate to match, the callback should always be called</p>
+              <p>This will publish arbitrary arguments to a subscriber and then to parent
+channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                        shouldCall = <span class="hljs-literal">true</span>;
-                    }
-                }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+        publish(data) {</pre></div></div>
             
         </li>
         
@@ -571,11 +546,28 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Check if the callback should be called</p>
+              <p>slice method are cloning array, means default array can remove handlers</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> (shouldCall) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">this</span>._subscribers.slice().forEach(subscriber=&gt;subscriber.run(data));
+
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._parent) {
+                <span class="hljs-keyword">this</span>._parent.publish(data);
+            }
+
+            <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">false</span>;
+        };
+    }
+
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Mediator</span> </span>{
+        <span class="hljs-keyword">constructor</span>(context = {}, hook = ()=&gt; {
+        }) {
+            <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Mediator)) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Mediator(context, hook);
+            }
+            <span class="hljs-keyword">this</span>.channel = <span class="hljs-keyword">new</span> Channel(<span class="hljs-string">''</span>, <span class="hljs-literal">false</span>, context, hook);
+        }</pre></div></div>
             
         </li>
         
@@ -586,11 +578,10 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Check if the subscriber has options and if this include the calls options</p>
+              <p>A Mediator instance is the interface through which events are registered
+and removed from publish channels.</p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (subscriber.options &amp;&amp; subscriber.options.calls !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
             
         </li>
         
@@ -601,11 +592,19 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>Decrease the number of calls left by one</p>
+              <p>Returns a channel instance based on namespace, for example
+application:chat:message:received. If readOnly is true we
+will refrain from creating non existing channels.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                        subscriber.options.calls--;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+        getChannel(namespace, readOnly) {
+            <span class="hljs-keyword">let</span> namespaceHierarchy = namespace.split(<span class="hljs-string">':'</span>);
+            <span class="hljs-keyword">if</span> (namespaceHierarchy.length &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.channel.returnChannel(namespaceHierarchy, readOnly);
+            }
+        };</pre></div></div>
             
         </li>
         
@@ -616,14 +615,23 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>Once the number of calls left reaches zero or less we need to remove the subscriber</p>
+              <p>Pass in a channel namespace, function to be called, options, and context
+to call the function in to Subscribe. It will create a channel if one
+does not exist. Options can include a predicate to determine if it
+should be called (based on the data published to it) and a priority
+index.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                        <span class="hljs-keyword">if</span> (subscriber.options.calls &lt; <span class="hljs-number">1</span>) {
-                            <span class="hljs-keyword">this</span>.removeSubscriber(subscriber.id);
-                        }
-                    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+        subscribe(channelName, fn, options = {}, context) {
+            <span class="hljs-keyword">if</span> (channelName &amp;&amp; channelName !== <span class="hljs-string">''</span>) {
+                <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName, <span class="hljs-literal">false</span>);
+                <span class="hljs-keyword">return</span> channel.addSubscriber(fn, options, context);
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Namespace should be provided!'</span>);
+            }
+        };</pre></div></div>
             
         </li>
         
@@ -634,36 +642,19 @@ channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Now we call the callback, if this in turns publishes to the same channel it will no longer
-cause the callback to be called as we just removed it as a subscriber</p>
+              <p>Pass in a channel namespace, function to be called, options, and context
+to call the function in to Subscribe. It will create a channel if one
+does not exist. Options can include a predicate to determine if it
+should be called (based on the data published to it) and a priority
+index.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    subscriber.fn.apply(subscriber.context, data);
-
-                    subsAfter = <span class="hljs-keyword">this</span>._subscribers.length;
-                    y         = subsAfter;
-                    <span class="hljs-keyword">if</span> (subsAfter === subsBefore - <span class="hljs-number">1</span>) {
-                        x--;
-                    }
-                }
-            }
-
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>._parent) {
-                <span class="hljs-keyword">this</span>._parent.publish(data);
-            }
-
-            <span class="hljs-keyword">this</span>.stopped = <span class="hljs-literal">false</span>;
-        }
-    };
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Mediator</span>(<span class="hljs-params">context</span>) </span>{
-        <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Mediator)) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Mediator(context);
-        }
-
-        <span class="hljs-keyword">this</span>._channels = <span class="hljs-keyword">new</span> Channel(<span class="hljs-string">''</span>, <span class="hljs-literal">false</span>, context);
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+        once(channelName, fn, options = {}, context) {
+            options.calls = <span class="hljs-number">1</span>;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.subscribe(channelName, fn, options, context);
+        };</pre></div></div>
             
         </li>
         
@@ -674,13 +665,28 @@ cause the callback to be called as we just removed it as a subscriber</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>A Mediator instance is the interface through which events are registered
-and removed from publish channels.</p>
+              <p>Publishes arbitrary data to a given channel namespace. Channels are
+called recursively downwards; a post to application:chat will post to
+application:chat:receive and application:chat:derp:test:beta:bananas.
+Called using Mediator.publish(“application:chat”, [ args ]);</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    Mediator.prototype = {</pre></div></div>
+        publish(channelName, ...args) {
+            <span class="hljs-keyword">if</span> (channelName &amp;&amp; channelName !== <span class="hljs-string">''</span>) {
+                <span class="hljs-keyword">let</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName, <span class="hljs-literal">true</span>);
+                <span class="hljs-keyword">if</span> (channel &amp;&amp; channel.namespace === channelName) {
+                    args.push(channel)
+                    channel.publish(args);
+                }
+            }
+        };
+
+        clear() {
+            <span class="hljs-keyword">this</span>.channel.clear();
+        };
+    }</pre></div></div>
             
         </li>
         
@@ -691,40 +697,12 @@ and removed from publish channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Returns a channel instance based on namespace, for example
-application:chat:message:received. If readOnly is true we
-will refrain from creating non existing channels.</p>
+              <p>Alias some common names for easy interop</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-        getChannel: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">namespace, readOnly</span>) </span>{
-            <span class="hljs-keyword">var</span> channel            = <span class="hljs-keyword">this</span>._channels,
-                namespaceHierarchy = namespace.split(<span class="hljs-string">':'</span>),
-                x                  = <span class="hljs-number">0</span>,
-                y                  = namespaceHierarchy.length;
-
-            <span class="hljs-keyword">if</span> (namespace === <span class="hljs-string">''</span>) {
-                <span class="hljs-keyword">return</span> channel;
-            }
-
-            <span class="hljs-keyword">if</span> (namespaceHierarchy.length &gt; <span class="hljs-number">0</span>) {
-                <span class="hljs-keyword">for</span> (x, y; x &lt; y; x++) {
-
-                    <span class="hljs-keyword">if</span> (!channel.hasChannel(namespaceHierarchy[x])) {
-                        <span class="hljs-keyword">if</span> (readOnly) {
-                            <span class="hljs-keyword">break</span>;
-                        } <span class="hljs-keyword">else</span> {
-                            channel.addChannel(namespaceHierarchy[x]);
-                        }
-                    }
-
-                    channel = channel.returnChannel(namespaceHierarchy[x]);
-                }
-            }
-
-            <span class="hljs-keyword">return</span> channel;
-        },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    Mediator.prototype.on = Mediator.prototype.subscribe;
+    Mediator.prototype.trigger = Mediator.prototype.publish;</pre></div></div>
             
         </li>
         
@@ -735,178 +713,12 @@ will refrain from creating non existing channels.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>Pass in a channel namespace, function to be called, options, and context
-to call the function in to Subscribe. It will create a channel if one
-does not exist. Options can include a predicate to determine if it
-should be called (based on the data published to it) and a priority
-index.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-        subscribe: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, fn, options, context</span>) </span>{
-            <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">false</span>);
-
-            options = options || {};
-
-            <span class="hljs-keyword">return</span> channel.addSubscriber(fn, options, context);
-        },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-27">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
-              </div>
-              <p>Pass in a channel namespace, function to be called, options, and context
-to call the function in to Subscribe. It will create a channel if one
-does not exist. Options can include a predicate to determine if it
-should be called (based on the data published to it) and a priority
-index.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-        once: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, fn, options, context</span>) </span>{
-            options       = options || {};
-            options.calls = <span class="hljs-number">1</span>;
-
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.subscribe(channelName, fn, options, context);
-        },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-28">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
-              </div>
-              <p>Returns a subscriber for a given subscriber id / named function and
-channel namespace</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-        getSubscriber: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">identifier, channelName</span>) </span>{
-            <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-29">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <p>We have to check if channel within the hierarchy exists and if it is
-an exact match for the requested channel</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (channel.namespace !== channelName) {
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
-            }
-
-            <span class="hljs-keyword">return</span> channel.getSubscriber(identifier);
-        },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
-              </div>
-              <p>Remove a subscriber from a given channel namespace recursively based on
-a passed-in subscriber id or named function.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-        remove: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName, identifier</span>) </span>{
-            <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);
-            <span class="hljs-keyword">if</span> (channel.namespace !== channelName) {
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-            }
-
-            channel.removeSubscriber(identifier);
-        },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-31">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
-              </div>
-              <p>Publishes arbitrary data to a given channel namespace. Channels are
-called recursively downwards; a post to application:chat will post to
-application:chat:receive and application:chat:derp:test:beta:bananas.
-Called using Mediator.publish(“application:chat”, [ args ]);</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-        publish: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">channelName</span>) </span>{
-            <span class="hljs-keyword">var</span> channel = <span class="hljs-keyword">this</span>.getChannel(channelName || <span class="hljs-string">""</span>, <span class="hljs-literal">true</span>);
-            <span class="hljs-keyword">if</span> (channel.namespace !== channelName) {
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
-            }
-
-            <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">Array</span>.prototype.slice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">1</span>);
-
-            args.push(channel);
-
-            channel.publish(args);
-        }
-    };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-32">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
-              </div>
-              <p>Alias some common names for easy interop</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    Mediator.prototype.on      = Mediator.prototype.subscribe;
-    Mediator.prototype.bind    = Mediator.prototype.subscribe;
-    Mediator.prototype.emit    = Mediator.prototype.publish;
-    Mediator.prototype.trigger = Mediator.prototype.publish;
-    Mediator.prototype.off     = Mediator.prototype.remove;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-33">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
-              </div>
               <p>Finally, expose it all.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>
-    Mediator.Channel    = Channel;
-    Mediator.Subscriber = Subscriber;
-    Mediator.version    = <span class="hljs-string">"0.9.8"</span>;
+    Mediator.version = <span class="hljs-string">"0.9.9"</span>;
 
     <span class="hljs-keyword">return</span> Mediator;
 }));</pre></div></div>

@@ -1,6 +1,6 @@
 /* globals describe, it, expect, beforeEach */
 define([
-    'Mediator'
+    'widget/Mediator'
 ], function (Mediator) {
     'use strict';
     var expect = chai.expect;

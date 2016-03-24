@@ -1,276 +1,486 @@
-module.exports = function (grunt) {
+module.exports = function(grunt) {
+    'use strict';
+
     var coders = {
-        templateCoders: [
-            'coders/component/CpCoder',
+            templateCoders:   [
+                'coders/component/CpCoder',
+                'coders/placeholders/plCoder',
+                'coders/databind/bdCoder',
+                'coders/router/RouterCoder',
+                'coders/style/styleCoder'
+            ],
+            templateDecoders: [
+                'coders/component/CpDecoder',
+                'coders/placeholders/plDecoder',
+                'coders/databind/bdDecoder',
+                'coders/router/RouterDecoder',
+                'coders/style/styleDecoder'
+            ],
+            exclude:          [
+                'coders/component/cpCoder',
+                'coders/component/cpDecoder',
+                'coders/placeholders/plCoder',
+                'coders/placeholders/plDecoder',
+                'coders/databind/bdDecoder',
+                'coders/databind/bdCoder',
+                'coders/router/routerDecoder',
+                'coders/router/routerCoder',
+                'coders/style/styleCoder',
+                'coders/style/styleDecoder',
+                'widget/Constructor',
+                'widget/App',
+                'templating/Decoder',
+                'templating/dom'
+
+            ]
+        },
+        appPaths = {
+            'coders':         '../../../node_modules/richtemplate/dist/es5/dev/coders',
+            'templating':     '../../../node_modules/richtemplate/dist/es5/dev/templating',
+            'widget':         '../../../src/widget',
+            'watch':          '../../../lib/watch/src/watch',
+            'd3':             '../../../bower_components/d3/d3',
+            'router':         '../../../bower_components/urlmanager/dist/router',
+            'three':          '../../../bower_components/three.js/three',
+            'babel/polyfill': '../../../node_modules/babel-polyfill/dist/polyfill'
+
+
+        },
+        stubModules = ['templating/parser', 'widget/parser'],
+        rootPaths = {
+            'watch':          '../lib/watch/src/watch',
+            'templating':     '../node_modules/richtemplate/dist/es6/dev/templating',
+            'coders':         '../node_modules/richtemplate/dist/es6/dev/coders',
+            'router':         '../bower_components/urlmanager/dist/router',
+            'babel/polyfill': '../node_modules/babel-polyfill/dist/polyfill'
+        },
+        appExclude = [
+            'coders/component/cpCoder',
+            'coders/component/cpDecoder',
             'coders/placeholders/plCoder',
-            'coders/databind/bdCoder',
-            'coders/router/RouterCoder',
-            'coders/style/styleCoder'
-        ],
-        templateDecoders: [
-            'coders/component/CpDecoder',
             'coders/placeholders/plDecoder',
             'coders/databind/bdDecoder',
-            'coders/router/RouterDecoder',
-            'coders/style/styleDecoder'
-        ],
-        exclude: [
-            'coders/component/CpCoder',
-            'coders/component/CpDecoder',
-            'coders/placeholders/plCoder',
-            'coders/placeholders/plDecoder',
-            'coders/databind/bdDecoder',
             'coders/databind/bdCoder',
-            'coders/router/RouterDecoder',
-            'coders/router/RouterCoder',
+            'coders/router/routerDecoder',
+            'coders/router/routerCoder',
             'coders/style/styleCoder',
             'coders/style/styleDecoder',
-            'widget/Constructor',
-            'widget/App',
-            'templating/Decoder'
+            'templating/Decoder',
+            'templating/dom'
 
-        ]
-    }
-    var appPaths = {
-        coders: '../../../node_modules/richtemplate/dev/coders',
-        templating: '../../../node_modules/richtemplate/dev/templating',
-        'widget': '../../../src/widget',
-        'watch': '../../../lib/watch/src/watch',
-        'd3': '../../../bower_components/d3/d3',
-        'router': '../../../bower_components/urlmanager/dist/prod/router',
-        'three':'../../../bower_components/three.js/three'
-
-    };
-    var stubModules = ['templating/parser', 'widget/parser'];
+        ];
 
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
-        clean: ['target', 'dist'],
-        exec: {
+        pkg:       grunt.file.readJSON('package.json'),
+        clean:     ['target', 'dist', 'examples/**/target'],
+        exec:      {
             npmpack: 'npm pack dist',
             publish: 'npm publish dist'
         },
         requirejs: {
-            prod: {
+            prod:        {
                 options: {
-                    baseUrl: 'src',
-                    optimize: 'uglify2',
+                    baseUrl:        'src',
+                    optimize:       'none',
                     removeCombined: true,
-                    paths: {
-                        'watch': '../lib/watch/src/watch',
-                        'templating': '../node_modules/richtemplate/dev/templating',
-                        'router': '../bower_components/urlmanager/dist/prod/router'
-                    },
-                    dir: 'target/prod',
-                    modules: [
+                    paths:          rootPaths,
+                    dir:            'target/es6/prod',
+                    modules:        [
                         {
-                            name: 'widget/App'
+                            name:    'widget/App',
+                            exclude: appExclude
                         },
                         {
-                            name: 'widget/Constructor',
+                            name:    'widget/Constructor',
                             exclude: [
-                                'widget/mediator',
-                                'widget/utils'
-                            ]
+                                         'widget/Mediator'
+                                     ].concat(appExclude)
+                        },
+                        {
+                            name: 'babel/polyfill'
+
                         }
                     ]
                 }
             },
-            dev: {
+            dev:         {
                 options: {
-                    baseUrl: 'src',
-                    optimize: 'none',
+                    baseUrl:        'src',
+                    optimize:       'none',
                     removeCombined: true,
-                    paths: {
-                        'watch': '../lib/watch/src/watch',
-                        'templating': '../node_modules/richtemplate/dev/templating',
-                        'router': '../bower_components/urlmanager/dist/prod/router'
-                    },
-                    dir: 'target/dev',
-                    modules: [
+                    paths:          rootPaths,
+                    dir:            'target/es6/dev',
+                    modules:        [
                         {
-                            name: 'widget/App'
+                            name:    'widget/App',
+                            exclude: appExclude
                         },
                         {
-                            name: 'widget/Constructor',
+                            name:    'widget/Constructor',
                             exclude: [
-                                'widget/mediator',
-                                'widget/utils'
-                            ]
+                                         'widget/Mediator'
+                                     ].concat(appExclude)
                         },
                         {
-                            name: 'widget/parser',
+                            name:    'widget/parser',
                             exclude: [
                                 'widget/Constructor'
                             ]
+                        },
+                        {
+                            name: 'babel/polyfill'
+
                         }
                     ]
                 }
             },
-            element: {
+            /*   element: {
+             options: {
+             baseUrl: 'examples/element/src',
+             removeCombined: true,
+             optimize: 'none',
+             templateCoders: coders.templateCoders,
+             templateDecoders: coders.templateDecoders,
+             stubModules: stubModules,
+             exclude: coders.exclude,
+             dir: "examples/element/target/es6",
+             paths: appPaths,
+             name: 'Element'
+
+             }
+             },*/
+            basic:       {
                 options: {
-                    baseUrl: 'examples/element/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
+                    baseUrl:          'examples/basic/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/element/target",
-                    paths: appPaths,
-                    name: 'Element'
+                    stubModules:      stubModules,
+                    dir:              "examples/basic/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'Basic',
+                            exclude: coders.exclude
+
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
+                }
+            },
+            basicBind:   {
+                options: {
+                    baseUrl:          'examples/basicBind/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/basicBind/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'BasicBind',
+                            exclude: coders.exclude
+
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
 
                 }
             },
-            basic: {
+            /*         webGL: {
+             options: {
+             baseUrl: 'examples/webgl/src',
+             removeCombined: true,
+             optimize: 'none',
+             templateCoders: coders.templateCoders,
+             templateDecoders: coders.templateDecoders,
+             stubModules: stubModules,
+             exclude: coders.exclude,
+             dir: "examples/webgl/target/es6",
+             paths: appPaths,
+             name: 'WebGL'
+
+             }
+             },*/
+            routes:      {
                 options: {
-                    baseUrl: 'examples/basic/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
+                    baseUrl:          'examples/routes/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/basic/target",
-                    paths: appPaths,
-                    name: 'Basic'
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/routes/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'Routes',
+                            exclude: coders.exclude
+
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
 
                 }
             },
-            basicBind: {
+            basicTable:  {
                 options: {
-                    baseUrl: 'examples/basicBind/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
+                    baseUrl:          'examples/basicTable/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/basicBind/target",
-                    paths: appPaths,
-                    name: 'BasicBind'
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/basicTable/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'App',
+                            exclude: coders.exclude
+
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
 
                 }
             },
-   /*         webGL: {
+            todo:        {
                 options: {
-                    baseUrl: 'examples/webgl/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
+                    baseUrl:          'examples/todo/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/webgl/target",
-                    paths: appPaths,
-                    name: 'WebGL'
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/todo/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'App',
+                            exclude: coders.exclude
 
-                }
-            },*/
-            routes: {
-                options: {
-                    baseUrl: 'examples/routes/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
-                    templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/routes/target",
-                    paths: appPaths,
-                    name: 'Routes'
-
-                }
-            },
-            basicTable: {
-                options: {
-                    baseUrl: 'examples/basicTable/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
-                    templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/basicTable/target",
-                    paths: appPaths,
-                    name: 'App'
-
-                }
-            },
-            todo: {
-                options: {
-                    baseUrl: 'examples/todo/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
-                    templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/todo/target",
-                    paths: appPaths,
-                    name: 'App'
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
 
                 }
             },
             application: {
                 options: {
-                    baseUrl: 'examples/application/src',
-                    removeCombined: true,
-                    optimize: 'none',
-                    templateCoders: coders.templateCoders,
+                    baseUrl:          'examples/application/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders,
-                    stubModules: stubModules,
-                    exclude: coders.exclude,
-                    dir: "examples/application/target",
-                    paths: appPaths,
-                    name: 'App'
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/application/target/es6",
+                    paths:            appPaths,
+                    modules:          [
+                        {
+                            name:    'App',
+                            exclude: coders.exclude
+
+                        },
+                        {
+                            name: 'babel/polyfill'
+                        }
+                    ]
 
                 }
             }
         },
-        concat: {
+        concat:    {
             options: {
                 separator: ';'
             },
-            Widget: {
-                src: [
-                    'node_modules/richtemplate/prod/templating/Decoder.js',
-                    'target/prod/widget/App.js',
-                    'target/prod/widget/Constructor.js',
-                    'target/prod/loader.js'
+            Widget:  {
+                src:  [
+                    'node_modules/richtemplate/dist/es6/prod/templating/Decoder.js',
+                    'target/es6/prod/widget/App.js',
+                    'target/es6/prod/widget/Constructor.js',
+                    'target/es6/prod/loader.js'
                 ],
-                dest: 'dist/prod/loader.js'
+                dest: 'target/es6/prod/loader.js'
             }
         },
-        copy: {
-            prod: {
+        copy:      {
+            es6: {
                 files: [
+
+                    // includes files within path and its sub-directories
+                    {expand: true, cwd: 'target/es6/dev', src: ['widget/**', 'loader.js'], dest: 'dist/es6/dev'},
+                    {expand: true, cwd: 'target/es6/prod', src: ['loader.js'], dest: 'dist/es6/prod'},
                     {expand: true, cwd: './', src: ['package.json', 'bower.json', 'README.md'], dest: 'dist'}
+
+
                 ]
             },
-            dev: {
+            es5: {
                 files: [
-                    {expand: true, cwd: './target/dev', src: ['widget/**', 'loader.js'], dest: 'dist/dev'}
+                    {expand:  true,
+                        cwd:  'target/es5/dev',
+                        src:  ['babel/**', 'widget/**', 'loader.js'],
+                        dest: 'dist/es5/dev'
+                    },
+                    {expand: true, cwd: 'target/es5/prod', src: ['babel/**', 'loader.js'], dest: 'dist/es5/prod'}
                 ]
             }
         },
+        babel:     {
+            options:     {
+                presets: ['es2015'],
+                compact: false
+            },
+            dev:         {
+                options: {
+                    sourceMap: true
+                },
+                files:   [{
+                    expand: true,
+                    cwd:    'target/es6/dev',
+                    src:    '**/*.js',
+                    dest:   'target/es5/dev'
+                }]
+            },
+            prod:        {
+                options: {
+                    sourceMap: false
+                },
+                files:   [{
+                    expand: true,
+                    cwd:    'target/es6/prod',
+                    src:    ['loader.js', 'babel/polyfill.js'],
+                    dest:   'target/es5/prod'
+                }]
+            },
+            basic:       {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/basic/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/basic/target/es5'
+                    }
+                ]
+            },
+            basicBind:   {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/basicBind/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/basicBind/target/es5'
+                    }
+                ]
+            },
+            routes:      {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/routes/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/routes/target/es5'
+                    }
+                ]
+            },
+            basicTable:  {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/basicTable/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/basicTable/target/es5'
+                    }
+                ]
+            },
+            todo:        {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/todo/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/todo/target/es5'
+                    }
+                ]
+            },
+            application: {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/application/target/es6',
+                        src:    '**/*.js',
+                        dest:   'examples/application/target/es5'
+                    }
+                ]
+            }
+        },
+        uglify:    {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            },
+            prod:    {
+                files: [{
+                    expand: true,
+                    cwd:    'target/es5/prod',
+                    src:    '**/*.js',
+                    dest:   'target/es5/prod'
+                }]
+            }
+        },
+
         mocha_phantomjs: {
-            dev: {
+            dev:  {
                 options: {
                     urls: [
                         'http://localhost:8000/test/dev/index.html'
                     ]
                 }
             },
-            prod: {
+          /*  prod: {
                 options: {
                     urls: [
                         'http://localhost:8000/test/prod/index.html'
                     ]
                 }
-            }
+            }*/
         },
-        connect: {
+        connect:         {
             server: {
                 options: {
                     port: 8000,
@@ -278,24 +488,24 @@ module.exports = function (grunt) {
                 }
             }
         },
-        docco: {
+        docco:           {
             debug: {
-                src: ['src/**/*.js'],
+                src:     ['src/**/*.js'],
                 options: {
                     output: 'dist/docs/'
                 }
             }
         },
-        bump: {
+        bump:            {
             options: {
-                files: ['package.json', 'bower.json', 'dist/package.json', 'dist/bower.json'],
-                commit: true,
+                files:       ['package.json', 'bower.json', 'dist/package.json', 'dist/bower.json'],
+                commit:      true,
                 commitFiles: ['package.json', 'bower.json', 'dist/*'],
-                createTag: true,
-                tagName: '%VERSION%',
-                tagMessage: 'Version %VERSION%',
-                push: true,
-                pushTo: 'origin'
+                createTag:   true,
+                tagName:     '%VERSION%',
+                tagMessage:  'Version %VERSION%',
+                push:        true,
+                pushTo:      'origin'
             }
         }
     });
@@ -304,6 +514,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-babel');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+
 
     grunt.loadNpmTasks('grunt-mocha-phantomjs');
     grunt.loadNpmTasks('grunt-contrib-connect');
@@ -312,7 +525,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-bump');
 
     grunt.registerTask('test', ['connect', 'mocha_phantomjs']);
-    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'copy', 'test', 'docco']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'babel', 'uglify', 'copy', 'test', 'docco']);
     grunt.registerTask('publish', ['default', 'bump', 'exec:publish']);
 
 };

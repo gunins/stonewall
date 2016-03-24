@@ -6,26 +6,31 @@ define([
     'widget/parser!container/Container',
     'data',
     'watch'
-], function (App, Container, data, WatchJS) {
+], function(App, Container, data, WatchJS) {
     var watch = WatchJS.watch;
 
 
     return App.extend({
-
-        init:         function () {
+        beforeInit:   function() {
+            this.selection = '';
+        },
+        init:         function() {
             this.context.eventBus.subscribe('itemShow', this.itemShow.bind(this));
             this.context.eventBus.subscribe('addRecord', this.addRecord.bind(this));
         },
         AppContainer: Container,
-        setContext:   function () {
+        setContext:   function() {
             return {
                 data: data
             }
         },
-        itemShow:     function (selection) {
-            data.tasks.items.forEach(function (node) {
+        itemShow:     function(selection) {
+            if (selection) {
+                this.selection = selection;
+            }
+            data.tasks.items.forEach(function(node) {
                 var checked = node.completed.checked;
-                switch (selection) {
+                switch (this.selection) {
                     case 'Active':
                         if (checked !== true) {
                             node.show = 'show';
@@ -45,15 +50,15 @@ define([
                         break;
 
                 }
-            });
+            }.bind(this));
         },
-        addRecord:    function (record) {
+        addRecord:    function(record) {
             var item = {
                 value:     record,
                 completed: {
                     checked: false
                 },
-                show:      'show'
+                show:      this.selection !== 'Completed' ? 'show' : 'hide'
             };
             data.tasks.items.unshift(item);
         }

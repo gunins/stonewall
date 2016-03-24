@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>setBinders.js</title>
+  <title>applyParent.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -91,7 +91,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>setBinders.js</h1>
+                  <h1>applyParent.js</h1>
               </div>
           </li>
         
@@ -109,27 +109,48 @@
             <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
  * Created by guntars on 11/11/14.
  */</span>
-define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+define([
+    <span class="hljs-string">'templating/dom'</span>,
+    <span class="hljs-string">'./addChildren'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">dom, addChildren</span>) </span>{
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setBinders</span>(<span class="hljs-params">children, ignoreCP</span>) </span>{
-        <span class="hljs-keyword">let</span> bindings = {};
-        <span class="hljs-built_in">Object</span>.defineProperty(bindings, <span class="hljs-string">'__cp__'</span>, {
-            enumerable: <span class="hljs-literal">false</span>,
-            value:      []
-        });
-        <span class="hljs-built_in">Object</span>.keys(children).forEach((key) =&gt; {
-            <span class="hljs-keyword">let</span> el = children[key];
-            <span class="hljs-keyword">if</span> (el &amp;&amp; el.data &amp;&amp; el.data.bind !== <span class="hljs-literal">undefined</span> &amp;&amp; el.data.type !== <span class="hljs-string">'cp'</span>) {
-                bindings[el.data.bind] = bindings[el.data.bind] || []
-                bindings[el.data.bind].push(el);
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!ignoreCP &amp;&amp; el.data.type === <span class="hljs-string">'cp'</span>) {
-                bindings[<span class="hljs-string">'__cp__'</span>].push(el);
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setChildren</span>(<span class="hljs-params">context, parentChildren = {}, data = {}</span>) </span>{
+        <span class="hljs-keyword">if</span> (context) {
+            <span class="hljs-keyword">let</span> elements = context.children;
+
+            <span class="hljs-keyword">if</span> (elements) {
+                <span class="hljs-built_in">Object</span>.keys(elements).forEach((name)=&gt; {
+                    <span class="hljs-keyword">let</span> add = <span class="hljs-literal">true</span>,
+                        child = elements[name],
+                        parentChild = parentChildren[name];
+                    <span class="hljs-keyword">if</span> (parentChild !== <span class="hljs-literal">undefined</span>) {
+                        <span class="hljs-keyword">if</span> (context.nodes[name] !== <span class="hljs-literal">undefined</span>) {
+                            context.nodes[name].call(context, child, parentChild, data);
+                        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span>) {
+                            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> parentChild === <span class="hljs-string">'string'</span>) {
+                                dom.text(child, parentChild);
+                            }
+                            <span class="hljs-keyword">else</span> {
+                                child = parentChild.run(child.el);
+                            }
+                        }
+
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (context.nodes[name] !== <span class="hljs-literal">undefined</span> &amp;&amp;
+                        child.data.tplSet.noattach === <span class="hljs-string">'true'</span>) {
+                        context.nodes[name].call(context, child, data);
+                        add = <span class="hljs-literal">false</span>;
+                    }
+                    <span class="hljs-keyword">if</span> (add &amp;&amp; child.elGroup.size &gt; <span class="hljs-number">0</span>) {
+                        addChildren(context, child, data);
+                    }
+
+                });
             }
-        });
-        <span class="hljs-keyword">return</span> bindings;
+        }
     }
 
-    <span class="hljs-keyword">return</span> setBinders;
+    <span class="hljs-keyword">return</span> setChildren;
 });</pre></div></div>
             
         </li>

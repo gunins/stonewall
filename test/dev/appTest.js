@@ -1,8 +1,8 @@
 /* globals describe, it, expect, beforeEach */
 define([
     'sinon',
-    'App',
-    'Mediator'
+    'widget/App',
+    'widget/Mediator'
 ], function (sinon, App, Mediator) {
     'use strict';
     var expect = chai.expect;

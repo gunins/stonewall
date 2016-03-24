@@ -34,18 +34,18 @@
               </a>
             
               
-              <a class="source" href="dom.html">
-                dom.js
-              </a>
-            
-              
-              <a class="source" href="mediator.html">
-                mediator.js
+              <a class="source" href="Mediator.html">
+                Mediator.js
               </a>
             
               
               <a class="source" href="parser.html">
                 parser.js
+              </a>
+            
+              
+              <a class="source" href="addChildren.html">
+                addChildren.js
               </a>
             
               
@@ -59,28 +59,18 @@
               </a>
             
               
-              <a class="source" href="applyEvents.html">
-                applyEvents.js
+              <a class="source" href="applyElement.html">
+                applyElement.js
               </a>
             
               
-              <a class="source" href="deepBindings.html">
-                deepBindings.js
-              </a>
-            
-              
-              <a class="source" href="elOnchange.html">
-                elOnchange.js
+              <a class="source" href="applyParent.html">
+                applyParent.js
               </a>
             
               
               <a class="source" href="setBinders.html">
                 setBinders.js
-              </a>
-            
-              
-              <a class="source" href="setChildren.html">
-                setChildren.js
               </a>
             
               
@@ -145,15 +135,14 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>define([
-    <span class="hljs-string">'./mediator'</span>,
-    <span class="hljs-string">'router/Router'</span>,
-    <span class="hljs-string">'./utils'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Mediator, Router, utils</span>) </span>{
+    <span class="hljs-string">'./Mediator'</span>,
+    <span class="hljs-string">'router/Router'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">Mediator, Router</span>) </span>{
 <span class="hljs-meta">    'use strict'</span>;
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">triggerRoute</span>(<span class="hljs-params">router</span>) </span>{
         router.start();
         <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">onHashChange</span>(<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">var</span> match = <span class="hljs-built_in">window</span>.location.href.match(<span class="hljs-regexp">/#(.*)$/</span>);
+            <span class="hljs-keyword">let</span> match = <span class="hljs-built_in">window</span>.location.href.match(<span class="hljs-regexp">/#(.*)$/</span>);
             router.trigger(match ? match[<span class="hljs-number">1</span>] : <span class="hljs-string">''</span>);
         };
         <span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'hashchange'</span>, onHashChange, <span class="hljs-literal">false</span>);
@@ -177,13 +166,20 @@ Usage Example</p>
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">App</span>(<span class="hljs-params">options</span>) </span>{
-        options    = options || {};
-        <span class="hljs-keyword">var</span> router = <span class="hljs-keyword">new</span> Router(),
-            mapHandler;
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">App</span> </span>{
+        static extend(options = {}) {
+            <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Surrogate</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">App</span> </span>{
+            }
+            <span class="hljs-built_in">Object</span>.assign(Surrogate.prototype, options);
+            <span class="hljs-keyword">return</span> Surrogate;
+        };
 
-        <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
-        <span class="hljs-keyword">this</span>.context = utils.extend(<span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>), {</pre></div></div>
+        <span class="hljs-keyword">constructor</span>(options) {
+            options = options || {};
+            <span class="hljs-keyword">let</span> router = <span class="hljs-keyword">new</span> Router();
+
+            <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+            <span class="hljs-keyword">this</span>.context = <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>), {</pre></div></div>
             
         </li>
         
@@ -198,37 +194,37 @@ Usage Example</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            eventBus: <span class="hljs-keyword">new</span> Mediator()
-        });
-        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer({
-                appContext: <span class="hljs-keyword">this</span>.context
+            <div class="content"><div class='highlight'><pre>                eventBus: <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>.context, (channel, scope)=&gt; {
+                    scope._globalEvents = scope._globalEvents || [];
+                    <span class="hljs-keyword">if</span> (scope._globalEvents.indexOf(channel) === <span class="hljs-number">-1</span>) {
+                        scope._globalEvents.push(channel);
+                    }
+                })
             });
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) {
-                mapHandler = <span class="hljs-keyword">this</span>.appContainer._match.bind(<span class="hljs-keyword">this</span>.appContainer);
-            } <span class="hljs-keyword">else</span> {
-                mapHandler = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-                }
-            }
-
-            <span class="hljs-keyword">if</span> (options.rootRoute !== <span class="hljs-literal">undefined</span>) {
-                router.match(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">match</span>) </span>{
-                    match(options.rootRoute, mapHandler);
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer({
+                    appContext: <span class="hljs-keyword">this</span>.context
                 });
-            } <span class="hljs-keyword">else</span> {
-                router.match(mapHandler);
+
+                <span class="hljs-keyword">let</span> mapHandler = (<span class="hljs-keyword">this</span>.appContainer._match !== <span class="hljs-literal">undefined</span>) ? <span class="hljs-keyword">this</span>.appContainer._match : ()=&gt; {
+                };
+
+                <span class="hljs-keyword">if</span> (options.rootRoute !== <span class="hljs-literal">undefined</span>) {
+                    router.match((match)=&gt; {
+                        match(options.rootRoute, mapHandler);
+                    });
+                } <span class="hljs-keyword">else</span> {
+                    router.match(mapHandler);
+                }
+
+                <span class="hljs-keyword">this</span>.el = <span class="hljs-keyword">this</span>.appContainer.el;
+
+                triggerRoute(router);
+
             }
-
-            <span class="hljs-keyword">this</span>.el           = <span class="hljs-keyword">this</span>.appContainer.el;
-            setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                <span class="hljs-keyword">this</span>.el.classList.add(<span class="hljs-string">'show'</span>);
-            }.bind(<span class="hljs-keyword">this</span>), <span class="hljs-number">100</span>);
-            triggerRoute(router);
-
-        }
-        <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
-    }</pre></div></div>
+            <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+        }</pre></div></div>
             
         </li>
         
@@ -239,14 +235,13 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>Extending the <code>App</code> Class</p>
-<pre><code> @Static method extend
+              <p>Running ‘AppContainer’ is initialised.</p>
+<pre><code> @method beforeInit
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>    App.extend = utils.fnExtend;
-
-    utils.extend(App.prototype, {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        beforeInit() {
+        };</pre></div></div>
             
         </li>
         
@@ -257,13 +252,13 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Running ‘AppContainer’ is initialised.</p>
-<pre><code> @method beforeInit
+              <p>Running after ‘AppContainer’ is initialised.</p>
+<pre><code> @method init
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        beforeInit: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-        },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        init() {
+        };</pre></div></div>
             
         </li>
         
@@ -274,13 +269,14 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Running after ‘AppContainer’ is initialised.</p>
-<pre><code> @method init
+              <p>SettingContext for the <code>App</code></p>
+<pre><code> @method setContext
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        init:       <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-        },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        setContext() {
+            <span class="hljs-keyword">return</span> {};
+        }</pre></div></div>
             
         </li>
         
@@ -291,36 +287,24 @@ Usage Example</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>SettingContext for the <code>App</code></p>
-<pre><code> @method setContext
-</code></pre>
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        setContext: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">return</span> {};
-        },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
-              </div>
               <p>Starting <code>App</code> in provided <code>Container</code></p>
 <pre><code> @method start
  @param {HTMLElement} container
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        start:      <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">container</span>) </span>{
+            <div class="content"><div class='highlight'><pre>        start(container) {
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
                 container.appendChild(<span class="hljs-keyword">this</span>.el);
+                setTimeout(() =&gt; {
+                    <span class="hljs-keyword">this</span>.el.classList.add(<span class="hljs-string">'show'</span>);
+                }, <span class="hljs-number">100</span>);
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Contaner should be a HTML element'</span>);
             }
         }
-    });
+    }
+    ;
     <span class="hljs-keyword">return</span> App;
 });</pre></div></div>
             

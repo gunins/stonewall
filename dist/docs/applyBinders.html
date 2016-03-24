@@ -34,18 +34,18 @@
               </a>
             
               
-              <a class="source" href="dom.html">
-                dom.js
-              </a>
-            
-              
-              <a class="source" href="mediator.html">
-                mediator.js
+              <a class="source" href="Mediator.html">
+                Mediator.js
               </a>
             
               
               <a class="source" href="parser.html">
                 parser.js
+              </a>
+            
+              
+              <a class="source" href="addChildren.html">
+                addChildren.js
               </a>
             
               
@@ -59,28 +59,18 @@
               </a>
             
               
-              <a class="source" href="applyEvents.html">
-                applyEvents.js
+              <a class="source" href="applyElement.html">
+                applyElement.js
               </a>
             
               
-              <a class="source" href="deepBindings.html">
-                deepBindings.js
-              </a>
-            
-              
-              <a class="source" href="elOnchange.html">
-                elOnchange.js
+              <a class="source" href="applyParent.html">
+                applyParent.js
               </a>
             
               
               <a class="source" href="setBinders.html">
                 setBinders.js
-              </a>
-            
-              
-              <a class="source" href="setChildren.html">
-                setChildren.js
               </a>
             
               
@@ -120,187 +110,134 @@
  * Created by guntars on 11/11/14.
  */</span>
 define([
-    <span class="hljs-string">'../dom'</span>,
+    <span class="hljs-string">'templating/dom'</span>,
     <span class="hljs-string">'../utils'</span>,
     <span class="hljs-string">'watch'</span>,
-    <span class="hljs-string">'./applyEvents'</span>,
-    <span class="hljs-string">'./applyAttribute'</span>,
-    <span class="hljs-string">'./elOnchange'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">dom, utils, WatchJS, applyEvents, applyAttribute, elOnChange</span>) </span>{
-    <span class="hljs-keyword">var</span> watch        = WatchJS.watch,
-        unwatch      = WatchJS.unwatch,
-        callWatchers = WatchJS.callWatchers;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>TODO: This is necessary for Safari and FF, but possible memory leak, need check later.</p>
+    <span class="hljs-string">'./setBinders'</span>,
+    <span class="hljs-string">'./addChildren'</span>,
+    <span class="hljs-string">'./applyAttribute'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">dom, utils, WatchJS, setBinders, addChildren, applyAttribute</span>) </span>{
+    <span class="hljs-keyword">var</span> watch = WatchJS.watch,
+        unwatch = WatchJS.unwatch;
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBinder</span>(<span class="hljs-params">objKey, obj, parent, binder</span>) </span>{
-        <span class="hljs-keyword">var</span> events = <span class="hljs-keyword">this</span>.events[binder._node.name];
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBinder</span>(<span class="hljs-params">context, objKey, obj, binder</span>) </span>{
         <span class="hljs-keyword">if</span> (binder !== <span class="hljs-literal">undefined</span>) {
             <span class="hljs-keyword">var</span> data = obj[objKey];
-            binder.applyAttach();
 
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.nodes[objKey]) {
-                <span class="hljs-keyword">var</span> childBinder = binder;
-                <span class="hljs-keyword">this</span>.nodes[objKey].call(<span class="hljs-keyword">this</span>, childBinder, parent, data);
+            <span class="hljs-keyword">if</span> (context.nodes[objKey]) {
+                context.nodes[objKey].call(context, binder, data);
             } <span class="hljs-keyword">else</span> {
                 <span class="hljs-keyword">if</span> (!utils.isArray(data) &amp;&amp; !utils.isObject(data)) {
-                    <span class="hljs-keyword">var</span> childBinder = binder; <span class="hljs-comment">//.clone();</span>
-                    childBinder.add(parent);
-                    childBinder.text(data);
-                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name] !== <span class="hljs-literal">undefined</span>) {
-                        <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
+                    <span class="hljs-keyword">let</span> element = binder.run(<span class="hljs-literal">true</span>);
+                    element.text(data);
+                    addChildren.applyEvents(context, element, data);
+                    addChildren.elReady(context, element, data);
+                    addChildren.elOnChange(context, element, data);
+
+                    <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
+                        watch(obj, objKey, () =&gt; {
+                            element.text(obj[objKey]);
+                            addChildren.elOnChange(context, element, obj[objKey]);
+                        });
                     }
-                    elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, data);
-                    <span class="hljs-keyword">if</span> (childBinder._node.data.tplSet.update === <span class="hljs-string">'true'</span>) {
-                        watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                            childBinder.text(obj[objKey]);
-                            elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, obj[objKey]);
-                        }.bind(<span class="hljs-keyword">this</span>));
-                    }
-                    applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isArray(data)) {
-                    binder.applyAttach();
 
-                    <span class="hljs-keyword">var</span> updateChildren = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                        <span class="hljs-keyword">var</span> hasParent  = <span class="hljs-literal">false</span>,
-                            bindedData = [],
-                            addItem    = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">item, index</span>) </span>{
-                                <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);<span class="hljs-comment">//.clone();</span>
-                                <span class="hljs-keyword">var</span> isString = <span class="hljs-literal">false</span>;
-                                <span class="hljs-keyword">if</span> (!utils.isArray(item) &amp;&amp; !utils.isObject(item)) {
-                                    isString = <span class="hljs-literal">true</span>;
-                                }
-
-                                childBinder._events = [];
-                                <span class="hljs-keyword">if</span> (!hasParent) {
-                                    childBinder.add(parent);
-                                    <span class="hljs-keyword">if</span> (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    hasParent = binder.getParent();
-                                    bindedData.push({
-                                        binder: childBinder,
-                                        data:   item
+                    <span class="hljs-keyword">let</span> bindedData = [],
+                        addItem = (item, index)=&gt; {
+                            <span class="hljs-keyword">let</span> isString = <span class="hljs-literal">false</span>;
+                            <span class="hljs-keyword">if</span> (!utils.isArray(item) &amp;&amp; !utils.isObject(item)) {
+                                isString = <span class="hljs-literal">true</span>;
+                            }
+                            <span class="hljs-keyword">let</span> element = binder.run(<span class="hljs-literal">true</span>, index);
+                            <span class="hljs-keyword">if</span> (isString) {
+                                element.text(item);
+                                <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
+                                    watch(obj, objKey, ()=&gt; {
+                                        element.text(item);
+                                        addChildren.elOnChange(context, element, item);
                                     });
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (index !== <span class="hljs-literal">undefined</span> &amp;&amp; index &lt;= bindedData.length - <span class="hljs-number">1</span>) {
-                                    childBinder.add(parent, hasParent, <span class="hljs-literal">false</span>, bindedData[index].binder.el);
-                                    <span class="hljs-keyword">if</span> (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    bindedData.splice(index, <span class="hljs-number">0</span>, {
-                                        binder: childBinder,
-                                        data:   item
-                                    });
-
-                                } <span class="hljs-keyword">else</span> {
-                                    <span class="hljs-keyword">var</span> nextSibling;
-                                    <span class="hljs-keyword">if</span> (index &gt; <span class="hljs-number">0</span>) {
-                                        nextSibling = bindedData[index - <span class="hljs-number">1</span>].binder.el.nextSibling;
-                                    }
-                                    childBinder.add(parent, hasParent, <span class="hljs-literal">false</span>, nextSibling);
-
-                                    <span class="hljs-keyword">if</span> (isString) {
-                                        childBinder.text(item);
-                                    }
-                                    bindedData.push({
-                                        binder: childBinder,
-                                        data:   item
-                                    });
-
                                 }
+                            }
 
-                                applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                applyBinders.call(<span class="hljs-keyword">this</span>, item, childBinder);
+                            bindedData.push({
+                                binder: element,
+                                data:   item
+                            });
 
-                                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
-                                    <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, item);
+
+                            applyAttribute(element, item);
+                            addChildren.applyEvents(context, element, item);
+                            addChildren.elReady(context, element, item);
+                            addChildren.elOnChange(context, element, item);
+
+                            <span class="hljs-keyword">if</span> (element.children) {
+                                element.bindings = setBinders(element.children);
+                                applyBinders(context, item, element);
+                            }
+
+
+                        };
+
+                    data.forEach(addItem);
+
+                    <span class="hljs-keyword">let</span> update = binder.data.tplSet.update;
+                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                        <span class="hljs-keyword">let</span> removeMethodNames = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>],
+                            insertMethodNames = [<span class="hljs-string">'push'</span>, <span class="hljs-string">'unshift'</span>],
+                            sortingMethodNames = [<span class="hljs-string">'reverse'</span>, <span class="hljs-string">'sort'</span>];
+                        watch(obj, objKey, (prop, action, newValue, oldValue)=&gt; {
+                            <span class="hljs-keyword">let</span> clonedData = bindedData.slice(<span class="hljs-number">0</span>);
+                            <span class="hljs-keyword">if</span> (oldValue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
+                                <span class="hljs-keyword">let</span> filter = clonedData.filter((item)=&gt; item.data === newValue[<span class="hljs-number">0</span>]);
+
+                                <span class="hljs-keyword">if</span> (filter.length === <span class="hljs-number">0</span>) {
+                                    addItem(newValue[<span class="hljs-number">0</span>], (action === <span class="hljs-string">'unshift'</span>) ? <span class="hljs-number">0</span> : clonedData.length);
                                 }
-
-                                elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                <span class="hljs-keyword">if</span> (isString &amp;&amp; childBinder._node.data.tplSet.update === <span class="hljs-string">'true'</span>) {
-                                    watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                                        childBinder.text(item);
-                                        elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, item);
-                                    }.bind(<span class="hljs-keyword">this</span>));
-                                }
-                                applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, item);
-
-                            };
-                        data.forEach(addItem.bind(<span class="hljs-keyword">this</span>));
-                        <span class="hljs-keyword">var</span> update     = binder._node.data.tplSet.update;
-                        <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
-                            <span class="hljs-keyword">var</span> removeMethodNames  = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>],
-                                insertMethodNames  = [<span class="hljs-string">'push'</span>, <span class="hljs-string">'unshift'</span>],
-                                sortingMethodNames = [<span class="hljs-string">'reverse'</span>, <span class="hljs-string">'sort'</span>];
-                            watch(obj, objKey, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">prop, action, newvalue, oldvalue</span>) </span>{
-                                <span class="hljs-keyword">var</span> clonedData = bindedData.slice(<span class="hljs-number">0</span>);
-                                <span class="hljs-keyword">if</span> (oldvalue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-                                    <span class="hljs-keyword">var</span> filter = clonedData.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">item</span>) </span>{
-                                        <span class="hljs-keyword">return</span> item.data === newvalue[<span class="hljs-number">0</span>];
-                                    });
-                                    <span class="hljs-keyword">if</span> (filter.length === <span class="hljs-number">0</span>) {
-                                        addItem.call(<span class="hljs-keyword">this</span>, newvalue[<span class="hljs-number">0</span>], (action === <span class="hljs-string">'unshift'</span>) ? <span class="hljs-number">0</span> : clonedData.length);
+                            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (removeMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
+                                clonedData.forEach((binder)=&gt; {
+                                    <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === <span class="hljs-number">-1</span>) {
+                                        binder.binder.remove();
+                                        bindedData.splice(bindedData.indexOf(binder), <span class="hljs-number">1</span>);
                                     }
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (removeMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-                                    clonedData.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">binder</span>) </span>{
-                                        <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === <span class="hljs-number">-1</span>) {
-                                            binder.binder.remove();
-                                            bindedData.splice(bindedData.indexOf(binder), <span class="hljs-number">1</span>);
-                                        }
-                                    }.bind(<span class="hljs-keyword">this</span>));
+                                });
 
-                                    <span class="hljs-keyword">if</span> (action === <span class="hljs-string">'splice'</span>) {
-                                        <span class="hljs-keyword">var</span> vals = <span class="hljs-built_in">Array</span>.prototype.slice.call(newvalue, <span class="hljs-number">2</span>);
-                                        <span class="hljs-keyword">if</span> (vals &amp;&amp; vals.length &gt; <span class="hljs-number">0</span>) {
-                                            vals.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">val</span>) </span>{
-                                                <span class="hljs-keyword">var</span> index = obj[objKey].indexOf(val);
-                                                <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
-                                                    addItem.call(<span class="hljs-keyword">this</span>, val, index);
-                                                }
-                                            }.bind(<span class="hljs-keyword">this</span>));
-                                        }
+                                <span class="hljs-keyword">if</span> (action === <span class="hljs-string">'splice'</span>) {
+                                    <span class="hljs-keyword">let</span> vals = <span class="hljs-built_in">Array</span>.prototype.slice.call(newValue, <span class="hljs-number">2</span>);
+                                    <span class="hljs-keyword">if</span> (vals &amp;&amp; vals.length &gt; <span class="hljs-number">0</span>) {
+                                        vals.forEach((val)=&gt; {
+                                            <span class="hljs-keyword">let</span> index = obj[objKey].indexOf(val);
+                                            <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
+                                                addItem(val, index);
+                                            }
+                                        });
                                     }
-                                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-
                                 }
+                            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
+                                data.forEach((value, index)=&gt; {
+                                    <span class="hljs-keyword">let</span> element = clonedData.filter(item=&gt;item.data === value)[<span class="hljs-number">0</span>];
+                                    bindedData.splice(index, <span class="hljs-number">0</span>, bindedData.splice(bindedData.indexOf(element), <span class="hljs-number">1</span>)[<span class="hljs-number">0</span>]);
+                                    element.binder.changePosition(index);
 
-                            }.bind(<span class="hljs-keyword">this</span>));
-                        }
+                                });
+                            }
+
+                        });
                     }
-                    updateChildren.call(<span class="hljs-keyword">this</span>);
+
 
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isObject(data)) {
-                    <span class="hljs-keyword">var</span> childBinder = utils.extend({}, binder);
-                    <span class="hljs-keyword">if</span> (childBinder._node.data.type === <span class="hljs-string">'cp'</span>) {
-                        <span class="hljs-keyword">if</span> (childBinder.el === <span class="hljs-literal">undefined</span>) {
-                            dom.add(childBinder, parent, <span class="hljs-literal">false</span>, data);
-                        } <span class="hljs-keyword">else</span> {
-                            dom.replace(childBinder, binder, data);
+                    <span class="hljs-keyword">let</span> element = binder.run(data);
+                    <span class="hljs-keyword">if</span> (element.data.type !== <span class="hljs-string">'cp'</span>) {
+                        applyAttribute(element, data);
+                        addChildren.applyEvents(context, element, data);
+                        addChildren.elReady(context, element, data);
+                        addChildren.elOnChange(context, element, data);
+                        <span class="hljs-keyword">if</span> (element.children) {
+                            element.bindings = setBinders(element.children);
+                            applyBinders(context, data, element);
                         }
                     }
-                    <span class="hljs-keyword">else</span> {
-                        dom.add(childBinder, parent);
-                        applyEvents.call(<span class="hljs-keyword">this</span>, childBinder, events, data);
-                        applyAttribute.call(<span class="hljs-keyword">this</span>, childBinder, data);
-                        applyBinders.call(<span class="hljs-keyword">this</span>, data, childBinder);
-                    }
 
-                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elReady[childBinder._node.name]) {
-                        <span class="hljs-keyword">this</span>.elReady[childBinder._node.name].call(<span class="hljs-keyword">this</span>, childBinder, data);
-                    }
-                    elOnChange.call(<span class="hljs-keyword">this</span>, childBinder, data);
 
                 }
             }
@@ -308,46 +245,31 @@ define([
 
     };
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyBinders</span>(<span class="hljs-params">obj, instance</span>) </span>{
-        <span class="hljs-keyword">var</span> binders = instance.bindings,
-            parent  = instance.el;
-
-        <span class="hljs-keyword">if</span> (obj &amp;&amp; binders !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">Object</span>.keys(obj).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">objKey</span>) </span>{
-                <span class="hljs-keyword">if</span> (binders[objKey] !== <span class="hljs-literal">undefined</span>) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>TODO: Investigate, why not always an Array</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (binders[objKey].forEach !== <span class="hljs-literal">undefined</span>) {
-                        binders[objKey].forEach(parseBinder.bind(<span class="hljs-keyword">this</span>, objKey, obj, parent));
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyBinders</span>(<span class="hljs-params">context, obj, instance</span>) </span>{
+        <span class="hljs-keyword">let</span> binders = instance.bindings;
+        <span class="hljs-keyword">if</span> (binders) {
+            <span class="hljs-keyword">if</span> (binders[<span class="hljs-string">'__cp__'</span>].length &gt; <span class="hljs-number">0</span>) {
+                binders[<span class="hljs-string">'__cp__'</span>].forEach(binder=&gt; {
+                    <span class="hljs-keyword">let</span> component = binder.run(obj);
+                    addChildren.elReady(context, component, obj);
+                    addChildren.elOnChange(context, component, obj);
+                });
+            }
+            <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(binders);
+            <span class="hljs-keyword">if</span> (obj &amp;&amp; keys.length &gt; <span class="hljs-number">0</span>) {
+                keys.forEach((binderKey) =&gt; {
+                    <span class="hljs-keyword">if</span> (obj[binderKey] !== <span class="hljs-literal">undefined</span>) {
+                        binders[binderKey].forEach(binder=&gt;parseBinder(context, binderKey, obj, binder));
                     } <span class="hljs-keyword">else</span> {
-                        parseBinder.call(<span class="hljs-keyword">this</span>, objKey, obj, parent, binders[objKey]);
-                    }
-                }
-            }.bind(<span class="hljs-keyword">this</span>));
-            <span class="hljs-keyword">if</span> (binders) {
-                <span class="hljs-built_in">Object</span>.keys(binders).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">binderKey</span>) </span>{
-                    <span class="hljs-keyword">if</span> (obj[binderKey] === <span class="hljs-literal">undefined</span>) {
-                        <span class="hljs-keyword">var</span> fn = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">prop, action, newvalue, oldvalue</span>) </span>{
-                            <span class="hljs-keyword">if</span> (newvalue !== <span class="hljs-literal">undefined</span> &amp;&amp; oldvalue === <span class="hljs-literal">undefined</span>) {
-                                binders[binderKey].forEach(parseBinder.bind(<span class="hljs-keyword">this</span>, binderKey, obj, parent));
+                        <span class="hljs-keyword">let</span> fn = (prop, action, newValue, oldValue) =&gt; {
+                            <span class="hljs-keyword">if</span> (newValue !== <span class="hljs-literal">undefined</span> &amp;&amp; oldValue === <span class="hljs-literal">undefined</span>) {
+                                binders[binderKey].forEach(binder=&gt;parseBinder(context, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
-                        }.bind(<span class="hljs-keyword">this</span>);
+                        }
                         watch(obj, binderKey, fn, <span class="hljs-number">0</span>);
                     }
-                }.bind(<span class="hljs-keyword">this</span>));
+                });
             }
         }
     }

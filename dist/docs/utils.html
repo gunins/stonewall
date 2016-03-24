@@ -34,18 +34,18 @@
               </a>
             
               
-              <a class="source" href="dom.html">
-                dom.js
-              </a>
-            
-              
-              <a class="source" href="mediator.html">
-                mediator.js
+              <a class="source" href="Mediator.html">
+                Mediator.js
               </a>
             
               
               <a class="source" href="parser.html">
                 parser.js
+              </a>
+            
+              
+              <a class="source" href="addChildren.html">
+                addChildren.js
               </a>
             
               
@@ -59,28 +59,18 @@
               </a>
             
               
-              <a class="source" href="applyEvents.html">
-                applyEvents.js
+              <a class="source" href="applyElement.html">
+                applyElement.js
               </a>
             
               
-              <a class="source" href="deepBindings.html">
-                deepBindings.js
-              </a>
-            
-              
-              <a class="source" href="elOnchange.html">
-                elOnchange.js
+              <a class="source" href="applyParent.html">
+                applyParent.js
               </a>
             
               
               <a class="source" href="setBinders.html">
                 setBinders.js
-              </a>
-            
-              
-              <a class="source" href="setChildren.html">
-                setChildren.js
               </a>
             
               
@@ -161,19 +151,20 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
         child.__super__ = parent.prototype;
         <span class="hljs-keyword">return</span> child;
     };
+
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isString</span>(<span class="hljs-params">obj</span>) </span>{
         <span class="hljs-keyword">return</span> toString.call(obj) === <span class="hljs-string">'[object String]'</span>;
 
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isObject</span>(<span class="hljs-params">obj</span>) </span>{
-        <span class="hljs-keyword">var</span> type = <span class="hljs-keyword">typeof</span> obj;
-        <span class="hljs-keyword">return</span> type === <span class="hljs-string">'function'</span> || type === <span class="hljs-string">'object'</span> &amp;&amp; !!obj;
+        <span class="hljs-keyword">return</span> obj === <span class="hljs-built_in">Object</span>(obj);
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isArray</span>(<span class="hljs-params">obj</span>) </span>{
         <span class="hljs-keyword">return</span> (<span class="hljs-built_in">Array</span>.isArray) ? <span class="hljs-built_in">Array</span>.isArray(obj) : toString.call(obj) === <span class="hljs-string">'[object Array]'</span>;
     }
+
 
     <span class="hljs-keyword">return</span> {
         fnExtend: fnExtend,</pre></div></div>
@@ -191,7 +182,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        extend: extend,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        extend:   extend,</pre></div></div>
             
         </li>
         
@@ -236,7 +227,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        isArray: isArray
+            <div class="content"><div class='highlight'><pre>        isArray:  isArray
     };
 });</pre></div></div>
             

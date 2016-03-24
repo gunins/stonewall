@@ -40,7 +40,6 @@ define('widget/parser',[],function () {
                     return Widget;
                 });
             req([moduleName], function (Widget) {
-                console.log(Widget,'Show Widget!!!')
                 onLoad(Widget);
             });
         },
