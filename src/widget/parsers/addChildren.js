@@ -3,24 +3,26 @@
  */
 define([], function() {
     'use strict';
-    function addChildren(context, name, child, data) {
-        applyEvents(context, child);
-        elReady(context, child, data);
-        elOnChange(context, child, data);
+    function addChildren(context, child, data) {
+        if (child && child.name && context) {
+            applyEvents(context, child, data);
+            elReady(context, child, data);
+            elOnChange(context, child, data);
 
-        context.children[name] = child;
-        return child;
-    };
-
-    function elOnChange(context, childBinder, data) {
-        if (context.elOnChange[childBinder.name] !== undefined) {
-            context.elOnChange[childBinder.name].call(context, childBinder, data);
+            context.children[child.name] = child;
+            return child;
         }
     };
 
-    function elReady(context, childBinder, data) {
-        if (context.elReady[childBinder.name] !== undefined) {
-            context.elReady[childBinder.name].call(context, childBinder, data);
+    function elOnChange(context, child, data) {
+        if (context.elOnChange[child.name] !== undefined) {
+            context.elOnChange[child.name].call(context, child, data);
+        }
+    };
+
+    function elReady(context, child, data) {
+        if (context.elReady[child.name] !== undefined) {
+            context.elReady[child.name].call(context, child, data);
         }
     };
 
@@ -30,15 +32,14 @@ define([], function() {
     //      @param {dom.Element} element
     //      @param {Array} events
     //      @param {Object} data
-    function applyEvents(context, element, data) {
-        var events = context.events[element.name];
-        if (events !== undefined && element.el !== undefined && element.data.type !== 'cp') {
+    function applyEvents(context, child, data) {
+        var events = context.events[child.name];
+        if (events !== undefined && child.el !== undefined && child.data.type !== 'cp') {
             events.forEach((event)=> {
-                context._events.push(element.on(event.name, event.action, context, data));
+                context._events.push(child.on(event.name, event.action, context, data));
             });
         }
     };
-
 
 
     Object.assign(addChildren, {elOnChange, elReady, applyEvents});

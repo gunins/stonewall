@@ -4,7 +4,7 @@
 define([
     'templating/dom',
     './addChildren'
-], function (dom, addChildren) {
+], function(dom, addChildren) {
 
 
     function setChildren(context, parentChildren = {}, data = {}) {
@@ -20,21 +20,21 @@ define([
                         if (context.nodes[name] !== undefined) {
                             context.nodes[name].call(context, child, parentChild, data);
                         } else if (child !== undefined) {
-                            if (typeof parentChild == 'string') {
+                            if (typeof parentChild === 'string') {
                                 dom.text(child, parentChild);
                             }
                             else {
                                 child = parentChild.run(child.el);
                             }
                         }
-                        addChildren(context, name, child, data);
+
                     } else if (context.nodes[name] !== undefined &&
                         child.data.tplSet.noattach === 'true') {
                         context.nodes[name].call(context, child, data);
                         add = false;
                     }
-                    if (add) {
-                        addChildren(context, name, child, data);
+                    if (add && child.elGroup.size > 0) {
+                        addChildren(context, child, data);
                     }
 
                 });

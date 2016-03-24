@@ -124,7 +124,7 @@ define([
                     this.applyBinders(this.data, this);
                 }
 
-                addChildren(this, 'root', this.root);
+                addChildren(this, this.root);
 
             } else {
                 this.el = document.createElement('div');
@@ -277,7 +277,7 @@ define([
             }
 
             instance = el.run(data || true);
-            addChildren(this, name, instance, data);
+            addChildren(this, instance, data);
 
             this.setRoutes(instance);
             this.rebind();
