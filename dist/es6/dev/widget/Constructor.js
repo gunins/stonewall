@@ -1239,7 +1239,7 @@ define('widget/Constructor',[
             this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
                 this.context._cssReady.push(url);
-                var linkRef = document.createElement("link");
+                let linkRef = document.createElement("link");
                 linkRef.setAttribute("rel", "stylesheet")
                 linkRef.setAttribute("type", "text/css")
                 linkRef.setAttribute("href", url)

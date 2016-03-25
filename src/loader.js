@@ -9,16 +9,48 @@
 //
 //      `<script data-name="App" data-target="body"
 //          src="../../src/loader.js"></script>`
-(function () {
+(function(global) {
+    var checkEs6 = function() {
+        'use strict';
 
-    function getData(attributes, dataset) {
-        for (var a = 0; a < attributes.length; a++) {
-            var attribs = attributes[a];
-            if (attribs.name.indexOf('data-') == 0 && attribs.name.length > 5) {
-                dataset[attribs.name.substr(5)] = attribs.value;
-            }
+        if (typeof Symbol == 'undefined') return false;
+        try {
+            eval('class Foo {}');
+            eval('var bar = (x) => x+1');
+        } catch (e) {
+            return false;
         }
-        return dataset;
+
+        return true;
+    }();
+    var target = checkEs6 ? 'es6' : 'es5';
+
+    define('es6Features', ['require'], function(require) {
+        var methods = ['Map', 'Set', 'Symbol'];
+
+        function testGlobal(method) {
+            return global[method] === undefined;
+        }
+
+        return function(done) {
+            if (methods.filter(testGlobal).length > 0) {
+                require(['babel/polyfill'], function() {
+                    done();
+                });
+            } else {
+                done();
+            }
+        }.bind(this);
+    });
+
+    function getData(script, dataset) {
+        var data = script.dataset,
+            keys = Object.keys(data);
+        if (keys.length > 0) {
+            keys.forEach(function(key) {
+                dataset[key] = data[key];
+            })
+        }
     }
 
     function getDataSet() {
@@ -26,9 +58,7 @@
             scripts = document.getElementsByTagName('script');
         if (scripts.length > 0) {
             for (var a = 0; a < scripts.length; a++) {
-                var script = scripts[a];
-                var attributes = script.attributes;
-                getData(attributes, dataset);
+                getData(scripts[a], dataset);
             }
         }
 
@@ -37,15 +67,28 @@
 
     function containerStart(dataset) {
         if (dataset.name !== undefined) {
-            require([dataset.name], function (App) {
-                var container = (dataset.target) ? document.querySelector(dataset.target) : document.body;
-                var app = new App();
-                app.start(container);
-            });
+            var config = [['es6Features'], function(cb) {
+                cb(function run() {
+                    require(['widget/App'], function() {
+                        require({}, [dataset.name], function(App) {
+                            var container = (dataset.target) ? document.querySelector(dataset.target) : document.body,
+                                app = new App();
+                            app.start(container);
+                        });
+                    });
+                });
+
+            }];
+            if (dataset.dev !== 'true') {
+                config.unshift({baseUrl: './target/' + target})
+            }
+            require.apply(global, config);
+
         }
     }
-    document.addEventListener("DOMContentLoaded", function(){
+
+    document.addEventListener("DOMContentLoaded", function() {
         containerStart(getDataSet());
     }, false);
 
-}());
+}(this));

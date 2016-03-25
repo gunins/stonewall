@@ -3,17 +3,17 @@ module.exports = function(grunt) {
 
     var coders = {
             templateCoders:   [
-                'coders/component/CpCoder',
+                'coders/component/cpCoder',
                 'coders/placeholders/plCoder',
                 'coders/databind/bdCoder',
-                'coders/router/RouterCoder',
+                'coders/router/routerCoder',
                 'coders/style/styleCoder'
             ],
             templateDecoders: [
-                'coders/component/CpDecoder',
+                'coders/component/cpDecoder',
                 'coders/placeholders/plDecoder',
                 'coders/databind/bdDecoder',
-                'coders/router/RouterDecoder',
+                'coders/router/routerDecoder',
                 'coders/style/styleDecoder'
             ],
             exclude:          [
@@ -315,33 +315,73 @@ module.exports = function(grunt) {
                 src:  [
                     'node_modules/richtemplate/dist/es6/prod/templating/Decoder.js',
                     'target/es6/prod/widget/App.js',
-                    'target/es6/prod/widget/Constructor.js',
-                    'target/es6/prod/loader.js'
+                    'target/es6/prod/widget/Constructor.js'
                 ],
-                dest: 'target/es6/prod/loader.js'
+                dest: 'target/es6/prod/widget/App.js'
             }
         },
         copy:      {
-            es6: {
+            es6:              {
                 files: [
-
-                    // includes files within path and its sub-directories
-                    {expand: true, cwd: 'target/es6/dev', src: ['widget/**', 'loader.js'], dest: 'dist/es6/dev'},
-                    {expand: true, cwd: 'target/es6/prod', src: ['loader.js'], dest: 'dist/es6/prod'},
+                    {expand: true, cwd: 'target/es6/dev', src: ['widget/**'], dest: 'dist/es6/dev'},
+                    {expand: true, cwd: 'target/es6/prod', src: ['widget/App.js'], dest: 'dist/es6/prod'},
                     {expand: true, cwd: './', src: ['package.json', 'bower.json', 'README.md'], dest: 'dist'}
-
-
                 ]
             },
-            es5: {
+            es5:              {
                 files: [
-                    {expand:  true,
-                        cwd:  'target/es5/dev',
-                        src:  ['babel/**', 'widget/**', 'loader.js'],
-                        dest: 'dist/es5/dev'
+                    {
+                        expand: true,
+                        cwd:    'target/es5/dev',
+                        src:    ['babel/**', 'widget/**'],
+                        dest:   'dist/es5/dev'
                     },
-                    {expand: true, cwd: 'target/es5/prod', src: ['babel/**', 'loader.js'], dest: 'dist/es5/prod'}
+                    {expand: true, cwd: 'target/es5/prod', src: ['babel/**', 'widget/App.js'], dest: 'dist/es5/prod'}
                 ]
+            },
+            loader:           {
+                files: [
+                    {
+                        expand: true,
+                        cwd:    'target/',
+                        src:    ['loader.js'],
+                        dest:   'dist/'
+                    },
+                    {expand: true, cwd: 'target/es5/prod', src: ['babel/**', 'widget/**'], dest: 'dist/es5/prod'}
+                ]
+            },
+            examplesES6:      {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                    return {
+                        expand: true,
+                        cwd:    'target/es6/prod',
+                        src:    ['widget/App.js'],
+                        dest:   'examples/' + name + '/target/es6/'
+                    }
+
+                })
+            },
+            examplesES5:      {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                    return {
+                        expand: true,
+                        cwd:    'target/es5/prod',
+                        src:    ['widget/App.js', 'babel/polyfill.js'],
+                        dest:   'examples/' + name + '/target/es5/'
+                    }
+
+                })
+            },
+            examplesToLoader: {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                    return {
+                        expand: true,
+                        cwd:    'target/',
+                        src:    ['loader.js'],
+                        dest:   'examples/' + name + '/target/'
+                    }
+
+                })
             }
         },
         babel:     {
@@ -367,7 +407,7 @@ module.exports = function(grunt) {
                 files:   [{
                     expand: true,
                     cwd:    'target/es6/prod',
-                    src:    ['loader.js', 'babel/polyfill.js'],
+                    src:    ['babel/polyfill.js', 'widget/App.js'],
                     dest:   'target/es5/prod'
                 }]
             },
@@ -379,7 +419,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/basic/target/es6',
-                        src:    '**/*.js',
+                        src:    'Basic.js',
                         dest:   'examples/basic/target/es5'
                     }
                 ]
@@ -392,7 +432,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/basicBind/target/es6',
-                        src:    '**/*.js',
+                        src:    'BasicBind.js',
                         dest:   'examples/basicBind/target/es5'
                     }
                 ]
@@ -405,7 +445,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/routes/target/es6',
-                        src:    '**/*.js',
+                        src:    'Routes.js',
                         dest:   'examples/routes/target/es5'
                     }
                 ]
@@ -418,7 +458,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/basicTable/target/es6',
-                        src:    '**/*.js',
+                        src:    'App.js',
                         dest:   'examples/basicTable/target/es5'
                     }
                 ]
@@ -431,7 +471,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/todo/target/es6',
-                        src:    '**/*.js',
+                        src:    'App.js',
                         dest:   'examples/todo/target/es5'
                     }
                 ]
@@ -444,7 +484,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd:    'examples/application/target/es6',
-                        src:    '**/*.js',
+                        src:    'App.js',
                         dest:   'examples/application/target/es5'
                     }
                 ]
@@ -461,24 +501,32 @@ module.exports = function(grunt) {
                     src:    '**/*.js',
                     dest:   'target/es5/prod'
                 }]
+            },
+            loader:  {
+                files: [{
+                    expand: true,
+                    cwd:    'src/',
+                    src:    'loader.js',
+                    dest:   'target/'
+                }]
             }
         },
 
         mocha_phantomjs: {
-            dev:  {
+            dev: {
                 options: {
                     urls: [
                         'http://localhost:8000/test/dev/index.html'
                     ]
                 }
             },
-          /*  prod: {
-                options: {
-                    urls: [
-                        'http://localhost:8000/test/prod/index.html'
-                    ]
-                }
-            }*/
+            /*  prod: {
+             options: {
+             urls: [
+             'http://localhost:8000/test/prod/index.html'
+             ]
+             }
+             }*/
         },
         connect:         {
             server: {

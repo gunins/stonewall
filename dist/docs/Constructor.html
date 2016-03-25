@@ -332,7 +332,7 @@ Basic Usage example</p>
             <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === <span class="hljs-number">-1</span>) {
                 <span class="hljs-keyword">this</span>.context._cssReady.push(url);
-                <span class="hljs-keyword">var</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>);
+                <span class="hljs-keyword">let</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>);
                 linkRef.setAttribute(<span class="hljs-string">"rel"</span>, <span class="hljs-string">"stylesheet"</span>)
                 linkRef.setAttribute(<span class="hljs-string">"type"</span>, <span class="hljs-string">"text/css"</span>)
                 linkRef.setAttribute(<span class="hljs-string">"href"</span>, url)

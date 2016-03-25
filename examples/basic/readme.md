@@ -21,7 +21,7 @@
       <!--
           location of framework
           data-name: location of main script for Application
-          data-target?: location to container if not set, use document.body
+                  data-target?: location to container if not set, use document.body         data-dev?: Define App is in development mode
       -->
       <script data-name="app" data-target="body" src="../../src/loader.js"></script>
 
