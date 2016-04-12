@@ -17,13 +17,21 @@
 define([
     './Mediator',
     'router/Router'
-], function (Mediator, Router) {
+], function(Mediator, Router) {
     'use strict';
     function triggerRoute(router) {
         router.start();
-        function onHashChange() {
+        router.setListener((location)=> {
             let match = window.location.href.match(/#(.*)$/);
-            router.trigger(match ? match[1] : '');
+            if (match[1] !== location) {
+                window.location.hash = location;
+            }
+        });
+
+        function onHashChange() {
+            let match = window.location.href.match(/#(.*)$/),
+                route = match ? match[1] : ''
+                router.trigger(route);
         };
         window.addEventListener('hashchange', onHashChange, false);
         onHashChange();
@@ -43,9 +51,8 @@ define([
             return Surrogate;
         };
 
-        constructor(options) {
-            options = options || {};
-            let router = new Router();
+        constructor(options = {}) {
+            this.options = options;
 
             this.beforeInit.apply(this, arguments);
             this.context = Object.assign(this.setContext.apply(this, arguments), {
@@ -63,20 +70,6 @@ define([
                     appContext: this.context
                 });
 
-                let mapHandler = (this.appContainer._match !== undefined) ? this.appContainer._match : ()=> {
-                };
-
-                if (options.rootRoute !== undefined) {
-                    router.match((match)=> {
-                        match(options.rootRoute, mapHandler);
-                    });
-                } else {
-                    router.match(mapHandler);
-                }
-
-                this.el = this.appContainer.el;
-
-                triggerRoute(router);
 
             }
             this.init.apply(this, arguments);
@@ -108,9 +101,18 @@ define([
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
-                container.appendChild(this.el);
+                this.el = container;
+                let el = document.createElement('div');
+                container.appendChild(el);
+                this.appContainer.ready(el);
+
+                let router = new Router(this.options.rootRoute);
+                router.match((match)=> this.appContainer._match(match));
+
+                triggerRoute(router);
+
                 setTimeout(() => {
-                    this.el.classList.add('show');
+                    container.classList.add('show');
                 }, 100);
             } else {
                 throw Error('Contaner should be a HTML element');

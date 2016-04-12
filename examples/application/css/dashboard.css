@@ -11,12 +11,10 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-}
-body > div {
   opacity: 0;
   transition: opacity 1s;
 }
-body > div.show {
+body.show {
   opacity: 1;
 }
 /*

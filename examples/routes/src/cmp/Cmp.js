@@ -4,17 +4,18 @@
 define([
     'widget/Constructor',
     'templating/parser!./_cmp.html'
-], function (Constructor, template) {
+], function(Constructor, template) {
     'use strict';
-    var action    = [
+    var action = [
         {
             name:   'change',
-            action: function (e, el) {
+            action: function(e, el, data) {
+                data.value = el.val();
                 this.setLocation({id: el.val()})
             }
         }
     ];
-    var serialize = function (obj) {
+    var serialize = function(obj) {
         var str = [];
         for (var p in obj)
             if (obj.hasOwnProperty(p)) {
@@ -24,43 +25,66 @@ define([
     };
     return Constructor.extend({
         template:    template,
-        init:        function (data) {
-            // console.log('init'); //, this.el, data);
-            //console.log(this)
+        async:       true,
+        init:        function(data) {
+            this.data = {
+                input: {
+                    value: ''
+                }
+            };
+
         },
-        match:       function (match) {
+        match:       function(match) {
             // console.log(match, 'match');
-            match('/:id').to(function (id) {
+            this.custom = match('/:id').to(function(id) {
                 console.log('custom', id);
             })
         },
-        to:          function (id) {
-            this.children.showid.text((typeof id !== 'object') ? id : 'Link id not dynamic');
+        to:          function(id) {
+            this.id = (typeof id !== 'object') ? id : 'Link id not dynamic';
             console.log('to', id); //, this.el, id);
-        },
-        leave:       function () {
-            console.log('leave'); //, this.el)
-        },
-        query:       function (params) {
-            this.children.input.val(params.getQuery().id || '');
-            this.children.inputA.val(params.getQuery().id || '');
-        },
-        onDestroy:function () {
-          // console.log('cpm', this);
-        },
-        getLocation: function () {
+            // this.render();
 
         },
-        setLocation: function (query) {
-            var location         = window.location.hash.split('?', 2)[0]
+        leave:       function(done) {
+            var close = confirm('Are You Sure?');
+            done(close);
+            if (close) {
+                this.custom.remove();
+                console.log('leave'); //, this.el)
+            }
+        },
+        query:       function(params) {
+            // console.log('query')
+            this.queryId = params.getQuery().id;
+            if (this.queryId) {
+                this.data.input.value = this.queryId;
+            }
+            this.render();
+
+
+        },
+        onDestroy:   function() {
+            // console.log('cpm', this);
+        },
+        getLocation: function() {
+
+        },
+        setLocation: function(query) {
+            var location = window.location.hash.split('?', 2)[0]
             window.location.hash = location + '?' + serialize(query);
         },
         events:      {
             input:  action,
             inputA: action
         },
+        elReady:     {
+            showid: function(el) {
+                el.text(this.id);
+            }
+        },
         nodes:       {
-            footer: function (el) {
+            footer: function(el) {
                 setTimeout(()=> {
                     this.setChildren(el);
                 }, 2000)

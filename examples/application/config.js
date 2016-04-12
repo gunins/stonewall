@@ -22,7 +22,7 @@ require.config({
         'widget': '../../../src/widget',
         'routerCoders': '../../../src/routerCoders',
         'watch':'../../../lib/watch/src/watch',
-        'router':'../../../bower_components/urlmanager/dist/router',
+        'router':'../../../bower_components/urlmanager/dist/es6/dev/router',
         'd3':'../../../bower_components/d3/d3'
     }
 });

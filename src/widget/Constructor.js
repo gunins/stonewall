@@ -75,20 +75,24 @@ define([
             return Surrogate;
         };
 
-        constructor(data, parentChildren, dataSet, node) {
+        constructor(options = {}, parentChildren, dataSet = {}, node) {
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._routes = [];
             this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
+            this._parentChildren = parentChildren;
+            this._options = options;
+            this._rendered = false;
+            this._arguments = arguments;
+
 
             this.eventBus = new Mediator(this);
 
             this.context = context;
 
-            if (data.appContext !== undefined) {
-                Object.assign(this.context, data.appContext);
+            if (options.appContext !== undefined) {
+                Object.assign(this.context, options.appContext);
             }
 
             if (node !== undefined && node.name !== undefined) {
@@ -97,40 +101,80 @@ define([
 
             this.beforeInit.apply(this, arguments);
 
-
-            if (this.template) {
+            if (!this.data) {
                 let keys = (dataSet) ? Object.keys(dataSet) : [],
                     contextData = (keys.length > 0) ? dataSet : this.context.data;
-
-                if (!this.data && contextData) {
-                    this.data = contextData[data.bind] || contextData;
+                if (contextData) {
+                    this.data = contextData[options.bind] || contextData;
                 }
-
-                let decoder = new Decoder(this.template),
-                    template = decoder.render(this.data);
-
-                this.el = template.fragment;
-
-                this.root = new dom.Element(this.el, {
-                    name: 'root'
-                });
-
-                this.children = applyElement(template.children, data);
-                setRoutes(this, this.children);
-                applyParent(this, parentChildren, this.data);
-                this.bindings = setBinders(this.children, true);
-
-                if (this.data) {
-                    this.applyBinders(this.data, this);
-                }
-
-                addChildren(this, this.root);
-
-            } else {
-                this.el = document.createElement('div');
             }
-            this.init.apply(this, arguments);
+        };
+
+        ready(el) {
+            this.el = el;
+
         }
+
+        _match(match) {
+            this._match_ = match;
+
+            if (this.match) {
+                this.match(match);
+            }
+
+            if (!this.async) {
+                this.render();
+            }
+
+            this.init.apply(this, this._arguments);
+        }
+
+        // method render called manually if flag async is true;
+        //
+        //      @method render
+        render(data) {
+            if (!this._rendered) {
+                if (this.template) {
+                    if (data) {
+                        this.data = data;
+                    }
+                    let options = this._options,
+                        parentChildren = this._parentChildren,
+                        decoder = new Decoder(this.template),
+                        template = decoder.render(this.data);
+                    if (this.el) {
+                        let parent = this.el.parentNode;
+                        if (parent) {
+                            parent.replaceChild(template.fragment, this.el);
+                        }
+                        if (this.elGroup && this.elGroup.get(this.el)) {
+                            this.elGroup.delete(this.el);
+                            this.el = template.fragment;
+                            this.elGroup.set(template.fragment, this);
+                        }
+                    } else {
+                        this.el = template.fragment;
+                    }
+
+
+                    this.root = new dom.Element(template.fragment, {
+                        name: 'root'
+                    });
+
+                    this.children = applyElement(template.children, options);
+                    applyParent(this, parentChildren, this.data);
+                    this.bindings = setBinders(this.children, true);
+
+                    if (this.data) {
+                        this.applyBinders(this.data, this);
+                    }
+
+                    setRoutes(this.children, this._match_);
+                    addChildren(this, this.root);
+                    this._rendered = true;
+                }
+            }
+        };
 
         init(data, children, dataSet) {
         };
@@ -201,15 +245,11 @@ define([
         //Removing widget from Dom
         //
         //      @method destroy
-        destroy(force) {
+        destroy() {
             this.onDestroy();
             this.eventBus.clear();
             while (this._events.length > 0) {
                 this._events.shift().remove();
-            }
-
-            while (this._appliedRoutes.length > 0) {
-                this._appliedRoutes.shift().remove();
             }
 
             while (this._globalEvents.length > 0) {
@@ -217,14 +257,13 @@ define([
             }
 
             destroy(this.children);
-            if (force && this._matches) {
-                this._matches.remove();
-            }
 
             if (this.elGroup !== undefined && this.el !== undefined) {
                 this.elGroup.delete(this.el);
             }
-            this.root.remove();
+            if (this.root && this.root.remove) {
+                this.root.remove();
+            }
 
             delete this.el;
 
@@ -233,37 +272,6 @@ define([
         remove(...args) {
             this.destroy(...args);
         }
-
-        setRoutes(instance) {
-            if (instance !== undefined) {
-                this._routes.push(instance);
-            }
-        };
-
-        _applyRoutes(matches) {
-            while (this._routes.length > 0) {
-                let instance = this._routes.shift();
-                if (instance && instance._match) {
-                    matches.setRoutes((routes)=> {
-                        instance._match((...args)=> {
-                            let match = routes.match(...args);
-                            this._appliedRoutes.push(match);
-                            return match;
-                        });
-                        routes.run();
-                    });
-                }
-            }
-            matches.rebind();
-        };
-
-        _reRoute() {
-            this._routes.splice(0, this._routes.length);
-        };
-
-        rebind() {
-            this._reRoute();
-        };
 
         // Adding Childrens manually after initialization.
         //  @method setChildren
@@ -278,9 +286,6 @@ define([
 
             instance = el.run(data || true);
             addChildren(this, instance, data);
-
-            this.setRoutes(instance);
-            this.rebind();
         };
 
         // Adding Dynamic components
@@ -304,9 +309,8 @@ define([
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
+            instance._match(this._match_);
             this.children[name] = instance;
-            this.setRoutes(instance);
-            this.rebind();
             return instance;
         };
 
@@ -319,7 +323,11 @@ define([
                 },
                 run:  (container)=> {
                     options.appContext = this.context;
-                    let cp = new Component(options, options.children, options.data);
+                    let cp = new Component(options, options.children, options.data),
+                        el = document.createElement('div');
+                    el.setAttribute('style', 'display:none;');
+                    cp.ready(el);
+
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {
@@ -345,7 +353,7 @@ define([
         //
         //      @method applyBinders
         applyBinders(...args) {
-           return applyBinders(this, ...args);
+            return applyBinders(this, ...args);
         }
     }
     Object.assign(Constructor.prototype, {

@@ -40,7 +40,7 @@ module.exports = function(grunt) {
             'widget':         '../../../src/widget',
             'watch':          '../../../lib/watch/src/watch',
             'd3':             '../../../bower_components/d3/d3',
-            'router':         '../../../bower_components/urlmanager/dist/router',
+            'router':         '../../../bower_components/urlmanager/dist/es6/dev/router',
             'three':          '../../../bower_components/three.js/three',
             'babel/polyfill': '../../../node_modules/babel-polyfill/dist/polyfill'
 
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
             'watch':          '../lib/watch/src/watch',
             'templating':     '../node_modules/richtemplate/dist/es6/dev/templating',
             'coders':         '../node_modules/richtemplate/dist/es6/dev/coders',
-            'router':         '../bower_components/urlmanager/dist/router',
+            'router':         '../bower_components/urlmanager/dist/es6/dev/router',
             'babel/polyfill': '../node_modules/babel-polyfill/dist/polyfill'
         },
         appExclude = [

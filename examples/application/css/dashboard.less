@@ -3,20 +3,20 @@
  */
 
 /* Move down content because we have a fixed navbar that is 50px tall */
-html{
+html {
   width: 100%;
   height: 100%;
   position: relative;
 }
+
 body {
-position: relative;
+  position: relative;
   width: 100%;
   height: 100%;
-  > div {
-    opacity: 0;
-    transition: opacity 1s;
-  }
-  > div.show {
+  opacity: 0;
+  transition: opacity 1s;
+
+  &.show {
     opacity: 1;
   }
 }

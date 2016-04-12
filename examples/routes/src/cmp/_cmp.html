@@ -9,10 +9,24 @@
     <h4>Testing url query params</h4>
 
     <div class="form-group">
-        <input name="input" tp-type="pl" tp-name="input" class="form-control" type="text" autocomplete="off"/>
+        <input name="input"
+               tp-bind-value="value"
+               data-bind="input"
+               tp-update="true"
+               tp-type="bd"
+               tp-name="input"
+               class="form-control"
+               type="text" autocomplete="off"/>
     </div>
     <div class="form-group">
-        <input name="inputA" tp-type="pl" tp-name="inputA" class="form-control" type="text" autocomplete="off"/>
+        <input name="inputA"
+               data-bind="input"
+               tp-bind-value="value"
+               tp-type="bd"
+               tp-name="inputA"
+               tp-update="true"
+               class="form-control" type="text"
+               autocomplete="off"/>
     </div>
     <pl-footer tp-noattach="true">This is a Footer</pl-footer>
 
