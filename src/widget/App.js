@@ -19,20 +19,31 @@ define([
     'router/Router'
 ], function(Mediator, Router) {
     'use strict';
-    function triggerRoute(router) {
-        router.start();
-        router.setListener((location)=> {
-            let match = window.location.href.match(/#(.*)$/);
-            if (match[1] !== location) {
+    function triggerRoute(router, active) {
+        var activeLocation = '';
+
+        router.setListener((location, move)=> {
+            activeLocation = location;
+            if (!move) {
                 window.location.hash = location;
+            }
+        });
+
+        router.onRouteChange(()=>{
+            if (active.size > 0) {
+                active.forEach(handler=>handler());
+                active.clear();
             }
         });
 
         function onHashChange() {
             let match = window.location.href.match(/#(.*)$/),
                 route = match ? match[1] : ''
+            if (activeLocation !== route) {
                 router.trigger(route);
+            }
         };
+        router.start();
         window.addEventListener('hashchange', onHashChange, false);
         onHashChange();
     }
@@ -65,14 +76,7 @@ define([
                 })
             });
 
-            if (this.AppContainer !== undefined) {
-                this.appContainer = new this.AppContainer({
-                    appContext: this.context
-                });
 
-
-            }
-            this.init.apply(this, arguments);
         }
 
 
@@ -101,15 +105,24 @@ define([
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
+                if (this.AppContainer !== undefined) {
+                    this.appContainer = new this.AppContainer({
+                        appContext: this.context
+                    });
+                }
+                
+                this.init.call(this, this.options);
+
                 this.el = container;
                 let el = document.createElement('div');
                 container.appendChild(el);
                 this.appContainer.ready(el);
 
-                let router = new Router(this.options.rootRoute);
-                router.match((match)=> this.appContainer._match(match));
+                let router = new Router(this.options.rootRoute),
+                    active = new Map();
+                router.match((match)=> this.appContainer._match({match, active}));
 
-                triggerRoute(router);
+                triggerRoute(router, active);
 
                 setTimeout(() => {
                     container.classList.add('show');

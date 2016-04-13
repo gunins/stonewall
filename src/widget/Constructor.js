@@ -115,11 +115,11 @@ define([
 
         }
 
-        _match(match) {
-            this._match_ = match;
-
+        _match(router) {
+            this.router = router;
+            
             if (this.match) {
-                this.match(match);
+                this.match(router.match);
             }
 
             if (!this.async) {
@@ -169,7 +169,7 @@ define([
                         this.applyBinders(this.data, this);
                     }
 
-                    setRoutes(this.children, this._match_);
+                    setRoutes(this.children, this.router);
                     addChildren(this, this.root);
                     this._rendered = true;
                 }
@@ -309,7 +309,7 @@ define([
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
-            instance._match(this._match_);
+            instance._match(this.router);
             this.children[name] = instance;
             return instance;
         };

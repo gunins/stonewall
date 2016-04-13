@@ -35,13 +35,13 @@ define([
 
         },
         match:       function(match) {
-            // console.log(match, 'match');
             this.custom = match('/:id').to(function(id) {
                 console.log('custom', id);
             })
         },
         to:          function(id) {
             this.id = (typeof id !== 'object') ? id : 'Link id not dynamic';
+
             console.log('to', id); //, this.el, id);
             // this.render();
 
@@ -50,7 +50,9 @@ define([
             var close = confirm('Are You Sure?');
             done(close);
             if (close) {
-                this.custom.remove();
+                if (this.id !== 'Link id not dynamic') {
+                    this.custom.remove();
+                }
                 console.log('leave'); //, this.el)
             }
         },

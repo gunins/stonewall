@@ -143,6 +143,7 @@ define([
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
+                    component._match(context.router);
                     addChildren.elReady(context, component, obj);
                     addChildren.elOnChange(context, component, obj);
                 });

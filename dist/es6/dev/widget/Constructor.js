@@ -892,6 +892,7 @@ define('widget/parsers/applyBinders',[
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
+                    component._match(context.router);
                     addChildren.elReady(context, component, obj);
                     addChildren.elOnChange(context, component, obj);
                 });
@@ -922,7 +923,17 @@ define('widget/parsers/applyBinders',[
  */
 define('widget/parsers/setRoutes',[
     'templating/dom'
-], function (dom) {
+], function(dom) {
+
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg,
+        ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
+
+    function getArgs(func) {
+        let fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+            result = argsList.match(ARGUMENT_NAMES);
+        return (result === null) ? [] : result.map(item=>item.replace(/[\s,]/g, ''));
+    }
 
     function destroyComponent(cp) {
         if (cp.remove !== undefined) {
@@ -934,110 +945,125 @@ define('widget/parsers/setRoutes',[
     function applyToChildren(children, cb) {
         if (children !== undefined) {
             Object.keys(children).forEach((name)=> {
-                let cp = children[name];
-                if (cp.elGroup && cp.elGroup.size > 0) {
-                    cp.elGroup.forEach((item)=> cb(item));
-                } else {
-                    cb(cp);
+                let instance = children[name];
+                if (!applyToGroup(instance, cb)) {
+                    cb(instance);
                 }
             });
         }
     }
 
-    function matchRoute(child, match) {
-        let route = (child.data !== undefined) ? child.data.route : undefined;
+    function applyToGroup(child, cb) {
+        if (child.elGroup && child.elGroup.size > 0) {
+            child.elGroup.forEach((childInstance)=> {
+                cb(childInstance);
+            });
+            return true;
+        }
+        return false;
+    }
 
-        if (route !== undefined && child.data.type !== 'cp' && child.name !== 'root') {
-            let id, childMatch,
-            //Need add return match in router, for better readability
-                matches = match(route, match=> {
-                    childMatch = match;
+
+    function matchRoute(child, router) {
+        if (child._match) {
+            child._match(router)
+        } else {
+            let route = (child.data !== undefined) ? child.data.route : undefined;
+            if (route !== undefined && child.data.type === 'rt') {
+                let id,
+                    match = router.match,
+                    active = router.active,
+                    matches = match(route);
+
+                matches.to((...args)=> {
+                    let params = args.pop();
+                    id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
+
+                    if (!applyToGroup(child, instance=>dom.attach(instance))) {
+                        let childInstance = child.run(true);
+                        applyToChildren(childInstance.children, instance=> {
+                            if (instance) {
+                                match(route, match=> matchRoute(instance, {match, active}));
+                            }
+                        });
+                    }
+                    applyToGroup(child, (childInstance)=> {
+                        applyToChildren(childInstance.children, instance=> {
+                            if (instance && instance.to) {
+                                instance.to(...args.concat(params));
+                            }
+                        });
+                    });
                 });
-            matches.to((...args)=> {
-                let params = args.pop();
-                id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
-                if (child.elGroup && child.elGroup.size === 0) {
-                    child = child.run(true);
-                    applyToChildren(child.children, (instance)=> {
-                        if (instance && instance.to) {
-                            instance.to(...args.concat(params));
-                        }
+                matches.leave((done)=> {
+                    let items = 0,
+                            stopped = false;
+                        applyToGroup(child, (childInstance)=> {
+                            let finish = ()=> {
+                                    if (!id) {
+                                        dom.detach(childInstance);
+                                    } else {
+                                        destroyComponent(childInstance);
+                                    }
+                                },
+                                close = (close = true)=> {
+                                    if (close) {
+                                        items--;
+                                    } else {
+                                        stopped = true;
+                                        done(false);
+                                    }
 
-                        if (instance && !instance._match) {
-                            matchRoute(instance, childMatch);
-                        } else if (instance && instance._match) {
-                            matches.setRoutes((routes)=> {
-                                instance._match((...args)=> {
-                                    let match = routes.match(...args);
-                                    instance._appliedRoutes.push(match);
-                                    return match;
-                                });
-                                routes.run();
+                                    if (items === 0 && !stopped) {
+                                        active.set(childInstance, finish);
+                                        done(true);
+                                    }
+
+                                };
+
+                            applyToChildren(childInstance.children, instance=> {
+                                if (instance && instance.leave !== undefined) {
+                                    let args = getArgs(instance.leave);
+                                    if (args.length > 0) {
+                                        items++
+                                    }
+                                    instance.leave(close);
+                                }
                             });
 
-                            instance._reRoute = ()=> {
-                                instance._applyRoutes(matches);
-                            };
-                        }
-
-                    });
-
-                } else {
-                    applyToChildren(child.children, (instance)=> {
-                        if (instance && instance.to) {
-                            instance.to.apply(instance, args.concat(params));
-                        }
-                    });
-                    dom.attach(child);
-                }
-
-            });
-
-            matches.leave(()=> {
-                applyToChildren(child.children, (instance)=> {
-                    if (instance && instance.leave !== undefined) {
-                        instance.leave();
+                            if (items === 0) {
+                                active.set(childInstance, finish);
+                                done(true);
+                            }
+                        });
                     }
-                });
-                if (!id) {
-                    dom.detach(child);
-                } else {
-                    destroyComponent(child);
-                }
-            });
+                );
 
-            matches.query((params)=> {
-                applyToChildren(child.children, (instance)=> {
-                    if (instance && instance.query !== undefined) {
-                        instance.query(params);
-                    }
+                matches.query((params)=> {
+                    applyToGroup(child, (childInstance)=> {
+                        applyToChildren(childInstance.children, (instance)=> {
+                            if (instance && instance.query !== undefined) {
+                                instance.query(params);
+                            }
+                        });
+                    });
                 });
-            });
+                applyToGroup(child, instance=>instance._activeRoute = matches);
 
-        } else if (child.children !== undefined && child.data.type !== 'cp') {
-            applyToChildren(child.children, child=> matchRoute(child, match));
-        } else if (child.elGroup && child.elGroup.size > 0) {
-            child.elGroup.forEach((instance)=> {
-                if (child.data.type === 'cp' && instance._match) {
-                    instance._match(match);
-                }
-            })
+            } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
+                applyToChildren(child.children, instance=> matchRoute(instance, router));
+            }
         }
     }
 
-    function setRoutes(context, children) {
-        if (!context._match) {
-            context._match = (match)=> {
-                applyToChildren(children, child=> matchRoute(child, match));
-                if (context.match) {
-                    context.match(match);
-                }
-            }
-        }
+    function setRoutes(children, router) {
+        applyToChildren(children, child=> matchRoute(child, router));
+
     };
 
     return setRoutes;
-});
+})
+;
 /**
  * Created by guntars on 15/03/2016.
  */
@@ -1160,20 +1186,24 @@ define('widget/Constructor',[
             return Surrogate;
         };
 
-        constructor(data, parentChildren, dataSet, node) {
+        constructor(options = {}, parentChildren, dataSet = {}, node) {
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._routes = [];
             this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
+            this._parentChildren = parentChildren;
+            this._options = options;
+            this._rendered = false;
+            this._arguments = arguments;
+
 
             this.eventBus = new Mediator(this);
 
             this.context = context;
 
-            if (data.appContext !== undefined) {
-                Object.assign(this.context, data.appContext);
+            if (options.appContext !== undefined) {
+                Object.assign(this.context, options.appContext);
             }
 
             if (node !== undefined && node.name !== undefined) {
@@ -1182,40 +1212,80 @@ define('widget/Constructor',[
 
             this.beforeInit.apply(this, arguments);
 
-
-            if (this.template) {
+            if (!this.data) {
                 let keys = (dataSet) ? Object.keys(dataSet) : [],
                     contextData = (keys.length > 0) ? dataSet : this.context.data;
-
-                if (!this.data && contextData) {
-                    this.data = contextData[data.bind] || contextData;
+                if (contextData) {
+                    this.data = contextData[options.bind] || contextData;
                 }
-
-                let decoder = new Decoder(this.template),
-                    template = decoder.render(this.data);
-
-                this.el = template.fragment;
-
-                this.root = new dom.Element(this.el, {
-                    name: 'root'
-                });
-
-                this.children = applyElement(template.children, data);
-                setRoutes(this, this.children);
-                applyParent(this, parentChildren, this.data);
-                this.bindings = setBinders(this.children, true);
-
-                if (this.data) {
-                    this.applyBinders(this.data, this);
-                }
-
-                addChildren(this, this.root);
-
-            } else {
-                this.el = document.createElement('div');
             }
-            this.init.apply(this, arguments);
+        };
+
+        ready(el) {
+            this.el = el;
+
         }
+
+        _match(router) {
+            this.router = router;
+            
+            if (this.match) {
+                this.match(router.match);
+            }
+
+            if (!this.async) {
+                this.render();
+            }
+
+            this.init.apply(this, this._arguments);
+        }
+
+        // method render called manually if flag async is true;
+        //
+        //      @method render
+        render(data) {
+            if (!this._rendered) {
+                if (this.template) {
+                    if (data) {
+                        this.data = data;
+                    }
+                    let options = this._options,
+                        parentChildren = this._parentChildren,
+                        decoder = new Decoder(this.template),
+                        template = decoder.render(this.data);
+                    if (this.el) {
+                        let parent = this.el.parentNode;
+                        if (parent) {
+                            parent.replaceChild(template.fragment, this.el);
+                        }
+                        if (this.elGroup && this.elGroup.get(this.el)) {
+                            this.elGroup.delete(this.el);
+                            this.el = template.fragment;
+                            this.elGroup.set(template.fragment, this);
+                        }
+                    } else {
+                        this.el = template.fragment;
+                    }
+
+
+                    this.root = new dom.Element(template.fragment, {
+                        name: 'root'
+                    });
+
+                    this.children = applyElement(template.children, options);
+                    applyParent(this, parentChildren, this.data);
+                    this.bindings = setBinders(this.children, true);
+
+                    if (this.data) {
+                        this.applyBinders(this.data, this);
+                    }
+
+                    setRoutes(this.children, this.router);
+                    addChildren(this, this.root);
+                    this._rendered = true;
+                }
+            }
+        };
 
         init(data, children, dataSet) {
         };
@@ -1286,15 +1356,11 @@ define('widget/Constructor',[
         //Removing widget from Dom
         //
         //      @method destroy
-        destroy(force) {
+        destroy() {
             this.onDestroy();
             this.eventBus.clear();
             while (this._events.length > 0) {
                 this._events.shift().remove();
-            }
-
-            while (this._appliedRoutes.length > 0) {
-                this._appliedRoutes.shift().remove();
             }
 
             while (this._globalEvents.length > 0) {
@@ -1302,14 +1368,13 @@ define('widget/Constructor',[
             }
 
             destroy(this.children);
-            if (force && this._matches) {
-                this._matches.remove();
-            }
 
             if (this.elGroup !== undefined && this.el !== undefined) {
                 this.elGroup.delete(this.el);
             }
-            this.root.remove();
+            if (this.root && this.root.remove) {
+                this.root.remove();
+            }
 
             delete this.el;
 
@@ -1318,37 +1383,6 @@ define('widget/Constructor',[
         remove(...args) {
             this.destroy(...args);
         }
-
-        setRoutes(instance) {
-            if (instance !== undefined) {
-                this._routes.push(instance);
-            }
-        };
-
-        _applyRoutes(matches) {
-            while (this._routes.length > 0) {
-                let instance = this._routes.shift();
-                if (instance && instance._match) {
-                    matches.setRoutes((routes)=> {
-                        instance._match((...args)=> {
-                            let match = routes.match(...args);
-                            this._appliedRoutes.push(match);
-                            return match;
-                        });
-                        routes.run();
-                    });
-                }
-            }
-            matches.rebind();
-        };
-
-        _reRoute() {
-            this._routes.splice(0, this._routes.length);
-        };
-
-        rebind() {
-            this._reRoute();
-        };
 
         // Adding Childrens manually after initialization.
         //  @method setChildren
@@ -1363,9 +1397,6 @@ define('widget/Constructor',[
 
             instance = el.run(data || true);
             addChildren(this, instance, data);
-
-            this.setRoutes(instance);
-            this.rebind();
         };
 
         // Adding Dynamic components
@@ -1389,9 +1420,8 @@ define('widget/Constructor',[
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
+            instance._match(this.router);
             this.children[name] = instance;
-            this.setRoutes(instance);
-            this.rebind();
             return instance;
         };
 
@@ -1404,7 +1434,11 @@ define('widget/Constructor',[
                 },
                 run:  (container)=> {
                     options.appContext = this.context;
-                    let cp = new Component(options, options.children, options.data);
+                    let cp = new Component(options, options.children, options.data),
+                        el = document.createElement('div');
+                    el.setAttribute('style', 'display:none;');
+                    cp.ready(el);
+
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {
@@ -1430,7 +1464,7 @@ define('widget/Constructor',[
         //
         //      @method applyBinders
         applyBinders(...args) {
-           return applyBinders(this, ...args);
+            return applyBinders(this, ...args);
         }
     }
     Object.assign(Constructor.prototype, {

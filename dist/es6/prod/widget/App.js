@@ -119,7 +119,7 @@ define('templating/utils/List',[],function () {
  * Created by guntars on 10/10/2014.
  */
 //## templating/dom Class for dom manipulation
-define('templating/dom',[],function () {
+define('templating/dom',[],function() {
     'use strict';
 
     function isObject(obj) {
@@ -525,6 +525,7 @@ define('templating/dom',[],function () {
             while (el._events.length > 0) {
                 el._events.shift().remove();
             }
+
             if (el.children) {
                 destroy(el.children);
             }
@@ -584,7 +585,7 @@ define('templating/dom',[],function () {
 /**
  * Created by guntars on 22/01/2016.
  */
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define('templating/DomFragment',factory);
@@ -594,8 +595,14 @@ define('templating/dom',[],function () {
         // like Node.
         module.exports = factory();
     }
-}(this, function () {
+}(this, function() {
     'use strict';
+    function createPlaceholder(tag) {
+        var placeholder = document.createElement(tag || 'div');
+        placeholder.setAttribute('style', 'display:none;');
+        return placeholder;
+    }
+
     class DomFragment {
         constructor(_node, placeholder, childNodes, elGroup, index, obj) {
             Object.assign(this, {
@@ -611,7 +618,7 @@ define('templating/dom',[],function () {
 
         applyAttributes(el) {
             let attributes = this._node.data.attribs;
-            Object.keys(attributes).forEach(function (key) {
+            Object.keys(attributes).forEach(function(key) {
                 el.setAttribute(key, attributes[key]);
             });
         };
@@ -659,7 +666,7 @@ define('templating/dom',[],function () {
                 node = this._node,
                 keep = (!placeholder.id && this.elGroup.size === 0),
                 instance = node.tmpEl((keep) ? placeholder : false, this.obj, this.childNodes, node),
-                el = instance.el;
+                el = instance.el || createPlaceholder(node.data.tag);
 
             if (!keep && !node.replace) {
                 this.applyAttributes(el);
@@ -672,6 +679,10 @@ define('templating/dom',[],function () {
             }
 
             this.appendToBody(el);
+
+            if (instance.ready) {
+                instance.ready(el);
+            }
 
             return instance;
 
@@ -1373,126 +1384,358 @@ define('templating/dom',[],function () {
     return Mediator;
 }));
 
-(function (root, factory) {
+/*globals define*/
+(function(root, factory) {
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define('router/MatchBinding',factory);
+        define('router/utils',[], factory);
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory();
-    } else {
-        // Browser globals (root is window)
-        root.UrlManager              = root.UrlManager || {};
-        root.UrlManager.MatchBinding = factory();
     }
-}(this, function () {
-    function MatchBinding(pattern, location) {
-        if (location === '') {
-            this.pattern = location = pattern.replace(/^\(\/\)/g, '').replace(/^\/|$/g, '');
-        } else {
-            this.pattern = pattern;
-            location     = (location + pattern);
+}(this, function() {
+    'use strict';
+
+    function parseParams(value) {
+        try {
+            return decodeURIComponent(value.replace(/\+/g, ' '));
         }
-        this.location = location.replace(/\((.*?)\)/g, '$1').replace(/^\/|$/g, '');
-
-        var route = this.pattern.replace(MatchBinding.ESCAPE_PARAM, '\\$&')
-            .replace(MatchBinding.OPTIONAL_PARAM, '(?:$1)?')
-            .replace(MatchBinding.NAMED_PARAM, function (match, optional) {
-                         return optional ? match : '([^\/]+)';
-                     }).replace(MatchBinding.SPLAT_PARAM, '(.*?)');
-
-        this.patternRegExp = new RegExp('^' + route);
-        this.routeHandler  = [];
-        this.leaveHandler  = [];
-        this.queryHandler  = [];
-        this.routes        = [];
+        catch (err) {
+            // Failover to whatever was passed if we get junk data
+            return value;
+        }
     }
 
-    MatchBinding.prototype.onBind    = function () {
-    };
-    MatchBinding.prototype.setOnBind = function (onBinding) {
-        this.onBind = onBinding
-    };
-    MatchBinding.prototype.rebind    = function () {
-        if (this.onBind !== undefined) {
-            this.onBind();
-        }
-    };
-
-    MatchBinding.prototype.setRoutes = function (routes) {
-        this.routes.push(routes);
-        return this;
-    };
-
-    MatchBinding.prototype.getRoutes = function () {
-        return this.routes;
-    };
-
-    MatchBinding.prototype.to              = function (routeHandler) {
-        this.routeHandler.push(routeHandler);
-        return this;
-    };
-    MatchBinding.prototype.leave           = function (leaveHandler) {
-        this.leaveHandler.push(leaveHandler);
-        return this;
-    };
-    MatchBinding.prototype.query           = function (queryHandler) {
-        this.queryHandler.push(queryHandler);
-        return this;
-    };
-    MatchBinding.prototype.remove          = function () {
-        this.routes.splice(0, this.routes.length);
-        this.routeHandler.splice(0, this.routeHandler.length);
-        this.leaveHandler.splice(0, this.leaveHandler.length);
-        this.queryHandler.splice(0, this.queryHandler.length);
-        return this;
-    };
-    MatchBinding.prototype.test            = function (location) {
-        return this.patternRegExp.test(location);
-    };
-    MatchBinding.prototype.getFragment     = function (location) {
-        var subLocation = this.applyParams(location);
-        return location.replace(subLocation, '');
-    };
-    MatchBinding.prototype.applyParams     = function (location) {
-        var matches  = this.pattern.replace(/\((.*?)\)/g, '$1').split('/');
-        var matches2 = location.split('/');
-        return matches2.splice(0, matches.length).join('/');
-    };
-    MatchBinding.prototype.extractParams   = function (fragment) {
-        var params = this.patternRegExp.exec(fragment).slice(1);
-        return params.map(function (param) {
-            return param ? decodeURIComponent(param) : null;
+    function iterateQueryString(queryString, callback) {
+        let keyValues = queryString.split('&');
+        keyValues.forEach((keyValue)=> {
+            let arr = keyValue.split('=');
+            callback(arr.shift(), arr.join('='));
         });
-    };
-    MatchBinding.prototype.setSubBinder    = function (subBinder) {
-        this.subBinder = subBinder;
-        return subBinder;
-    };
-    MatchBinding.prototype.getSubBinder    = function () {
-        return this.subBinder;
-    };
-    MatchBinding.prototype.getHandler      = function () {
-        return this.routeHandler;
-    };
-    MatchBinding.prototype.getLeaveHandler = function () {
-        return this.leaveHandler;
-    };
-    MatchBinding.prototype.getQueryHandler = function () {
-        return this.queryHandler;
+    }
+
+    function setQuery(parts) {
+        let query = {};
+        if (parts) {
+            iterateQueryString(parts, (name, value)=> {
+                value = parseParams(value);
+                if (!query[name]) {
+                    query[name] = value;
+                }
+                else if (typeof query[name] === 'string') {
+                    query[name] = [query[name], value];
+                }
+                else {
+                    query[name].push(value);
+                }
+            });
+        }
+        return query;
+    }
+
+    function serialize(obj) {
+        let str = [];
+        for (let p in obj)
+            if (obj.hasOwnProperty(p)) {
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            }
+        return str.join("&");
     };
 
-    MatchBinding.OPTIONAL_PARAM = /\((.*?)\)/g;
-    MatchBinding.NAMED_PARAM    = /(\(\?)?:\w+/g;
-    MatchBinding.SPLAT_PARAM    = /\*\w+/g;
-    MatchBinding.ESCAPE_PARAM   = /[\-{}\[\]+?.,\\\^$|#\s]/g;
+    function getLocation(params, pattern) {
+
+        return {
+            getQuery() {
+                return params.query;
+            },
+            getLocation(fragment = '', isQuery) {
+                let current = params.root.substring(0, params.root.length - pattern.length),
+                    newQuery;
+
+                if (isQuery === true) {
+                    newQuery = serialize(params.query);
+                }
+                else if (isQuery === false) {
+                    newQuery = '';
+                }
+                else {
+                    newQuery = serialize(isQuery);
+                }
+                return current + fragment + (newQuery.length === 0 ? '' : '?' + newQuery);
+            }
+        }
+    };
+
+    // attach the .equals method to Array's prototype to call it on any array
+    function equals(arr1, arr2) {
+        // if the other arr2 is a falsy value, return
+        if (!arr2)
+            return false;
+        // compare lengths - can save a lot of time
+        if (arr1.length !== arr2.length)
+            return false;
+
+        for (let i = 0, l = arr1.length; i < l; i++) {
+            // Check if we have nested arrays
+            if (arr1[i] instanceof Array && arr2[i] instanceof Array) {
+                // recurse into the nested arrays
+                if (!equals(arr1[i], arr2[i]))
+                    return false;
+            }
+            else if (arr1[i] !== arr2[i]) {
+                // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                return false;
+            }
+        }
+        return true;
+    };
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg,
+        ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
+
+    function getArgs(func) {
+        let fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+            result = argsList.match(ARGUMENT_NAMES);
+        return (result === null) ? [] : result.map(item=>item.replace(/[\s,]/g, ''));
+    }
+
+    return {
+        serialize, getLocation, equals, setQuery, getArgs
+    }
+
+}));
+(function(root, factory) {
+
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define('router/MatchBinding',[
+            './utils'
+        ], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./utils'));
+    }
+}(this, function(utils) {
+    'use strict';
+
+
+    class MatchBinding {
+        constructor(pattern, location, binder) {
+            if (binder) {
+                this.binder = binder;
+            }
+            if (location === '') {
+                this.pattern = pattern.replace(/^\(\/\)/g, '').replace(/^\/|$/g, '');
+            } else {
+                let match = pattern.match(/^(\/|\(\/)/g);
+                if (match === null) {
+                    pattern = pattern[0] === '(' ? '(/' + pattern.substring(1) : '/' + pattern;
+                }
+                this.pattern = pattern;
+            }
+
+            let route = this.pattern.replace(MatchBinding.ESCAPE_PARAM, '\\$&')
+                .replace(MatchBinding.OPTIONAL_PARAM, '(?:$1)?')
+                .replace(MatchBinding.NAMED_PARAM, function(match, optional) {
+                    return optional ? match : '([^\/]+)';
+                }).replace(MatchBinding.SPLAT_PARAM, '(.*)');
+
+            this.patternRegExp = new RegExp('^' + route);
+
+            this.routeHandler = new Set();
+            this.leaveHandler = new Set();
+            this.queryHandler = new Set();
+            this._active = false;
+        }
+
+        setRoutes(mapHandler) {
+            var subBinder = this.subBinder;
+            mapHandler({
+                match: subBinder.match.bind(subBinder)
+            });
+            return this;
+        };
+
+        reTrigger() {
+            this.binder.reTrigger();
+        }
+
+        match(match) {
+            var subBinder = this.subBinder;
+            match(subBinder.match.bind(subBinder));
+            return this;
+        };
+
+        to(routeHandler) {
+            this.routeHandler.add({handler: routeHandler, done: false});
+            this.reTrigger();
+            return this;
+        };
+
+        leave(leaveHandler) {
+            var args = utils.getArgs(leaveHandler);
+            this.leaveHandler.add({handler: leaveHandler, done: (args.length > 0 && args[0] === 'done')});
+            return this;
+        };
+
+        query(queryHandler) {
+            this.queryHandler.add({handler: queryHandler, done: false});
+            return this;
+        };
+
+        remove() {
+            this.routeHandler.clear();
+            this.leaveHandler.clear();
+            this.queryHandler.clear();
+            this.subBinder.remove();
+            return this;
+        };
+
+        test(location) {
+            return this.patternRegExp.test(location);
+        };
+
+        getFragment(location) {
+            let matches = location.match(this.patternRegExp);
+            return matches === null ? '' : location.substring(matches[0].length);
+        };
+
+        extractParams(fragment) {
+            let params = this.patternRegExp.exec(fragment)
+            if (params && params.length > 0) {
+                return params.slice(1).map(function(param) {
+                    return param ? decodeURIComponent(param) : null;
+                });
+            } else {
+                return [];
+            }
+        };
+
+        setSubBinder(MatchBinder, pattern, mapHandler) {
+            let subBinder = new MatchBinder(pattern, this);
+            this.subBinder = subBinder;
+            if (typeof mapHandler === 'function') {
+                mapHandler(subBinder.match.bind(subBinder));
+            }
+            return subBinder;
+        };
+
+
+        checkSegment(matched, params) {
+            let status = [];
+            if (this._active) {
+                let pattern = this.pattern.replace(/\((.*?)\)/g, '$1').replace(/^\//, '').split('/'),
+                    prevLoc = this.prevLoc.replace(/^\//, '').split('/'),
+                    currSegment = matched.slice(0, pattern.length),
+                    prevSegment = prevLoc.slice(0, pattern.length),
+                    equals = (utils.equals(currSegment, prevSegment));
+
+                if (!equals) {
+                    status = this.clearActive(params);
+                } else if (matched.length > 1) {
+                    status = this.subBinder.checkStatus(matched.slice(pattern.length), params);
+                } else if (equals) {
+                    status = this.subBinder.clearActive(params);
+                }
+            }
+            return status;
+        }
+
+        clearActive(params) {
+            let active = [];
+            if (this._active) {
+                active.push({
+                    handler: this.triggerLeave(params),
+                    disable: this.disable.bind(this)
+                });
+            }
+
+            return active.concat(this.subBinder.clearActive());
+        }
+
+        disable() {
+            this._active = false;
+        }
+
+        triggerTo(location, params) {
+            if (this.test(location)) {
+                // check if to is triggered
+                if (!this._active) {
+                    this.prevLoc = location;
+                    let args = this.extractParams(location).concat(utils.getLocation(params, location));
+                    this.applyHandlers(this.routeHandler, args)
+                    this._active = true;
+                }
+
+                // trigger query handler
+                this.applyHandlers(this.queryHandler, [utils.getLocation(params, location)]);
+
+                let fragment = this.getFragment(location);
+                if (fragment.trim() !== '') {
+                    let subBinder = this.subBinder;
+                    if (subBinder) {
+                        subBinder.triggerRoutes(fragment, params);
+                    }
+                }
+            }
+        };
+
+        applyHandlers(handlers, args = []) {
+            if (handlers && handlers.size > 0) {
+                handlers.forEach((item)=> {
+                    item.handler.apply(this, args);
+                });
+            }
+        };
+
+        triggerLeave(params) {
+            return (cb)=> {
+                let handlers = this.leaveHandler,
+                    location = utils.getLocation(params, this.prevLoc),
+                    items = 0,
+                    stopped = false;
+                if (handlers && handlers.size > 0) {
+                    handlers.forEach((item)=> {
+                        if (item.done) {
+                            items++;
+                        }
+                        item.handler((done = true)=> {
+                            if (done) {
+                                items--;
+                                if (items === 0 && !stopped) {
+                                    cb(true);
+                                }
+                            } else if (!done && !stopped) {
+                                stopped = true;
+                                cb(false);
+                            }
+                        }, location);
+                    });
+                }
+                if (items === 0) {
+                    cb(true);
+                }
+            }
+        };
+
+
+    }
+
+    Object.assign(MatchBinding, {
+        OPTIONAL_PARAM: /\((.*?)\)/g,
+        NAMED_PARAM:    /(\(\?)?:\w+/g,
+        SPLAT_PARAM:    /\*\w+/g,
+        ESCAPE_PARAM:   /[\-{}\[\]+?.,\\\^$|#\s]/g
+    });
 
     return MatchBinding;
 }));
-(function (root, factory) {
+(function(root, factory) {
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -1509,270 +1752,237 @@ define('templating/dom',[],function () {
         root.UrlManager = root.UrlManager || {};
         root.UrlManager.MatchBinder = factory(root.UrlManager.MatchBinding);
     }
-}(this, function (MatchBinding) {
-    function MatchBinder(location, params, command, root) {
-        this.bindings = [];
-        this.location = root || location || '';
-        this.command = command;
-        this.params = params;
+}(this, function(MatchBinding) {
+    'use strict';
 
+    class MatchBinder {
+        constructor(location, parent) {
+            this._parent = parent;
+            this.bindings = new Set();
+            this.location = location || '';
+            this._active = false;
+
+        }
+
+        reTrigger() {
+            this._parent.reTrigger();
+        };
+
+        match(pattern, mapHandler) {
+            if (typeof pattern === 'function') {
+                mapHandler = pattern;
+                pattern = false;
+            }
+            if (pattern === '') {
+                pattern = false;
+            }
+            return this.getMatchBinding(pattern, mapHandler);
+        };
+
+        getMatchBinding(pattern, mapHandler) {
+            if (pattern) {
+                let binding = new MatchBinding(pattern, this.location, this);
+                binding.setSubBinder(MatchBinder, this.location + (pattern || ''), mapHandler);
+                this.bindings.add(binding);
+                return binding;
+            } else {
+                if (typeof mapHandler === 'function') {
+                    mapHandler(this.match.bind(this));
+                }
+                return {
+                    match: this.match.bind(this)
+                }
+            }
+        };
+
+        clearActive(params, location) {
+            let active = [];
+            if (this.bindings.size > 0) {
+                this.bindings.forEach((binding)=> {
+                    active = active.concat(binding.clearActive(params, location));
+                });
+            }
+            return active;
+        };
+
+        checkStatus(matched, params) {
+            let active = []
+            if (this.bindings.size > 0) {
+                this.bindings.forEach((binding)=> {
+                    active = active.concat(binding.checkSegment(matched, params));
+                });
+            }
+            return active;
+        };
+
+        remove() {
+            if (this.bindings.size > 0) {
+                this.bindings.forEach((binding)=> binding.remove());
+            }
+        };
+
+     
+
+        triggerRoutes(location, params) {
+            if (this.bindings.size > 0) {
+                this.bindings.forEach(binding=>binding.triggerTo(location, params))
+            }
+        }
     }
 
-    MatchBinder.prototype.match = function (pattern, mapHandler) {
-        var binding = this.getMatchBinding(pattern, this.location);
-        this.bindings.push(binding);
-            var subBinder = this.getSubBinder(this.location + pattern);
-            binding.setSubBinder(subBinder);
-        if (mapHandler) {
-            mapHandler(subBinder.match.bind(subBinder));
-        }
-        return binding;
-    };
-    MatchBinder.prototype.getSubBinder = function (pattern) {
-        return new MatchBinder(pattern);
-    };
-    MatchBinder.prototype.getMatchBinding = function (pattern, root) {
-        return new MatchBinding(pattern, root);
-    };
-    MatchBinder.prototype.filter = function (location) {
-        return this.bindings.filter(function (binding) {
-            return binding.test(location);
-        });
-    };
-    MatchBinder.prototype.run = function () {
-        this.command(this);
-    };
     return MatchBinder;
 }));
 
 /*globals define*/
-(function (root, factory) {
+(function(root, factory) {
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define('router/Router',[
-            './MatchBinder'
+            './MatchBinder',
+            './utils'
         ], factory);
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('./MatchBinder'));
-    } else {
-        // Browser globals (root is window)
-        root.UrlManager = root.UrlManager || {};
-        root.UrlManager.Router = factory(root.UrlManager.MatchBinder);
+        module.exports = factory(require('./MatchBinder'), require('./utils'));
     }
-}(this, function (MatchBinder) {
-    'use strict';
+}(this, function(MatchBinder, utils) {
+        'use strict';
 
-    // attach the .equals method to Array's prototype to call it on any array
-    Array.prototype.equals = function (array) {
-        // if the other array is a falsy value, return
-        if (!array)
-            return false;
-        // compare lengths - can save a lot of time
-        if (this.length != array.length)
-            return false;
-
-        for (var i = 0, l = this.length; i < l; i++) {
-            // Check if we have nested arrays
-            if (this[i] instanceof Array && array[i] instanceof Array) {
-                // recurse into the nested arrays
-                if (!this[i].equals(array[i]))
-                    return false;
-            }
-            else if (this[i] != array[i]) {
-                // Warning - two different object instances will never be equal: {x:20} != {x:20}
-                return false;
-            }
-        }
-        return true;
-    };
-
-    function parseParams(value) {
-        try {
-            return decodeURIComponent(value.replace(/\+/g, ' '));
-        }
-        catch (err) {
-            // Failover to whatever was passed if we get junk data
-            return value;
-        }
-    }
-
-    function iterateQueryString(queryString, callback) {
-        var keyValues = queryString.split('&');
-        keyValues.forEach(function (keyValue) {
-            var arr = keyValue.split('=');
-            callback(arr.shift(), arr.join('='));
-        });
-    }
-
-    function getLocation(fragment, isQuery, params, location) {
-        var current = params.root.substring(0, params.root.length - location.length), newQuery;
-        fragment = fragment || '';
-        if (isQuery === true) {
-            newQuery = this.serialize(params.query);
-        }
-        else if (isQuery === false) {
-            newQuery = '';
-        }
-        else {
-            newQuery = this.serialize(isQuery);
-        }
-        return current + fragment + (newQuery.length === 0 ? '' : '?' + newQuery);
-    }
-
-    function Router() {
-        this.root = this.getBinder();
-        this.bindings = [];
-    }
-
-    Router.prototype.getBinder = function () {
-        return new MatchBinder();
-    };
-    Router.prototype.match = function (mapHandler) {
-        mapHandler(this.root.match.bind(this.root));
-    };
-    Router.prototype.trigger = function (location) {
-        if (this.started) {
-            var parts = location.split('?', 2);
-            var query = {};
-            if (parts[1]) {
-                iterateQueryString(parts[1], function (name, value) {
-                    value = parseParams(value);
-                    if (!query[name]) {
-                        query[name] = value;
-                    }
-                    else if (typeof query[name] === 'string') {
-                        query[name] = [query[name], value];
-                    }
-                    else {
-                        query[name].push(value);
-                    }
-                });
-            }
-            var loc = parts[0].replace(/^\/|$/g, ''),
-                params = {
-                    root: loc,
-                    query: query
-                },
-                notValid = [],
-                matched = false;
-
-            this.bindings.forEach(function (binder) {
-                var fragment,
-                    pattern = binder.pattern.replace(/\((.*?)\)/g, '$1').replace(/^\//, '').split('/'),
-                    binderLocation = binder.location.split('/'),
-                    prevLoc = binder.prevLoc.replace(/^\//, '').split('/'),
-                    checkSegment = function (link) {
-                        var currSegment = link.splice(binderLocation.length - pattern.length, pattern.length),
-                            prevSegment = prevLoc.splice(0, pattern.length);
-                        return (!currSegment.equals(prevSegment));
-                    };
-                fragment = checkSegment(matched || loc.split('/'));
-                if (fragment) {
-                    matched = loc.split('/').splice(0, binderLocation.length - pattern.length);
-                    var handler = binder.getLeaveHandler(),
-                        args = [];
-                    binder.setOnBind();
-
-                    this.applyHandler(handler, args, params, location);
-                    notValid.push(binder);
+        class Router {
+            constructor(location) {
+                if (location !== undefined && location !== '') {
+                    this._location = location.replace(/^\/|\/$/g, '') + '/';
                 }
-            }.bind(this));
+                this.root = this.getBinder();
+                this._listeners = new Set();
+                this._handlers = new Set();
+            };
 
-            notValid.forEach(function (binder) {
-                this.bindings.splice(this.bindings.indexOf(binder), 1);
-            }.bind(this));
+            getBinder() {
+                return new MatchBinder('', this);
+            };
 
-            this.find(this.root, loc, params);
-        }
-    };
-    Router.prototype.find = function (binder, location, params) {
-        var bindings = binder.filter(location);
-        bindings.forEach(this.onBinding.bind(this, location, params));
-    };
-
-    Router.prototype.execute = function (binder) {
-        var binderlocation = binder.location.split('/'),
-            rootLocation = binder.params.root.split('/'),
-            location = '/' + rootLocation.splice(binderlocation.length, rootLocation.length -
-                                                                        binderlocation.length).join('/');
-        this.find(binder, location, binder.params);
-    };
-
-    Router.prototype.onBinding = function (location, params, binding) {
-        binding.setOnBind(this.onBinding.bind(this, location, params, binding))
-        this.runHandler(location, params, binding);
-        var fragment = binding.getFragment(location);
-        var subBinder = binding.getSubBinder();
-        if (subBinder && subBinder.bindings && subBinder.bindings.length > 0) {
-            this.find(subBinder, fragment, params);
-        }
-        var subRoutes = binding.getRoutes();
-        if (subRoutes && subRoutes.length > 0) {
-            while (subRoutes.length > 0) {
-                var Route = subRoutes[0],
-                    binder = new MatchBinder(binding.getFragment(location), params, this.execute.bind(this), binding.location);
-                Route(binder);
-                subBinder.bindings = subBinder.bindings.concat(binder.bindings);
-                subRoutes.shift();
+            test(loc) {
+                return new RegExp('^' + this._location, 'g').test(loc);
             }
+
+            getLocation(loc) {
+                let location = loc.replace(/^\/|$/g, '');
+                if (this._location !== undefined) {
+                    if (this.test(location)) {
+                        return location.replace(this._location, '');
+                    } else {
+                        return false;
+                    }
+                }
+                return location;
+            };
+
+            reTrigger() {
+                if (this.currLocation) {
+                    this.trigger(this.currLocation);
+                }
+            };
+
+
+            trigger(location) {
+                if (this.started && location) {
+                    this.started = false;
+                    this.currLocation = location;
+                    let parts = location.split('?', 2),
+                        segments = this.getLocation(parts[0]);
+                    if (segments || segments === '') {
+                        let query = utils.setQuery(parts[1]),
+                            params = {
+                                root:  segments,
+                                query: query
+                            };
+                        this.execute(segments, params);
+                    }
+                }
+            };
+
+            execute(location, params) {
+                let matched = location.replace(/^\/|$/g, '').split('/'),
+                    binder = this.root,
+                    active = binder.checkStatus(matched, params);
+                if (active.length > 0) {
+                    active.forEach((item)=> {
+                        item.handler((applied)=> {
+                            if (!item.triggered) {
+                                item.triggered = true;
+                                item.applied = applied;
+                                if (active.filter(item=>item.applied).length === active.length) {
+                                    active.forEach(item=>item.disable());
+                                    this.setRoutes(true, location, params);
+                                } else if (active.filter(item=>item.triggered).length === active.length) {
+                                    this.setRoutes(false);
+                                }
+                            }
+                        });
+                    });
+
+                } else {
+                    this.setRoutes(true, location, params);
+                }
+
+            };
+
+            setRoutes(move, location, params) {
+                if (move) {
+                    this._handlers.forEach(handler=>handler());
+                    this.root.triggerRoutes(location, params);
+                }
+                this.setLocation(move);
+
+            };
+
+            setListener(listener) {
+                let listeners = this._listeners;
+                listeners.add(listener);
+                return {
+                    remove(){
+                        listeners.delete(listener);
+                    }
+                }
+            };
+
+            onRouteChange(handler) {
+                let handlers = this._handlers;
+                handlers.add(handler);
+                return {
+                    remove(){
+                        handlers.delete(handler);
+                    }
+                }
+            };
+
+
+            setLocation(move) {
+                let location = move ? this.currLocation : this.prevLocation;
+                this.prevLocation = location;
+                this.started = true;
+                this._listeners.forEach(listener=>listener(location, move));
+            };
+
+            match(mapHandler) {
+                mapHandler(this.root.match.bind(this.root));
+            };
+
+            start() {
+                this.started = true;
+            };
+
+            stop() {
+                this.started = false;
+            };
         }
-
-    };
-
-    Router.prototype.serialize = function (obj) {
-        var str = [];
-        for (var p in obj)
-            if (obj.hasOwnProperty(p)) {
-                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-            }
-        return str.join("&");
-    };
-    Router.prototype.runHandler = function (location, params, binding) {
-
-        if (this.bindings.indexOf(binding) === -1) {
-            var handler = binding.getHandler();
-            var args = binding.extractParams(location);
-
-            binding.prevLoc = location;
-
-            this.applyHandler(handler, args, params, location);
-            this.bindings.push(binding);
-        }
-
-        var handler = binding.getQueryHandler();
-        if (handler) {
-            var args = [];
-            this.applyHandler(handler, args, params, location);
-        }
-
-    };
-    Router.prototype.applyHandler = function (handlers, args, params, location) {
-        if (handlers && handlers.length > 0) {
-            handlers.forEach(function (handler) {
-                handler.apply(this, args.concat({
-                    getQuery: function () {
-                        return params.query;
-                    },
-                    getLocation: function (fragment, isQuery) {
-                        return getLocation.call(this, fragment, isQuery, params, location)
-                    }.bind(this)
-                }));
-            }.bind(this));
-        }
-    };
-    Router.prototype.start = function () {
-        this.started = true;
-    };
-    Router.prototype.stop = function () {
-        this.started = false;
-    };
-
-    return Router;
-}));
+        return Router;
+    }
+));
 
 /**
  * Created by guntars on 11/10/2014.
@@ -1793,14 +2003,33 @@ define('templating/dom',[],function () {
 define('widget/App',[
     './Mediator',
     'router/Router'
-], function (Mediator, Router) {
+], function(Mediator, Router) {
     'use strict';
-    function triggerRoute(router) {
-        router.start();
+    function triggerRoute(router, active) {
+        var activeLocation = '';
+
+        router.setListener((location, move)=> {
+            activeLocation = location;
+            if (!move) {
+                window.location.hash = location;
+            }
+        });
+
+        router.onRouteChange(()=>{
+            if (active.size > 0) {
+                active.forEach(handler=>handler());
+                active.clear();
+            }
+        });
+
         function onHashChange() {
-            let match = window.location.href.match(/#(.*)$/);
-            router.trigger(match ? match[1] : '');
+            let match = window.location.href.match(/#(.*)$/),
+                route = match ? match[1] : ''
+            if (activeLocation !== route) {
+                router.trigger(route);
+            }
         };
+        router.start();
         window.addEventListener('hashchange', onHashChange, false);
         onHashChange();
     }
@@ -1819,9 +2048,8 @@ define('widget/App',[
             return Surrogate;
         };
 
-        constructor(options) {
-            options = options || {};
-            let router = new Router();
+        constructor(options = {}) {
+            this.options = options;
 
             this.beforeInit.apply(this, arguments);
             this.context = Object.assign(this.setContext.apply(this, arguments), {
@@ -1834,28 +2062,7 @@ define('widget/App',[
                 })
             });
 
-            if (this.AppContainer !== undefined) {
-                this.appContainer = new this.AppContainer({
-                    appContext: this.context
-                });
 
-                let mapHandler = (this.appContainer._match !== undefined) ? this.appContainer._match : ()=> {
-                };
-
-                if (options.rootRoute !== undefined) {
-                    router.match((match)=> {
-                        match(options.rootRoute, mapHandler);
-                    });
-                } else {
-                    router.match(mapHandler);
-                }
-
-                this.el = this.appContainer.el;
-
-                triggerRoute(router);
-
-            }
-            this.init.apply(this, arguments);
         }
 
 
@@ -1884,9 +2091,27 @@ define('widget/App',[
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
-                container.appendChild(this.el);
+                if (this.AppContainer !== undefined) {
+                    this.appContainer = new this.AppContainer({
+                        appContext: this.context
+                    });
+                }
+                
+                this.init.call(this, this.options);
+
+                this.el = container;
+                let el = document.createElement('div');
+                container.appendChild(el);
+                this.appContainer.ready(el);
+
+                let router = new Router(this.options.rootRoute),
+                    active = new Map();
+                router.match((match)=> this.appContainer._match({match, active}));
+
+                triggerRoute(router, active);
+
                 setTimeout(() => {
-                    this.el.classList.add('show');
+                    container.classList.add('show');
                 }, 100);
             } else {
                 throw Error('Contaner should be a HTML element');
@@ -2790,6 +3015,7 @@ define('widget/parsers/applyBinders',[
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
+                    component._match(context.router);
                     addChildren.elReady(context, component, obj);
                     addChildren.elOnChange(context, component, obj);
                 });
@@ -2820,7 +3046,17 @@ define('widget/parsers/applyBinders',[
  */
 define('widget/parsers/setRoutes',[
     'templating/dom'
-], function (dom) {
+], function(dom) {
+
+    const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg,
+        ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
+
+    function getArgs(func) {
+        let fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+            result = argsList.match(ARGUMENT_NAMES);
+        return (result === null) ? [] : result.map(item=>item.replace(/[\s,]/g, ''));
+    }
 
     function destroyComponent(cp) {
         if (cp.remove !== undefined) {
@@ -2832,110 +3068,125 @@ define('widget/parsers/setRoutes',[
     function applyToChildren(children, cb) {
         if (children !== undefined) {
             Object.keys(children).forEach((name)=> {
-                let cp = children[name];
-                if (cp.elGroup && cp.elGroup.size > 0) {
-                    cp.elGroup.forEach((item)=> cb(item));
-                } else {
-                    cb(cp);
+                let instance = children[name];
+                if (!applyToGroup(instance, cb)) {
+                    cb(instance);
                 }
             });
         }
     }
 
-    function matchRoute(child, match) {
-        let route = (child.data !== undefined) ? child.data.route : undefined;
+    function applyToGroup(child, cb) {
+        if (child.elGroup && child.elGroup.size > 0) {
+            child.elGroup.forEach((childInstance)=> {
+                cb(childInstance);
+            });
+            return true;
+        }
+        return false;
+    }
 
-        if (route !== undefined && child.data.type !== 'cp' && child.name !== 'root') {
-            let id, childMatch,
-            //Need add return match in router, for better readability
-                matches = match(route, match=> {
-                    childMatch = match;
+
+    function matchRoute(child, router) {
+        if (child._match) {
+            child._match(router)
+        } else {
+            let route = (child.data !== undefined) ? child.data.route : undefined;
+            if (route !== undefined && child.data.type === 'rt') {
+                let id,
+                    match = router.match,
+                    active = router.active,
+                    matches = match(route);
+
+                matches.to((...args)=> {
+                    let params = args.pop();
+                    id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
+
+                    if (!applyToGroup(child, instance=>dom.attach(instance))) {
+                        let childInstance = child.run(true);
+                        applyToChildren(childInstance.children, instance=> {
+                            if (instance) {
+                                match(route, match=> matchRoute(instance, {match, active}));
+                            }
+                        });
+                    }
+                    applyToGroup(child, (childInstance)=> {
+                        applyToChildren(childInstance.children, instance=> {
+                            if (instance && instance.to) {
+                                instance.to(...args.concat(params));
+                            }
+                        });
+                    });
                 });
-            matches.to((...args)=> {
-                let params = args.pop();
-                id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
-                if (child.elGroup && child.elGroup.size === 0) {
-                    child = child.run(true);
-                    applyToChildren(child.children, (instance)=> {
-                        if (instance && instance.to) {
-                            instance.to(...args.concat(params));
-                        }
+                matches.leave((done)=> {
+                    let items = 0,
+                            stopped = false;
+                        applyToGroup(child, (childInstance)=> {
+                            let finish = ()=> {
+                                    if (!id) {
+                                        dom.detach(childInstance);
+                                    } else {
+                                        destroyComponent(childInstance);
+                                    }
+                                },
+                                close = (close = true)=> {
+                                    if (close) {
+                                        items--;
+                                    } else {
+                                        stopped = true;
+                                        done(false);
+                                    }
 
-                        if (instance && !instance._match) {
-                            matchRoute(instance, childMatch);
-                        } else if (instance && instance._match) {
-                            matches.setRoutes((routes)=> {
-                                instance._match((...args)=> {
-                                    let match = routes.match(...args);
-                                    instance._appliedRoutes.push(match);
-                                    return match;
-                                });
-                                routes.run();
+                                    if (items === 0 && !stopped) {
+                                        active.set(childInstance, finish);
+                                        done(true);
+                                    }
+
+                                };
+
+                            applyToChildren(childInstance.children, instance=> {
+                                if (instance && instance.leave !== undefined) {
+                                    let args = getArgs(instance.leave);
+                                    if (args.length > 0) {
+                                        items++
+                                    }
+                                    instance.leave(close);
+                                }
                             });
 
-                            instance._reRoute = ()=> {
-                                instance._applyRoutes(matches);
-                            };
-                        }
-
-                    });
-
-                } else {
-                    applyToChildren(child.children, (instance)=> {
-                        if (instance && instance.to) {
-                            instance.to.apply(instance, args.concat(params));
-                        }
-                    });
-                    dom.attach(child);
-                }
-
-            });
-
-            matches.leave(()=> {
-                applyToChildren(child.children, (instance)=> {
-                    if (instance && instance.leave !== undefined) {
-                        instance.leave();
+                            if (items === 0) {
+                                active.set(childInstance, finish);
+                                done(true);
+                            }
+                        });
                     }
-                });
-                if (!id) {
-                    dom.detach(child);
-                } else {
-                    destroyComponent(child);
-                }
-            });
+                );
 
-            matches.query((params)=> {
-                applyToChildren(child.children, (instance)=> {
-                    if (instance && instance.query !== undefined) {
-                        instance.query(params);
-                    }
+                matches.query((params)=> {
+                    applyToGroup(child, (childInstance)=> {
+                        applyToChildren(childInstance.children, (instance)=> {
+                            if (instance && instance.query !== undefined) {
+                                instance.query(params);
+                            }
+                        });
+                    });
                 });
-            });
+                applyToGroup(child, instance=>instance._activeRoute = matches);
 
-        } else if (child.children !== undefined && child.data.type !== 'cp') {
-            applyToChildren(child.children, child=> matchRoute(child, match));
-        } else if (child.elGroup && child.elGroup.size > 0) {
-            child.elGroup.forEach((instance)=> {
-                if (child.data.type === 'cp' && instance._match) {
-                    instance._match(match);
-                }
-            })
+            } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
+                applyToChildren(child.children, instance=> matchRoute(instance, router));
+            }
         }
     }
 
-    function setRoutes(context, children) {
-        if (!context._match) {
-            context._match = (match)=> {
-                applyToChildren(children, child=> matchRoute(child, match));
-                if (context.match) {
-                    context.match(match);
-                }
-            }
-        }
+    function setRoutes(children, router) {
+        applyToChildren(children, child=> matchRoute(child, router));
+
     };
 
     return setRoutes;
-});
+})
+;
 /**
  * Created by guntars on 15/03/2016.
  */
@@ -3058,20 +3309,24 @@ define('widget/Constructor',[
             return Surrogate;
         };
 
-        constructor(data, parentChildren, dataSet, node) {
+        constructor(options = {}, parentChildren, dataSet = {}, node) {
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._routes = [];
             this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
+            this._parentChildren = parentChildren;
+            this._options = options;
+            this._rendered = false;
+            this._arguments = arguments;
+
 
             this.eventBus = new Mediator(this);
 
             this.context = context;
 
-            if (data.appContext !== undefined) {
-                Object.assign(this.context, data.appContext);
+            if (options.appContext !== undefined) {
+                Object.assign(this.context, options.appContext);
             }
 
             if (node !== undefined && node.name !== undefined) {
@@ -3080,40 +3335,80 @@ define('widget/Constructor',[
 
             this.beforeInit.apply(this, arguments);
 
-
-            if (this.template) {
+            if (!this.data) {
                 let keys = (dataSet) ? Object.keys(dataSet) : [],
                     contextData = (keys.length > 0) ? dataSet : this.context.data;
-
-                if (!this.data && contextData) {
-                    this.data = contextData[data.bind] || contextData;
+                if (contextData) {
+                    this.data = contextData[options.bind] || contextData;
                 }
-
-                let decoder = new Decoder(this.template),
-                    template = decoder.render(this.data);
-
-                this.el = template.fragment;
-
-                this.root = new dom.Element(this.el, {
-                    name: 'root'
-                });
-
-                this.children = applyElement(template.children, data);
-                setRoutes(this, this.children);
-                applyParent(this, parentChildren, this.data);
-                this.bindings = setBinders(this.children, true);
-
-                if (this.data) {
-                    this.applyBinders(this.data, this);
-                }
-
-                addChildren(this, this.root);
-
-            } else {
-                this.el = document.createElement('div');
             }
-            this.init.apply(this, arguments);
+        };
+
+        ready(el) {
+            this.el = el;
+
         }
+
+        _match(router) {
+            this.router = router;
+            
+            if (this.match) {
+                this.match(router.match);
+            }
+
+            if (!this.async) {
+                this.render();
+            }
+
+            this.init.apply(this, this._arguments);
+        }
+
+        // method render called manually if flag async is true;
+        //
+        //      @method render
+        render(data) {
+            if (!this._rendered) {
+                if (this.template) {
+                    if (data) {
+                        this.data = data;
+                    }
+                    let options = this._options,
+                        parentChildren = this._parentChildren,
+                        decoder = new Decoder(this.template),
+                        template = decoder.render(this.data);
+                    if (this.el) {
+                        let parent = this.el.parentNode;
+                        if (parent) {
+                            parent.replaceChild(template.fragment, this.el);
+                        }
+                        if (this.elGroup && this.elGroup.get(this.el)) {
+                            this.elGroup.delete(this.el);
+                            this.el = template.fragment;
+                            this.elGroup.set(template.fragment, this);
+                        }
+                    } else {
+                        this.el = template.fragment;
+                    }
+
+
+                    this.root = new dom.Element(template.fragment, {
+                        name: 'root'
+                    });
+
+                    this.children = applyElement(template.children, options);
+                    applyParent(this, parentChildren, this.data);
+                    this.bindings = setBinders(this.children, true);
+
+                    if (this.data) {
+                        this.applyBinders(this.data, this);
+                    }
+
+                    setRoutes(this.children, this.router);
+                    addChildren(this, this.root);
+                    this._rendered = true;
+                }
+            }
+        };
 
         init(data, children, dataSet) {
         };
@@ -3184,15 +3479,11 @@ define('widget/Constructor',[
         //Removing widget from Dom
         //
         //      @method destroy
-        destroy(force) {
+        destroy() {
             this.onDestroy();
             this.eventBus.clear();
             while (this._events.length > 0) {
                 this._events.shift().remove();
-            }
-
-            while (this._appliedRoutes.length > 0) {
-                this._appliedRoutes.shift().remove();
             }
 
             while (this._globalEvents.length > 0) {
@@ -3200,14 +3491,13 @@ define('widget/Constructor',[
             }
 
             destroy(this.children);
-            if (force && this._matches) {
-                this._matches.remove();
-            }
 
             if (this.elGroup !== undefined && this.el !== undefined) {
                 this.elGroup.delete(this.el);
             }
-            this.root.remove();
+            if (this.root && this.root.remove) {
+                this.root.remove();
+            }
 
             delete this.el;
 
@@ -3216,37 +3506,6 @@ define('widget/Constructor',[
         remove(...args) {
             this.destroy(...args);
         }
-
-        setRoutes(instance) {
-            if (instance !== undefined) {
-                this._routes.push(instance);
-            }
-        };
-
-        _applyRoutes(matches) {
-            while (this._routes.length > 0) {
-                let instance = this._routes.shift();
-                if (instance && instance._match) {
-                    matches.setRoutes((routes)=> {
-                        instance._match((...args)=> {
-                            let match = routes.match(...args);
-                            this._appliedRoutes.push(match);
-                            return match;
-                        });
-                        routes.run();
-                    });
-                }
-            }
-            matches.rebind();
-        };
-
-        _reRoute() {
-            this._routes.splice(0, this._routes.length);
-        };
-
-        rebind() {
-            this._reRoute();
-        };
 
         // Adding Childrens manually after initialization.
         //  @method setChildren
@@ -3261,9 +3520,6 @@ define('widget/Constructor',[
 
             instance = el.run(data || true);
             addChildren(this, instance, data);
-
-            this.setRoutes(instance);
-            this.rebind();
         };
 
         // Adding Dynamic components
@@ -3287,9 +3543,8 @@ define('widget/Constructor',[
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
+            instance._match(this.router);
             this.children[name] = instance;
-            this.setRoutes(instance);
-            this.rebind();
             return instance;
         };
 
@@ -3302,7 +3557,11 @@ define('widget/Constructor',[
                 },
                 run:  (container)=> {
                     options.appContext = this.context;
-                    let cp = new Component(options, options.children, options.data);
+                    let cp = new Component(options, options.children, options.data),
+                        el = document.createElement('div');
+                    el.setAttribute('style', 'display:none;');
+                    cp.ready(el);
+
                     if (container instanceof HTMLElement === true) {
                         container.parentNode.replaceChild(cp.el, container);
                     } else if (container.el !== undefined && options.pos !== undefined) {
@@ -3328,7 +3587,7 @@ define('widget/Constructor',[
         //
         //      @method applyBinders
         applyBinders(...args) {
-           return applyBinders(this, ...args);
+            return applyBinders(this, ...args);
         }
     }
     Object.assign(Constructor.prototype, {

@@ -218,7 +218,7 @@ Basic Usage example</p>
             <span class="hljs-keyword">return</span> Surrogate;
         };
 
-        <span class="hljs-keyword">constructor</span>(data, parentChildren, dataSet, node) {</pre></div></div>
+        <span class="hljs-keyword">constructor</span>(options = {}, parentChildren, dataSet = {}, node) {</pre></div></div>
             
         </li>
         
@@ -234,17 +234,21 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">this</span>.instance = <span class="hljs-keyword">this</span>;
-            <span class="hljs-keyword">this</span>._routes = [];
             <span class="hljs-keyword">this</span>._appliedRoutes = [];
             <span class="hljs-keyword">this</span>._events = [];
             <span class="hljs-keyword">this</span>._globalEvents = [];
+            <span class="hljs-keyword">this</span>._parentChildren = parentChildren;
+            <span class="hljs-keyword">this</span>._options = options;
+            <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">false</span>;
+            <span class="hljs-keyword">this</span>._arguments = <span class="hljs-built_in">arguments</span>;
+
 
             <span class="hljs-keyword">this</span>.eventBus = <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>);
 
             <span class="hljs-keyword">this</span>.context = context;
 
-            <span class="hljs-keyword">if</span> (data.appContext !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">this</span>.context, data.appContext);
+            <span class="hljs-keyword">if</span> (options.appContext !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">this</span>.context, options.appContext);
             }
 
             <span class="hljs-keyword">if</span> (node !== <span class="hljs-literal">undefined</span> &amp;&amp; node.name !== <span class="hljs-literal">undefined</span>) {
@@ -253,43 +257,33 @@ Basic Usage example</p>
 
             <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
 
-
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.data) {
                 <span class="hljs-keyword">let</span> keys = (dataSet) ? <span class="hljs-built_in">Object</span>.keys(dataSet) : [],
                     contextData = (keys.length &gt; <span class="hljs-number">0</span>) ? dataSet : <span class="hljs-keyword">this</span>.context.data;
-
-                <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.data &amp;&amp; contextData) {
-                    <span class="hljs-keyword">this</span>.data = contextData[data.bind] || contextData;
+                <span class="hljs-keyword">if</span> (contextData) {
+                    <span class="hljs-keyword">this</span>.data = contextData[options.bind] || contextData;
                 }
-
-                <span class="hljs-keyword">let</span> decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
-                    template = decoder.render(<span class="hljs-keyword">this</span>.data);
-
-                <span class="hljs-keyword">this</span>.el = template.fragment;
-
-                <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(<span class="hljs-keyword">this</span>.el, {
-                    name: <span class="hljs-string">'root'</span>
-                });
-
-                <span class="hljs-keyword">this</span>.children = applyElement(template.children, data);
-                setRoutes(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.children);
-                applyParent(<span class="hljs-keyword">this</span>, parentChildren, <span class="hljs-keyword">this</span>.data);
-                <span class="hljs-keyword">this</span>.bindings = setBinders(<span class="hljs-keyword">this</span>.children, <span class="hljs-literal">true</span>);
-
-                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.data) {
-                    <span class="hljs-keyword">this</span>.applyBinders(<span class="hljs-keyword">this</span>.data, <span class="hljs-keyword">this</span>);
-                }
-
-                addChildren(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.root);
-
-            } <span class="hljs-keyword">else</span> {
-                <span class="hljs-keyword">this</span>.el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
             }
-            <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+        };
+
+        ready(el) {
+            <span class="hljs-keyword">this</span>.el = el;
+
         }
 
-        init(data, children, dataSet) {
-        };</pre></div></div>
+        _match(router) {
+            <span class="hljs-keyword">this</span>.router = router;
+            
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.match) {
+                <span class="hljs-keyword">this</span>.match(router.match);
+            }
+
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.async) {
+                <span class="hljs-keyword">this</span>.render();
+            }
+
+            <span class="hljs-keyword">this</span>.init.apply(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>._arguments);
+        }</pre></div></div>
             
         </li>
         
@@ -299,6 +293,67 @@ Basic Usage example</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>method render called manually if flag async is true;</p>
+<pre><code> @method render
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        render(data) {
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._rendered) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.template) {
+                    <span class="hljs-keyword">if</span> (data) {
+                        <span class="hljs-keyword">this</span>.data = data;
+                    }
+                    <span class="hljs-keyword">let</span> options = <span class="hljs-keyword">this</span>._options,
+                        parentChildren = <span class="hljs-keyword">this</span>._parentChildren,
+                        decoder = <span class="hljs-keyword">new</span> Decoder(<span class="hljs-keyword">this</span>.template),
+                        template = decoder.render(<span class="hljs-keyword">this</span>.data);
+                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.el) {
+                        <span class="hljs-keyword">let</span> parent = <span class="hljs-keyword">this</span>.el.parentNode;
+                        <span class="hljs-keyword">if</span> (parent) {
+                            parent.replaceChild(template.fragment, <span class="hljs-keyword">this</span>.el);
+                        }
+                        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elGroup &amp;&amp; <span class="hljs-keyword">this</span>.elGroup.get(<span class="hljs-keyword">this</span>.el)) {
+                            <span class="hljs-keyword">this</span>.elGroup.delete(<span class="hljs-keyword">this</span>.el);
+                            <span class="hljs-keyword">this</span>.el = template.fragment;
+                            <span class="hljs-keyword">this</span>.elGroup.set(template.fragment, <span class="hljs-keyword">this</span>);
+                        }
+                    } <span class="hljs-keyword">else</span> {
+                        <span class="hljs-keyword">this</span>.el = template.fragment;
+                    }
+
+
+                    <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(template.fragment, {
+                        name: <span class="hljs-string">'root'</span>
+                    });
+
+                    <span class="hljs-keyword">this</span>.children = applyElement(template.children, options);
+                    applyParent(<span class="hljs-keyword">this</span>, parentChildren, <span class="hljs-keyword">this</span>.data);
+                    <span class="hljs-keyword">this</span>.bindings = setBinders(<span class="hljs-keyword">this</span>.children, <span class="hljs-literal">true</span>);
+
+                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.data) {
+                        <span class="hljs-keyword">this</span>.applyBinders(<span class="hljs-keyword">this</span>.data, <span class="hljs-keyword">this</span>);
+                    }
+
+                    setRoutes(<span class="hljs-keyword">this</span>.children, <span class="hljs-keyword">this</span>.router);
+                    addChildren(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.root);
+                    <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">true</span>;
+                }
+            }
+        };
+
+        init(data, children, dataSet) {
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>Running before Constructor is initialised</p>
 <pre><code> @method beforeInit
@@ -316,11 +371,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Load external css style for third party modules.</p>
 <pre><code> @method loadCss
@@ -346,11 +401,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Remove from parentNode</p>
 <pre><code> @method detach
@@ -374,11 +429,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Add to parentNode</p>
 <pre><code> @method attach
@@ -394,11 +449,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>Executes when Component is destroyed</p>
 <pre><code> @method applyBinders
@@ -412,26 +467,22 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Removing widget from Dom</p>
 <pre><code> @method destroy
 </code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        destroy(force) {
+            <div class="content"><div class='highlight'><pre>        destroy() {
             <span class="hljs-keyword">this</span>.onDestroy();
             <span class="hljs-keyword">this</span>.eventBus.clear();
             <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._events.length &gt; <span class="hljs-number">0</span>) {
                 <span class="hljs-keyword">this</span>._events.shift().remove();
-            }
-
-            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._appliedRoutes.length &gt; <span class="hljs-number">0</span>) {
-                <span class="hljs-keyword">this</span>._appliedRoutes.shift().remove();
             }
 
             <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._globalEvents.length &gt; <span class="hljs-number">0</span>) {
@@ -439,14 +490,13 @@ Basic Usage example</p>
             }
 
             destroy(<span class="hljs-keyword">this</span>.children);
-            <span class="hljs-keyword">if</span> (force &amp;&amp; <span class="hljs-keyword">this</span>._matches) {
-                <span class="hljs-keyword">this</span>._matches.remove();
-            }
 
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.elGroup !== <span class="hljs-literal">undefined</span> &amp;&amp; <span class="hljs-keyword">this</span>.el !== <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">this</span>.elGroup.delete(<span class="hljs-keyword">this</span>.el);
             }
-            <span class="hljs-keyword">this</span>.root.remove();
+            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.root &amp;&amp; <span class="hljs-keyword">this</span>.root.remove) {
+                <span class="hljs-keyword">this</span>.root.remove();
+            }
 
             <span class="hljs-keyword">delete</span> <span class="hljs-keyword">this</span>.el;
 
@@ -454,47 +504,16 @@ Basic Usage example</p>
 
         remove(...args) {
             <span class="hljs-keyword">this</span>.destroy(...args);
-        }
-
-        setRoutes(instance) {
-            <span class="hljs-keyword">if</span> (instance !== <span class="hljs-literal">undefined</span>) {
-                <span class="hljs-keyword">this</span>._routes.push(instance);
-            }
-        };
-
-        _applyRoutes(matches) {
-            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">this</span>._routes.length &gt; <span class="hljs-number">0</span>) {
-                <span class="hljs-keyword">let</span> instance = <span class="hljs-keyword">this</span>._routes.shift();
-                <span class="hljs-keyword">if</span> (instance &amp;&amp; instance._match) {
-                    matches.setRoutes((routes)=&gt; {
-                        instance._match((...args)=&gt; {
-                            <span class="hljs-keyword">let</span> match = routes.match(...args);
-                            <span class="hljs-keyword">this</span>._appliedRoutes.push(match);
-                            <span class="hljs-keyword">return</span> match;
-                        });
-                        routes.run();
-                    });
-                }
-            }
-            matches.rebind();
-        };
-
-        _reRoute() {
-            <span class="hljs-keyword">this</span>._routes.splice(<span class="hljs-number">0</span>, <span class="hljs-keyword">this</span>._routes.length);
-        };
-
-        rebind() {
-            <span class="hljs-keyword">this</span>._reRoute();
-        };</pre></div></div>
+        }</pre></div></div>
             
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Adding Childrens manually after initialization.
  @method setChildren
@@ -512,19 +531,16 @@ Basic Usage example</p>
 
             instance = el.run(data || <span class="hljs-literal">true</span>);
             addChildren(<span class="hljs-keyword">this</span>, instance, data);
-
-            <span class="hljs-keyword">this</span>.setRoutes(instance);
-            <span class="hljs-keyword">this</span>.rebind();
         };</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Adding Dynamic components
 @method addComponent
@@ -550,9 +566,8 @@ Basic Usage example</p>
             }
             <span class="hljs-keyword">let</span> component = <span class="hljs-keyword">this</span>.setComponent(Component, options),
                 instance = component.run(options.container);
+            instance._match(<span class="hljs-keyword">this</span>.router);
             <span class="hljs-keyword">this</span>.children[name] = instance;
-            <span class="hljs-keyword">this</span>.setRoutes(instance);
-            <span class="hljs-keyword">this</span>.rebind();
             <span class="hljs-keyword">return</span> instance;
         };
 
@@ -565,7 +580,11 @@ Basic Usage example</p>
                 },
                 run:  (container)=&gt; {
                     options.appContext = <span class="hljs-keyword">this</span>.context;
-                    <span class="hljs-keyword">let</span> cp = <span class="hljs-keyword">new</span> Component(options, options.children, options.data);
+                    <span class="hljs-keyword">let</span> cp = <span class="hljs-keyword">new</span> Component(options, options.children, options.data),
+                        el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+                    el.setAttribute(<span class="hljs-string">'style'</span>, <span class="hljs-string">'display:none;'</span>);
+                    cp.ready(el);
+
                     <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
                         container.parentNode.replaceChild(cp.el, container);
                     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (container.el !== <span class="hljs-literal">undefined</span> &amp;&amp; options.pos !== <span class="hljs-literal">undefined</span>) {
@@ -582,11 +601,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Running when Constructor is initialised</p>
 <pre><code> @method applyBinders
@@ -601,7 +620,7 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        applyBinders(...args) {
-           <span class="hljs-keyword">return</span> applyBinders(<span class="hljs-keyword">this</span>, ...args);
+            <span class="hljs-keyword">return</span> applyBinders(<span class="hljs-keyword">this</span>, ...args);
         }
     }
     <span class="hljs-built_in">Object</span>.assign(Constructor.prototype, {</pre></div></div>
@@ -609,11 +628,11 @@ Basic Usage example</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><code>nodes</code> Object override default methods to Elements.
 Usage Example</p>
@@ -631,11 +650,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><code>events</code> Object applying events to elements
 You can apply more than one event on element
@@ -658,11 +677,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Applying extra methods to Element
 Usage Example</p>
@@ -681,11 +700,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Applying methods to element when data is changed to Element
 Usage Example</p>

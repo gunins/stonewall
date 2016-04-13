@@ -251,6 +251,7 @@ define([
             <span class="hljs-keyword">if</span> (binders[<span class="hljs-string">'__cp__'</span>].length &gt; <span class="hljs-number">0</span>) {
                 binders[<span class="hljs-string">'__cp__'</span>].forEach(binder=&gt; {
                     <span class="hljs-keyword">let</span> component = binder.run(obj);
+                    component._match(context.router);
                     addChildren.elReady(context, component, obj);
                     addChildren.elOnChange(context, component, obj);
                 });

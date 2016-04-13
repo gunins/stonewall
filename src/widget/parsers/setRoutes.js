@@ -43,15 +43,18 @@ define([
         return false;
     }
 
-    function matchRoute(child, match) {
+
+    function matchRoute(child, router) {
         if (child._match) {
-            child._match(match)
+            child._match(router)
         } else {
             let route = (child.data !== undefined) ? child.data.route : undefined;
-
             if (route !== undefined && child.data.type === 'rt') {
-                let id;
-                let matches = match(route);
+                let id,
+                    match = router.match,
+                    active = router.active,
+                    matches = match(route);
+
                 matches.to((...args)=> {
                     let params = args.pop();
                     id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
@@ -60,9 +63,7 @@ define([
                         let childInstance = child.run(true);
                         applyToChildren(childInstance.children, instance=> {
                             if (instance) {
-                                match(route, childMatch=> {
-                                    matchRoute(instance, childMatch);
-                                });
+                                match(route, match=> matchRoute(instance, {match, active}));
                             }
                         });
                     }
@@ -74,28 +75,31 @@ define([
                         });
                     });
                 });
-
                 matches.leave((done)=> {
-                        let items = 1,
+                    let items = 0,
                             stopped = false;
-                    applyToGroup(child, (childInstance)=> {
-                            let close = (close = true)=> {
-                                if (close) {
-                                    items--;
-                                } else {
-                                    stopped = true;
-                                    done(false);
-                                }
-                                if (items === 0 && !stopped) {
+                        applyToGroup(child, (childInstance)=> {
+                            let finish = ()=> {
                                     if (!id) {
                                         dom.detach(childInstance);
                                     } else {
                                         destroyComponent(childInstance);
                                     }
-                                    done(true);
-                                }
+                                },
+                                close = (close = true)=> {
+                                    if (close) {
+                                        items--;
+                                    } else {
+                                        stopped = true;
+                                        done(false);
+                                    }
 
-                            }
+                                    if (items === 0 && !stopped) {
+                                        active.set(childInstance, finish);
+                                        done(true);
+                                    }
+
+                                };
 
                             applyToChildren(childInstance.children, instance=> {
                                 if (instance && instance.leave !== undefined) {
@@ -107,8 +111,9 @@ define([
                                 }
                             });
 
-                            if (items === 1) {
-                                close(true);
+                            if (items === 0) {
+                                active.set(childInstance, finish);
+                                done(true);
                             }
                         });
                     }
@@ -126,13 +131,13 @@ define([
                 applyToGroup(child, instance=>instance._activeRoute = matches);
 
             } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                applyToChildren(child.children, instance=> matchRoute(instance, match));
+                applyToChildren(child.children, instance=> matchRoute(instance, router));
             }
         }
     }
 
-    function setRoutes(children, match) {
-        applyToChildren(children, child=> matchRoute(child, match));
+    function setRoutes(children, router) {
+        applyToChildren(children, child=> matchRoute(child, router));
 
     };
 

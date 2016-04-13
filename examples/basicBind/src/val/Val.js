@@ -13,6 +13,10 @@ define([
                     }
                 }
             ]
+        },
+        elReady:{
+            list: function(el, data) {
+            }
         }
     });
 

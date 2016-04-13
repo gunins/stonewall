@@ -896,6 +896,7 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(function (binder) {
                     var component = binder.run(obj);
+                    component._match(context.router);
                     addChildren.elReady(context, component, obj);
                     addChildren.elOnChange(context, component, obj);
                 });
@@ -932,6 +933,18 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
  */
 define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
 
+    var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg,
+        ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
+
+    function getArgs(func) {
+        var fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+            result = argsList.match(ARGUMENT_NAMES);
+        return result === null ? [] : result.map(function (item) {
+            return item.replace(/[\s,]/g, '');
+        });
+    }
+
     function destroyComponent(cp) {
         if (cp.remove !== undefined) {
             cp.remove();
@@ -941,116 +954,135 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
     function applyToChildren(children, cb) {
         if (children !== undefined) {
             Object.keys(children).forEach(function (name) {
-                var cp = children[name];
-                if (cp.elGroup && cp.elGroup.size > 0) {
-                    cp.elGroup.forEach(function (item) {
-                        return cb(item);
-                    });
-                } else {
-                    cb(cp);
+                var instance = children[name];
+                if (!applyToGroup(instance, cb)) {
+                    cb(instance);
                 }
             });
         }
     }
 
-    function matchRoute(child, match) {
-        var route = child.data !== undefined ? child.data.route : undefined;
+    function applyToGroup(child, cb) {
+        if (child.elGroup && child.elGroup.size > 0) {
+            child.elGroup.forEach(function (childInstance) {
+                cb(childInstance);
+            });
+            return true;
+        }
+        return false;
+    }
 
-        if (route !== undefined && child.data.type !== 'cp' && child.name !== 'root') {
+    function matchRoute(child, router) {
+        if (child._match) {
+            child._match(router);
+        } else {
             (function () {
-                var id = void 0,
-                    childMatch = void 0,
+                var route = child.data !== undefined ? child.data.route : undefined;
+                if (route !== undefined && child.data.type === 'rt') {
+                    (function () {
+                        var id = void 0,
+                            match = router.match,
+                            active = router.active,
+                            matches = match(route);
 
-                //Need add return match in router, for better readability
-                matches = match(route, function (match) {
-                    childMatch = match;
-                });
-                matches.to(function () {
-                    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                        args[_key] = arguments[_key];
-                    }
-
-                    var params = args.pop();
-                    id = args.length > 0 ? params.getLocation() + '_' + args.join('_') : undefined;
-                    if (child.elGroup && child.elGroup.size === 0) {
-                        child = child.run(true);
-                        applyToChildren(child.children, function (instance) {
-                            if (instance && instance.to) {
-                                instance.to.apply(instance, _toConsumableArray(args.concat(params)));
+                        matches.to(function () {
+                            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                                args[_key] = arguments[_key];
                             }
 
-                            if (instance && !instance._match) {
-                                matchRoute(instance, childMatch);
-                            } else if (instance && instance._match) {
-                                matches.setRoutes(function (routes) {
-                                    instance._match(function () {
-                                        var match = routes.match.apply(routes, arguments);
-                                        instance._appliedRoutes.push(match);
-                                        return match;
-                                    });
-                                    routes.run();
+                            var params = args.pop();
+                            id = args.length > 0 ? params.getLocation() + '_' + args.join('_') : undefined;
+
+                            if (!applyToGroup(child, function (instance) {
+                                return dom.attach(instance);
+                            })) {
+                                var childInstance = child.run(true);
+                                applyToChildren(childInstance.children, function (instance) {
+                                    if (instance) {
+                                        match(route, function (match) {
+                                            return matchRoute(instance, { match: match, active: active });
+                                        });
+                                    }
+                                });
+                            }
+                            applyToGroup(child, function (childInstance) {
+                                applyToChildren(childInstance.children, function (instance) {
+                                    if (instance && instance.to) {
+                                        instance.to.apply(instance, _toConsumableArray(args.concat(params)));
+                                    }
+                                });
+                            });
+                        });
+                        matches.leave(function (done) {
+                            var items = 0,
+                                stopped = false;
+                            applyToGroup(child, function (childInstance) {
+                                var finish = function finish() {
+                                    if (!id) {
+                                        dom.detach(childInstance);
+                                    } else {
+                                        destroyComponent(childInstance);
+                                    }
+                                },
+                                    close = function close() {
+                                    var close = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+                                    if (close) {
+                                        items--;
+                                    } else {
+                                        stopped = true;
+                                        done(false);
+                                    }
+
+                                    if (items === 0 && !stopped) {
+                                        active.set(childInstance, finish);
+                                        done(true);
+                                    }
+                                };
+
+                                applyToChildren(childInstance.children, function (instance) {
+                                    if (instance && instance.leave !== undefined) {
+                                        var args = getArgs(instance.leave);
+                                        if (args.length > 0) {
+                                            items++;
+                                        }
+                                        instance.leave(close);
+                                    }
                                 });
 
-                                instance._reRoute = function () {
-                                    instance._applyRoutes(matches);
-                                };
-                            }
+                                if (items === 0) {
+                                    active.set(childInstance, finish);
+                                    done(true);
+                                }
+                            });
                         });
-                    } else {
-                        applyToChildren(child.children, function (instance) {
-                            if (instance && instance.to) {
-                                instance.to.apply(instance, args.concat(params));
-                            }
+
+                        matches.query(function (params) {
+                            applyToGroup(child, function (childInstance) {
+                                applyToChildren(childInstance.children, function (instance) {
+                                    if (instance && instance.query !== undefined) {
+                                        instance.query(params);
+                                    }
+                                });
+                            });
                         });
-                        dom.attach(child);
-                    }
-                });
-
-                matches.leave(function () {
+                        applyToGroup(child, function (instance) {
+                            return instance._activeRoute = matches;
+                        });
+                    })();
+                } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
                     applyToChildren(child.children, function (instance) {
-                        if (instance && instance.leave !== undefined) {
-                            instance.leave();
-                        }
+                        return matchRoute(instance, router);
                     });
-                    if (!id) {
-                        dom.detach(child);
-                    } else {
-                        destroyComponent(child);
-                    }
-                });
-
-                matches.query(function (params) {
-                    applyToChildren(child.children, function (instance) {
-                        if (instance && instance.query !== undefined) {
-                            instance.query(params);
-                        }
-                    });
-                });
-            })();
-        } else if (child.children !== undefined && child.data.type !== 'cp') {
-            applyToChildren(child.children, function (child) {
-                return matchRoute(child, match);
-            });
-        } else if (child.elGroup && child.elGroup.size > 0) {
-            child.elGroup.forEach(function (instance) {
-                if (child.data.type === 'cp' && instance._match) {
-                    instance._match(match);
                 }
-            });
+            })();
         }
     }
 
-    function setRoutes(context, children) {
-        if (!context._match) {
-            context._match = function (match) {
-                applyToChildren(children, function (child) {
-                    return matchRoute(child, match);
-                });
-                if (context.match) {
-                    context.match(match);
-                }
-            };
-        }
+    function setRoutes(children, router) {
+        applyToChildren(children, function (child) {
+            return matchRoute(child, router);
+        });
     };
 
     return setRoutes;
@@ -1175,22 +1207,30 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             }
         }]);
 
-        function Constructor(data, parentChildren, dataSet, node) {
+        function Constructor() {
+            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var parentChildren = arguments[1];
+            var dataSet = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+            var node = arguments[3];
+
             _classCallCheck(this, Constructor);
 
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._routes = [];
             this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
+            this._parentChildren = parentChildren;
+            this._options = options;
+            this._rendered = false;
+            this._arguments = arguments;
 
             this.eventBus = new Mediator(this);
 
             this.context = context;
 
-            if (data.appContext !== undefined) {
-                Object.assign(this.context, data.appContext);
+            if (options.appContext !== undefined) {
+                Object.assign(this.context, options.appContext);
             }
 
             if (node !== undefined && node.name !== undefined) {
@@ -1199,40 +1239,85 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
 
             this.beforeInit.apply(this, arguments);
 
-            if (this.template) {
+            if (!this.data) {
                 var keys = dataSet ? Object.keys(dataSet) : [],
                     contextData = keys.length > 0 ? dataSet : this.context.data;
-
-                if (!this.data && contextData) {
-                    this.data = contextData[data.bind] || contextData;
+                if (contextData) {
+                    this.data = contextData[options.bind] || contextData;
                 }
-
-                var decoder = new Decoder(this.template),
-                    template = decoder.render(this.data);
-
-                this.el = template.fragment;
-
-                this.root = new dom.Element(this.el, {
-                    name: 'root'
-                });
-
-                this.children = applyElement(template.children, data);
-                setRoutes(this, this.children);
-                applyParent(this, parentChildren, this.data);
-                this.bindings = setBinders(this.children, true);
-
-                if (this.data) {
-                    this.applyBinders(this.data, this);
-                }
-
-                addChildren(this, this.root);
-            } else {
-                this.el = document.createElement('div');
             }
-            this.init.apply(this, arguments);
         }
 
         _createClass(Constructor, [{
+            key: 'ready',
+            value: function ready(el) {
+                this.el = el;
+            }
+        }, {
+            key: '_match',
+            value: function _match(router) {
+                this.router = router;
+
+                if (this.match) {
+                    this.match(router.match);
+                }
+
+                if (!this.async) {
+                    this.render();
+                }
+
+                this.init.apply(this, this._arguments);
+            }
+
+            // method render called manually if flag async is true;
+            //
+            //      @method render
+
+        }, {
+            key: 'render',
+            value: function render(data) {
+                if (!this._rendered) {
+                    if (this.template) {
+                        if (data) {
+                            this.data = data;
+                        }
+                        var options = this._options,
+                            parentChildren = this._parentChildren,
+                            decoder = new Decoder(this.template),
+                            template = decoder.render(this.data);
+                        if (this.el) {
+                            var parent = this.el.parentNode;
+                            if (parent) {
+                                parent.replaceChild(template.fragment, this.el);
+                            }
+                            if (this.elGroup && this.elGroup.get(this.el)) {
+                                this.elGroup.delete(this.el);
+                                this.el = template.fragment;
+                                this.elGroup.set(template.fragment, this);
+                            }
+                        } else {
+                            this.el = template.fragment;
+                        }
+
+                        this.root = new dom.Element(template.fragment, {
+                            name: 'root'
+                        });
+
+                        this.children = applyElement(template.children, options);
+                        applyParent(this, parentChildren, this.data);
+                        this.bindings = setBinders(this.children, true);
+
+                        if (this.data) {
+                            this.applyBinders(this.data, this);
+                        }
+
+                        setRoutes(this.children, this.router);
+                        addChildren(this, this.root);
+                        this._rendered = true;
+                    }
+                }
+            }
+        }, {
             key: 'init',
             value: function init(data, children, dataSet) {}
         }, {
@@ -1315,15 +1400,11 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             //Removing widget from Dom
             //
             //      @method destroy
-            value: function destroy(force) {
+            value: function destroy() {
                 this.onDestroy();
                 this.eventBus.clear();
                 while (this._events.length > 0) {
                     this._events.shift().remove();
-                }
-
-                while (this._appliedRoutes.length > 0) {
-                    this._appliedRoutes.shift().remove();
                 }
 
                 while (this._globalEvents.length > 0) {
@@ -1331,14 +1412,13 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                 }
 
                 _destroy(this.children);
-                if (force && this._matches) {
-                    this._matches.remove();
-                }
 
                 if (this.elGroup !== undefined && this.el !== undefined) {
                     this.elGroup.delete(this.el);
                 }
-                this.root.remove();
+                if (this.root && this.root.remove) {
+                    this.root.remove();
+                }
 
                 delete this.el;
             }
@@ -1347,55 +1427,14 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             value: function remove() {
                 this.destroy.apply(this, arguments);
             }
-        }, {
-            key: 'setRoutes',
-            value: function setRoutes(instance) {
-                if (instance !== undefined) {
-                    this._routes.push(instance);
-                }
-            }
-        }, {
-            key: '_applyRoutes',
-            value: function _applyRoutes(matches) {
-                var _this2 = this;
-
-                var _loop = function _loop() {
-                    var instance = _this2._routes.shift();
-                    if (instance && instance._match) {
-                        matches.setRoutes(function (routes) {
-                            instance._match(function () {
-                                var match = routes.match.apply(routes, arguments);
-                                _this2._appliedRoutes.push(match);
-                                return match;
-                            });
-                            routes.run();
-                        });
-                    }
-                };
-
-                while (this._routes.length > 0) {
-                    _loop();
-                }
-                matches.rebind();
-            }
-        }, {
-            key: '_reRoute',
-            value: function _reRoute() {
-                this._routes.splice(0, this._routes.length);
-            }
-        }, {
-            key: 'rebind',
-            value: function rebind() {
-                this._reRoute();
-            }
-        }, {
-            key: 'setChildren',
-
 
             // Adding Childrens manually after initialization.
             //  @method setChildren
             //  @param {Element} el
             //  @param {Object} data
+
+        }, {
+            key: 'setChildren',
             value: function setChildren(el, data) {
                 var name = el.data.name,
                     instance = this.children[name];
@@ -1405,9 +1444,6 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
 
                 instance = el.run(data || true);
                 addChildren(this, instance, data);
-
-                this.setRoutes(instance);
-                this.rebind();
             }
         }, {
             key: 'addComponent',
@@ -1434,15 +1470,14 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                 }
                 var component = this.setComponent(Component, options),
                     instance = component.run(options.container);
+                instance._match(this.router);
                 this.children[name] = instance;
-                this.setRoutes(instance);
-                this.rebind();
                 return instance;
             }
         }, {
             key: 'setComponent',
             value: function setComponent(Component, options) {
-                var _this3 = this;
+                var _this2 = this;
 
                 var instance = {
                     name: options.name,
@@ -1451,8 +1486,12 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                         type: 'cp'
                     },
                     run: function run(container) {
-                        options.appContext = _this3.context;
-                        var cp = new Component(options, options.children, options.data);
+                        options.appContext = _this2.context;
+                        var cp = new Component(options, options.children, options.data),
+                            el = document.createElement('div');
+                        el.setAttribute('style', 'display:none;');
+                        cp.ready(el);
+
                         if (container instanceof HTMLElement === true) {
                             container.parentNode.replaceChild(cp.el, container);
                         } else if (container.el !== undefined && options.pos !== undefined) {
