@@ -5,17 +5,23 @@ define([
     'widget/App',
     'container/Container',
     'data'
-], function (App, Container, data) {
-
+], function(App, Container, data) {
+    let rows = data(100);
     return App.extend({
 
-        init: function () {
-
+        init:         function() {
+            this.context.eventBus.subscribe('startStop', (start)=> {
+                if (start) {
+                    rows.start();
+                } else {
+                    rows.stop();
+                }
+            })
         },
         AppContainer: Container,
-        setContext: function () {
+        setContext:   function() {
             return {
-                data: data
+                data: rows.data
             }
         }
     });

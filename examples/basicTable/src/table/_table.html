@@ -1,0 +1,44 @@
+<div class="table-responsive">
+    <style-less>
+        .fadein {
+            opacity: 1;
+        }
+
+        .tdwrap {
+            position: relative;
+            display: block;
+        }
+
+        .tooltip {
+            left: -40px;
+            top: 0;
+        }
+    </style-less>
+    <pl-header class="table-header" tp-tag="h3">
+    </pl-header>
+    <table class="table table-striped">
+        <thead>
+        <bd-thead tp-tag="tr">
+            <bd-headvalue tp-tag="th"></bd-headvalue>
+            <bd-headset tp-tag="th"></bd-headset>
+            <bd-headelement tp-tag="th"></bd-headelement>
+            <bd-headtest tp-tag="th"></bd-headtest>
+            <bd-headother tp-tag="th"></bd-headother>
+        </bd-thead>
+        </thead>
+        <tbody>
+        <bd-tbody tp-tag="tr">
+            <bd-value tp-tag="td">
+                <div class="tdwrap">
+                    <bd-name tp-update="true" tp-tag="span"></bd-name>
+                    <bd-tooltip class="tooltip left" role="tooltip">
+                        <div class="tooltip-arrow"></div>
+                        <bd-value tp-update="true" class="tooltip-inner">
+                        </bd-value>
+                    </bd-tooltip>
+                </div>
+            </bd-value>
+        </bd-tbody>
+        </tbody>
+    </table>
+</div>
