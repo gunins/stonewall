@@ -29,7 +29,7 @@ define([
             }
         });
 
-        router.onRouteChange(()=>{
+        router.onRouteChange(()=> {
             if (active.size > 0) {
                 active.forEach(handler=>handler());
                 active.clear();
@@ -66,15 +66,6 @@ define([
             this.options = options;
 
             this.beforeInit.apply(this, arguments);
-            this.context = Object.assign(this.setContext.apply(this, arguments), {
-                // Creating `EventBus` More info look in `Mediator` Section
-                eventBus: new Mediator(this.context, (channel, scope)=> {
-                    scope._globalEvents = scope._globalEvents || [];
-                    if (scope._globalEvents.indexOf(channel) === -1) {
-                        scope._globalEvents.push(channel);
-                    }
-                })
-            });
 
 
         }
@@ -97,6 +88,31 @@ define([
         //      @method setContext
         setContext() {
             return {};
+        };
+
+        set context(context) {
+            let router = new Router(this.options.rootRoute);
+            router.match((match)=> {
+                Object.assign(context, {
+                    // Creating `EventBus` More info look in `Mediator` Section
+                    eventBus: new Mediator(this.context, (channel, scope)=> {
+                        scope._globalEvents = scope._globalEvents || [];
+                        if (scope._globalEvents.indexOf(channel) === -1) {
+                            scope._globalEvents.push(channel);
+                        }
+                    }),
+                    active:   new Map(),
+                    match:    match
+
+                });
+
+                triggerRoute(router, context.active);
+                this._context = context;
+            })
+        }
+
+        get context() {
+            return this._context;
         }
 
         // Starting `App` in provided `Container`
@@ -105,24 +121,22 @@ define([
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
+
+                this.context = this.setContext.apply(this, arguments);
+
+
                 if (this.AppContainer !== undefined) {
-                    this.appContainer = new this.AppContainer({
-                        appContext: this.context
-                    });
+                    this.appContainer = new this.AppContainer();
                 }
-                
+
                 this.init.call(this, this.options);
 
                 this.el = container;
                 let el = document.createElement('div');
                 container.appendChild(el);
                 this.appContainer.ready(el);
+                this.appContainer.setContext(this.context);
 
-                let router = new Router(this.options.rootRoute),
-                    active = new Map();
-                router.match((match)=> this.appContainer._match({match, active}));
-
-                triggerRoute(router, active);
 
                 setTimeout(() => {
                     container.classList.add('show');

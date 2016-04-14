@@ -68,7 +68,8 @@ define([
                     this.el = document.createElement('div');
                 };
 
-                AppContainer.prototype._match = function() {
+                AppContainer.prototype.setContext = function(context) {
+                    this.context = Object.assign({}, context);
                 };
                 AppContainer.prototype.ready = function() {
 
@@ -87,8 +88,8 @@ define([
                 var app = new Surogate();
                 var container = document.createElement('div');
                 app.start(container);
-                expect(app.context).to.equal(app.appContainer.appContext);
-                expect(app.context.eventBus).to.equal(app.appContainer.appContext.eventBus);
+                expect(app.context).to.deep.equal(app.appContainer.context);
+                expect(app.context.eventBus).to.deep.equal(app.appContainer.context.eventBus);
                 expect(app.context.eventBus).to.be.instanceof(Mediator);
             });
 
@@ -99,12 +100,12 @@ define([
                     this.el = document.createElement('div');
                 };
 
-                AppContainer.prototype._match = function() {
+                AppContainer.prototype.setContext = function() {
                 };
                 AppContainer.prototype.ready = function() {
                 };
 
-                var _match = sinon.spy(AppContainer.prototype, '_match');
+                var _match = sinon.spy(AppContainer.prototype, 'setContext');
                 var ready = sinon.spy(AppContainer.prototype, 'ready');
 
 

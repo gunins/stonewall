@@ -44,15 +44,15 @@ define([
     }
 
 
-    function matchRoute(child, router) {
-        if (child._match) {
-            child._match(router)
+    function matchRoute(child, context) {
+        if (child.setContext) {
+            child.setContext(context);
         } else {
             let route = (child.data !== undefined) ? child.data.route : undefined;
             if (route !== undefined && child.data.type === 'rt') {
                 let id,
-                    match = router.match,
-                    active = router.active,
+                    match = context.match,
+                    active = context.active,
                     matches = match(route);
 
                 matches.to((...args)=> {
@@ -76,7 +76,7 @@ define([
                     });
                 });
                 matches.leave((done)=> {
-                    let items = 0,
+                        let items = 0,
                             stopped = false;
                         applyToGroup(child, (childInstance)=> {
                             let finish = ()=> {
@@ -131,13 +131,13 @@ define([
                 applyToGroup(child, instance=>instance._activeRoute = matches);
 
             } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                applyToChildren(child.children, instance=> matchRoute(instance, router));
+                applyToChildren(child.children, instance=> matchRoute(instance, context));
             }
         }
     }
 
-    function setRoutes(children, router) {
-        applyToChildren(children, child=> matchRoute(child, router));
+    function setRoutes(children, context) {
+        applyToChildren(children, child=> matchRoute(child, context));
 
     };
 

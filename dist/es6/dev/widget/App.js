@@ -619,7 +619,7 @@
         };
 
         triggerLeave(params) {
-            return (cb)=> {
+            return new Promise((resolve)=> {
                 let handlers = this.leaveHandler,
                     location = utils.getLocation(params, this.prevLoc),
                     items = 0,
@@ -633,19 +633,19 @@
                             if (done) {
                                 items--;
                                 if (items === 0 && !stopped) {
-                                    cb(true);
+                                    resolve(true);
                                 }
                             } else if (!done && !stopped) {
                                 stopped = true;
-                                cb(false);
+                                resolve(false);
                             }
                         }, location);
                     });
                 }
                 if (items === 0) {
-                    cb(true);
+                    resolve(true);
                 }
-            }
+            });
         };
 
 
@@ -815,7 +815,7 @@
 
             trigger(location) {
                 if (this.started && location) {
-                    this.started = false;
+                    // this.started = false;
                     this.currLocation = location;
                     let parts = location.split('?', 2),
                         segments = this.getLocation(parts[0]);
@@ -825,35 +825,37 @@
                                 root:  segments,
                                 query: query
                             };
-                        this.execute(segments, params);
+                        this.execute(segments, params)
+                            .then(move=>this.setRoutes(move, segments, params))
+                            .then(move=> this.setLocation(move));
                     }
                 }
             };
 
             execute(location, params) {
-                let matched = location.replace(/^\/|$/g, '').split('/'),
-                    binder = this.root,
-                    active = binder.checkStatus(matched, params);
-                if (active.length > 0) {
-                    active.forEach((item)=> {
-                        item.handler((applied)=> {
-                            if (!item.triggered) {
-                                item.triggered = true;
-                                item.applied = applied;
-                                if (active.filter(item=>item.applied).length === active.length) {
-                                    active.forEach(item=>item.disable());
-                                    this.setRoutes(true, location, params);
-                                } else if (active.filter(item=>item.triggered).length === active.length) {
-                                    this.setRoutes(false);
+                return new Promise((resolve)=> {
+                    let matched = location.replace(/^\/|$/g, '').split('/'),
+                        binder = this.root,
+                        active = binder.checkStatus(matched, params);
+                    if (active.length > 0) {
+                        active.forEach((item)=> {
+                            item.handler.then((applied)=> {
+                                if (!item.triggered) {
+                                    item.triggered = true;
+                                    item.applied = applied;
+                                    if (active.filter(item=>item.applied).length === active.length) {
+                                        active.forEach(item=>item.disable());
+                                        resolve(true);
+                                    } else if (active.filter(item=>item.triggered).length === active.length) {
+                                        resolve(false);
+                                    }
                                 }
-                            }
+                            });
                         });
-                    });
-
-                } else {
-                    this.setRoutes(true, location, params);
-                }
-
+                    } else {
+                        resolve(true);
+                    }
+                });
             };
 
             setRoutes(move, location, params) {
@@ -861,8 +863,7 @@
                     this._handlers.forEach(handler=>handler());
                     this.root.triggerRoutes(location, params);
                 }
-                this.setLocation(move);
-
+                return move;
             };
 
             setListener(listener) {
@@ -889,7 +890,7 @@
             setLocation(move) {
                 let location = move ? this.currLocation : this.prevLocation;
                 this.prevLocation = location;
-                this.started = true;
+                // this.started = true;
                 this._listeners.forEach(listener=>listener(location, move));
             };
 
@@ -940,7 +941,7 @@ define('widget/App',[
             }
         });
 
-        router.onRouteChange(()=>{
+        router.onRouteChange(()=> {
             if (active.size > 0) {
                 active.forEach(handler=>handler());
                 active.clear();
@@ -977,15 +978,6 @@ define('widget/App',[
             this.options = options;
 
             this.beforeInit.apply(this, arguments);
-            this.context = Object.assign(this.setContext.apply(this, arguments), {
-                // Creating `EventBus` More info look in `Mediator` Section
-                eventBus: new Mediator(this.context, (channel, scope)=> {
-                    scope._globalEvents = scope._globalEvents || [];
-                    if (scope._globalEvents.indexOf(channel) === -1) {
-                        scope._globalEvents.push(channel);
-                    }
-                })
-            });
 
 
         }
@@ -1008,6 +1000,31 @@ define('widget/App',[
         //      @method setContext
         setContext() {
             return {};
+        };
+
+        set context(context) {
+            let router = new Router(this.options.rootRoute);
+            router.match((match)=> {
+                Object.assign(context, {
+                    // Creating `EventBus` More info look in `Mediator` Section
+                    eventBus: new Mediator(this.context, (channel, scope)=> {
+                        scope._globalEvents = scope._globalEvents || [];
+                        if (scope._globalEvents.indexOf(channel) === -1) {
+                            scope._globalEvents.push(channel);
+                        }
+                    }),
+                    active:   new Map(),
+                    match:    match
+
+                });
+
+                triggerRoute(router, context.active);
+                this._context = context;
+            })
+        }
+
+        get context() {
+            return this._context;
         }
 
         // Starting `App` in provided `Container`
@@ -1016,24 +1033,22 @@ define('widget/App',[
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
+
+                this.context = this.setContext.apply(this, arguments);
+
+
                 if (this.AppContainer !== undefined) {
-                    this.appContainer = new this.AppContainer({
-                        appContext: this.context
-                    });
+                    this.appContainer = new this.AppContainer();
                 }
-                
+
                 this.init.call(this, this.options);
 
                 this.el = container;
                 let el = document.createElement('div');
                 container.appendChild(el);
                 this.appContainer.ready(el);
+                this.appContainer.setContext(this.context);
 
-                let router = new Router(this.options.rootRoute),
-                    active = new Map();
-                router.match((match)=> this.appContainer._match({match, active}));
-
-                triggerRoute(router, active);
 
                 setTimeout(() => {
                     container.classList.add('show');

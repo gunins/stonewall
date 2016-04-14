@@ -149,7 +149,7 @@
             }
         });
 
-        router.onRouteChange(()=&gt;{
+        router.onRouteChange(()=&gt; {
             <span class="hljs-keyword">if</span> (active.size &gt; <span class="hljs-number">0</span>) {
                 active.forEach(handler=&gt;handler());
                 active.clear();
@@ -197,7 +197,9 @@ Usage Example</p>
             <span class="hljs-keyword">this</span>.options = options;
 
             <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
-            <span class="hljs-keyword">this</span>.context = <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>), {</pre></div></div>
+
+
+        }</pre></div></div>
             
         </li>
         
@@ -207,30 +209,6 @@ Usage Example</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <p>Creating <code>EventBus</code> More info look in <code>Mediator</code> Section</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                eventBus: <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>.context, (channel, scope)=&gt; {
-                    scope._globalEvents = scope._globalEvents || [];
-                    <span class="hljs-keyword">if</span> (scope._globalEvents.indexOf(channel) === <span class="hljs-number">-1</span>) {
-                        scope._globalEvents.push(channel);
-                    }
-                })
-            });
-
-
-        }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Running ‘AppContainer’ is initialised.</p>
 <pre><code> @method beforeInit
@@ -243,11 +221,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-6">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Running after ‘AppContainer’ is initialised.</p>
 <pre><code> @method init
@@ -260,11 +238,11 @@ Usage Example</p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>SettingContext for the <code>App</code></p>
 <pre><code> @method setContext
@@ -273,6 +251,44 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        setContext() {
             <span class="hljs-keyword">return</span> {};
+        };
+
+        set context(context) {
+            <span class="hljs-keyword">let</span> router = <span class="hljs-keyword">new</span> Router(<span class="hljs-keyword">this</span>.options.rootRoute);
+            router.match((match)=&gt; {
+                <span class="hljs-built_in">Object</span>.assign(context, {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Creating <code>EventBus</code> More info look in <code>Mediator</code> Section</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                    eventBus: <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>.context, (channel, scope)=&gt; {
+                        scope._globalEvents = scope._globalEvents || [];
+                        <span class="hljs-keyword">if</span> (scope._globalEvents.indexOf(channel) === <span class="hljs-number">-1</span>) {
+                            scope._globalEvents.push(channel);
+                        }
+                    }),
+                    active:   <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(),
+                    match:    match
+
+                });
+
+                triggerRoute(router, context.active);
+                <span class="hljs-keyword">this</span>._context = context;
+            })
+        }
+
+        get context() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._context;
         }</pre></div></div>
             
         </li>
@@ -292,24 +308,22 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        start(container) {
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
+
+                <span class="hljs-keyword">this</span>.context = <span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+
+
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
-                    <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer({
-                        appContext: <span class="hljs-keyword">this</span>.context
-                    });
+                    <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer();
                 }
-                
+
                 <span class="hljs-keyword">this</span>.init.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.options);
 
                 <span class="hljs-keyword">this</span>.el = container;
                 <span class="hljs-keyword">let</span> el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
                 container.appendChild(el);
                 <span class="hljs-keyword">this</span>.appContainer.ready(el);
+                <span class="hljs-keyword">this</span>.appContainer.setContext(<span class="hljs-keyword">this</span>.context);
 
-                <span class="hljs-keyword">let</span> router = <span class="hljs-keyword">new</span> Router(<span class="hljs-keyword">this</span>.options.rootRoute),
-                    active = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>();
-                router.match((match)=&gt; <span class="hljs-keyword">this</span>.appContainer._match({match, active}));
-
-                triggerRoute(router, active);
 
                 setTimeout(() =&gt; {
                     container.classList.add(<span class="hljs-string">'show'</span>);

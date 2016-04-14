@@ -725,7 +725,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function triggerLeave(params) {
                 var _this2 = this;
 
-                return function (cb) {
+                return new Promise(function (resolve) {
                     var handlers = _this2.leaveHandler,
                         location = utils.getLocation(params, _this2.prevLoc),
                         items = 0,
@@ -741,19 +741,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 if (done) {
                                     items--;
                                     if (items === 0 && !stopped) {
-                                        cb(true);
+                                        resolve(true);
                                     }
                                 } else if (!done && !stopped) {
                                     stopped = true;
-                                    cb(false);
+                                    resolve(false);
                                 }
                             }, location);
                         });
                     }
                     if (items === 0) {
-                        cb(true);
+                        resolve(true);
                     }
-                };
+                });
             }
         }]);
 
@@ -939,53 +939,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'trigger',
             value: function trigger(location) {
+                var _this3 = this;
+
                 if (this.started && location) {
-                    this.started = false;
-                    this.currLocation = location;
-                    var parts = location.split('?', 2),
-                        segments = this.getLocation(parts[0]);
-                    if (segments || segments === '') {
-                        var query = utils.setQuery(parts[1]),
-                            params = {
-                            root: segments,
-                            query: query
-                        };
-                        this.execute(segments, params);
-                    }
+                    (function () {
+                        // this.started = false;
+                        _this3.currLocation = location;
+                        var parts = location.split('?', 2),
+                            segments = _this3.getLocation(parts[0]);
+                        if (segments || segments === '') {
+                            (function () {
+                                var query = utils.setQuery(parts[1]),
+                                    params = {
+                                    root: segments,
+                                    query: query
+                                };
+                                _this3.execute(segments, params).then(function (move) {
+                                    return _this3.setRoutes(move, segments, params);
+                                }).then(function (move) {
+                                    return _this3.setLocation(move);
+                                });
+                            })();
+                        }
+                    })();
                 }
             }
         }, {
             key: 'execute',
             value: function execute(location, params) {
-                var _this3 = this;
+                var _this4 = this;
 
-                var matched = location.replace(/^\/|$/g, '').split('/'),
-                    binder = this.root,
-                    active = binder.checkStatus(matched, params);
-                if (active.length > 0) {
-                    active.forEach(function (item) {
-                        item.handler(function (applied) {
-                            if (!item.triggered) {
-                                item.triggered = true;
-                                item.applied = applied;
-                                if (active.filter(function (item) {
-                                    return item.applied;
-                                }).length === active.length) {
-                                    active.forEach(function (item) {
-                                        return item.disable();
-                                    });
-                                    _this3.setRoutes(true, location, params);
-                                } else if (active.filter(function (item) {
-                                    return item.triggered;
-                                }).length === active.length) {
-                                    _this3.setRoutes(false);
+                return new Promise(function (resolve) {
+                    var matched = location.replace(/^\/|$/g, '').split('/'),
+                        binder = _this4.root,
+                        active = binder.checkStatus(matched, params);
+                    if (active.length > 0) {
+                        active.forEach(function (item) {
+                            item.handler.then(function (applied) {
+                                if (!item.triggered) {
+                                    item.triggered = true;
+                                    item.applied = applied;
+                                    if (active.filter(function (item) {
+                                        return item.applied;
+                                    }).length === active.length) {
+                                        active.forEach(function (item) {
+                                            return item.disable();
+                                        });
+                                        resolve(true);
+                                    } else if (active.filter(function (item) {
+                                        return item.triggered;
+                                    }).length === active.length) {
+                                        resolve(false);
+                                    }
                                 }
-                            }
+                            });
                         });
-                    });
-                } else {
-                    this.setRoutes(true, location, params);
-                }
+                    } else {
+                        resolve(true);
+                    }
+                });
             }
         }, {
             key: 'setRoutes',
@@ -996,7 +1008,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     });
                     this.root.triggerRoutes(location, params);
                 }
-                this.setLocation(move);
+                return move;
             }
         }, {
             key: 'setListener',
@@ -1025,7 +1037,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function setLocation(move) {
                 var location = move ? this.currLocation : this.prevLocation;
                 this.prevLocation = location;
-                this.started = true;
+                // this.started = true;
                 this._listeners.forEach(function (listener) {
                     return listener(location, move);
                 });
@@ -1141,15 +1153,6 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
             this.options = options;
 
             this.beforeInit.apply(this, arguments);
-            this.context = Object.assign(this.setContext.apply(this, arguments), {
-                // Creating `EventBus` More info look in `Mediator` Section
-                eventBus: new Mediator(this.context, function (channel, scope) {
-                    scope._globalEvents = scope._globalEvents || [];
-                    if (scope._globalEvents.indexOf(channel) === -1) {
-                        scope._globalEvents.push(channel);
-                    }
-                })
-            });
         }
 
         // Running 'AppContainer' is initialised.
@@ -1178,47 +1181,64 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
             value: function setContext() {
                 return {};
             }
+        }, {
+            key: 'start',
+
 
             // Starting `App` in provided `Container`
             //
             //      @method start
             //      @param {HTMLElement} container
-
-        }, {
-            key: 'start',
             value: function start(container) {
-                var _this5 = this;
-
                 if (container instanceof HTMLElement === true) {
-                    (function () {
-                        if (_this5.AppContainer !== undefined) {
-                            _this5.appContainer = new _this5.AppContainer({
-                                appContext: _this5.context
-                            });
-                        }
 
-                        _this5.init.call(_this5, _this5.options);
+                    this.context = this.setContext.apply(this, arguments);
 
-                        _this5.el = container;
-                        var el = document.createElement('div');
-                        container.appendChild(el);
-                        _this5.appContainer.ready(el);
+                    if (this.AppContainer !== undefined) {
+                        this.appContainer = new this.AppContainer();
+                    }
 
-                        var router = new Router(_this5.options.rootRoute),
-                            active = new Map();
-                        router.match(function (match) {
-                            return _this5.appContainer._match({ match: match, active: active });
-                        });
+                    this.init.call(this, this.options);
 
-                        triggerRoute(router, active);
+                    this.el = container;
+                    var el = document.createElement('div');
+                    container.appendChild(el);
+                    this.appContainer.ready(el);
+                    this.appContainer.setContext(this.context);
 
-                        setTimeout(function () {
-                            container.classList.add('show');
-                        }, 100);
-                    })();
+                    setTimeout(function () {
+                        container.classList.add('show');
+                    }, 100);
                 } else {
                     throw Error('Contaner should be a HTML element');
                 }
+            }
+        }, {
+            key: 'context',
+            set: function set(context) {
+                var _this6 = this;
+
+                var router = new Router(this.options.rootRoute);
+                router.match(function (match) {
+                    Object.assign(context, {
+                        // Creating `EventBus` More info look in `Mediator` Section
+                        eventBus: new Mediator(_this6.context, function (channel, scope) {
+                            scope._globalEvents = scope._globalEvents || [];
+                            if (scope._globalEvents.indexOf(channel) === -1) {
+                                scope._globalEvents.push(channel);
+                            }
+                        }),
+                        active: new Map(),
+                        match: match
+
+                    });
+
+                    triggerRoute(router, context.active);
+                    _this6._context = context;
+                });
+            },
+            get: function get() {
+                return this._context;
             }
         }]);
 

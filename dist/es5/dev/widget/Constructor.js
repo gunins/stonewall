@@ -890,15 +890,15 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
         }
     };
 
-    function applyBinders(context, obj, instance) {
+    function applyBinders(child, obj, instance) {
         var binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(function (binder) {
                     var component = binder.run(obj);
-                    component._match(context.router);
-                    addChildren.elReady(context, component, obj);
-                    addChildren.elOnChange(context, component, obj);
+                    component.setContext(child.context);
+                    addChildren.elReady(child, component, obj);
+                    addChildren.elOnChange(child, component, obj);
                 });
             }
             var keys = Object.keys(binders);
@@ -906,14 +906,14 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                 keys.forEach(function (binderKey) {
                     if (obj[binderKey] !== undefined) {
                         binders[binderKey].forEach(function (binder) {
-                            return parseBinder(context, binderKey, obj, binder);
+                            return parseBinder(child, binderKey, obj, binder);
                         });
                     } else {
                         (function () {
                             var fn = function fn(prop, action, newValue, oldValue) {
                                 if (newValue !== undefined && oldValue === undefined) {
                                     binders[binderKey].forEach(function (binder) {
-                                        return parseBinder(context, binderKey, obj, binder);
+                                        return parseBinder(child, binderKey, obj, binder);
                                     });
                                     unwatch(obj, binderKey, fn);
                                 }
@@ -972,17 +972,17 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
         return false;
     }
 
-    function matchRoute(child, router) {
-        if (child._match) {
-            child._match(router);
+    function matchRoute(child, context) {
+        if (child.setContext) {
+            child.setContext(context);
         } else {
             (function () {
                 var route = child.data !== undefined ? child.data.route : undefined;
                 if (route !== undefined && child.data.type === 'rt') {
                     (function () {
                         var id = void 0,
-                            match = router.match,
-                            active = router.active,
+                            match = context.match,
+                            active = context.active,
                             matches = match(route);
 
                         matches.to(function () {
@@ -1072,16 +1072,16 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                     })();
                 } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
                     applyToChildren(child.children, function (instance) {
-                        return matchRoute(instance, router);
+                        return matchRoute(instance, context);
                     });
                 }
             })();
         }
     }
 
-    function setRoutes(children, router) {
+    function setRoutes(children, context) {
         applyToChildren(children, function (child) {
-            return matchRoute(child, router);
+            return matchRoute(child, context);
         });
     };
 
@@ -1155,10 +1155,6 @@ define('widget/parsers/applyElement', ['templating/dom'], function (dom) {
 define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom', './Mediator', './parsers/applyAttribute', './parsers/applyParent', './parsers/applyBinders', './parsers/setBinders', './parsers/setRoutes', './parsers/applyElement', './parsers/addChildren'], function (require, Decoder, dom, Mediator, applyAttribute, applyParent, _applyBinders, setBinders, setRoutes, applyElement, addChildren) {
     'use strict';
 
-    //TODO: need better Solution later. Context is too global;
-
-    var context = {};
-
     function _destroy(instance) {
         var keys = Object.keys(instance);
         if (keys.length > 0) {
@@ -1224,28 +1220,15 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             this._options = options;
             this._rendered = false;
             this._arguments = arguments;
+            this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);
-
-            this.context = context;
-
-            if (options.appContext !== undefined) {
-                Object.assign(this.context, options.appContext);
-            }
 
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
 
-            this.beforeInit.apply(this, arguments);
-
-            if (!this.data) {
-                var keys = dataSet ? Object.keys(dataSet) : [],
-                    contextData = keys.length > 0 ? dataSet : this.context.data;
-                if (contextData) {
-                    this.data = contextData[options.bind] || contextData;
-                }
-            }
+            this.beforeInit.apply(this, _toConsumableArray(this._arguments));
         }
 
         _createClass(Constructor, [{
@@ -1254,27 +1237,22 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                 this.el = el;
             }
         }, {
-            key: '_match',
-            value: function _match(router) {
-                this.router = router;
-
-                if (this.match) {
-                    this.match(router.match);
-                }
+            key: 'setContext',
+            value: function setContext(context) {
+                this.context = context;
 
                 if (!this.async) {
                     this.render();
                 }
-
-                this.init.apply(this, this._arguments);
+                this.init.apply(this, _toConsumableArray(this._arguments));
             }
+        }, {
+            key: 'render',
+
 
             // method render called manually if flag async is true;
             //
             //      @method render
-
-        }, {
-            key: 'render',
             value: function render(data) {
                 if (!this._rendered) {
                     if (this.template) {
@@ -1311,15 +1289,13 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                             this.applyBinders(this.data, this);
                         }
 
-                        setRoutes(this.children, this.router);
+                        setRoutes(this.children, this.context);
                         addChildren(this, this.root);
+                        this.rendered.apply(this, _toConsumableArray(this._arguments));
                         this._rendered = true;
                     }
                 }
             }
-        }, {
-            key: 'init',
-            value: function init(data, children, dataSet) {}
         }, {
             key: 'beforeInit',
 
@@ -1333,6 +1309,32 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             //      @param {Object} datatSet (data passing if component is
             //      in template binders)
             value: function beforeInit(data, children, dataSet) {}
+        }, {
+            key: 'init',
+
+
+            // Running when Constructor is initialised
+            //
+            //      @method beforeInit
+            //      @param {Object} data (comes from template data attributes)
+            //      @param {Object} children (comes placeholder content
+            //      from template)
+            //      @param {Object} datatSet (data passing if component is
+            //      in template binders)
+            value: function init(data, children, dataSet) {}
+        }, {
+            key: 'rendered',
+
+
+            // Running when widget is rendered
+            //
+            //      @method beforeInit
+            //      @param {Object} data (comes from template data attributes)
+            //      @param {Object} children (comes placeholder content
+            //      from template)
+            //      @param {Object} datatSet (data passing if component is
+            //      in template binders)
+            value: function rendered(data, children, dataSet) {}
         }, {
             key: 'loadCss',
 
@@ -1470,7 +1472,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                 }
                 var component = this.setComponent(Component, options),
                     instance = component.run(options.container);
-                instance._match(this.router);
+                instance.setContext(this.context);
                 this.children[name] = instance;
                 return instance;
             }
@@ -1525,6 +1527,31 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                 }
 
                 return _applyBinders.apply(undefined, [this].concat(args));
+            }
+        }, {
+            key: 'context',
+            set: function set(context) {
+                var _this3 = this;
+
+                if (!this.data) {
+                    var keys = this._dataSet ? Object.keys(this._dataSet) : [],
+                        contextData = keys.length > 0 ? this._dataSet : context.data;
+                    if (contextData) {
+                        this.data = contextData[this._options.bind] || contextData;
+                    }
+                }
+                context.match(function (match) {
+                    if (_this3.match) {
+                        _this3.match(match);
+                    }
+
+                    _this3._context = Object.assign({
+                        match: match
+                    }, context);
+                });
+            },
+            get: function get() {
+                return this._context;
             }
         }]);
 

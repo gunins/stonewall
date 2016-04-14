@@ -152,15 +152,15 @@ define([
     }
 
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchRoute</span>(<span class="hljs-params">child, router</span>) </span>{
-        <span class="hljs-keyword">if</span> (child._match) {
-            child._match(router)
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">matchRoute</span>(<span class="hljs-params">child, context</span>) </span>{
+        <span class="hljs-keyword">if</span> (child.setContext) {
+            child.setContext(context);
         } <span class="hljs-keyword">else</span> {
             <span class="hljs-keyword">let</span> route = (child.data !== <span class="hljs-literal">undefined</span>) ? child.data.route : <span class="hljs-literal">undefined</span>;
             <span class="hljs-keyword">if</span> (route !== <span class="hljs-literal">undefined</span> &amp;&amp; child.data.type === <span class="hljs-string">'rt'</span>) {
                 <span class="hljs-keyword">let</span> id,
-                    match = router.match,
-                    active = router.active,
+                    match = context.match,
+                    active = context.active,
                     matches = match(route);
 
                 matches.to((...args)=&gt; {
@@ -184,7 +184,7 @@ define([
                     });
                 });
                 matches.leave((done)=&gt; {
-                    <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
+                        <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
                             stopped = <span class="hljs-literal">false</span>;
                         applyToGroup(child, (childInstance)=&gt; {
                             <span class="hljs-keyword">let</span> finish = ()=&gt; {
@@ -239,13 +239,13 @@ define([
                 applyToGroup(child, instance=&gt;instance._activeRoute = matches);
 
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; [<span class="hljs-string">'cp'</span>].indexOf(child.data.type) === <span class="hljs-number">-1</span>) {
-                applyToChildren(child.children, instance=&gt; matchRoute(instance, router));
+                applyToChildren(child.children, instance=&gt; matchRoute(instance, context));
             }
         }
     }
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRoutes</span>(<span class="hljs-params">children, router</span>) </span>{
-        applyToChildren(children, child=&gt; matchRoute(child, router));
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRoutes</span>(<span class="hljs-params">children, context</span>) </span>{
+        applyToChildren(children, child=&gt; matchRoute(child, context));
 
     };
 

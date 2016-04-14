@@ -137,26 +137,26 @@ define([
 
     };
 
-    function applyBinders(context, obj, instance) {
+    function applyBinders(child, obj, instance) {
         let binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
-                    component._match(context.router);
-                    addChildren.elReady(context, component, obj);
-                    addChildren.elOnChange(context, component, obj);
+                    component.setContext(child.context);
+                    addChildren.elReady(child, component, obj);
+                    addChildren.elOnChange(child, component, obj);
                 });
             }
             let keys = Object.keys(binders);
             if (obj && keys.length > 0) {
                 keys.forEach((binderKey) => {
                     if (obj[binderKey] !== undefined) {
-                        binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                        binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                     } else {
                         let fn = (prop, action, newValue, oldValue) => {
                             if (newValue !== undefined && oldValue === undefined) {
-                                binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                                binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
                         }

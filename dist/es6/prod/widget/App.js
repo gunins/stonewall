@@ -1694,7 +1694,7 @@ define('templating/dom',[],function() {
         };
 
         triggerLeave(params) {
-            return (cb)=> {
+            return new Promise((resolve)=> {
                 let handlers = this.leaveHandler,
                     location = utils.getLocation(params, this.prevLoc),
                     items = 0,
@@ -1708,19 +1708,19 @@ define('templating/dom',[],function() {
                             if (done) {
                                 items--;
                                 if (items === 0 && !stopped) {
-                                    cb(true);
+                                    resolve(true);
                                 }
                             } else if (!done && !stopped) {
                                 stopped = true;
-                                cb(false);
+                                resolve(false);
                             }
                         }, location);
                     });
                 }
                 if (items === 0) {
-                    cb(true);
+                    resolve(true);
                 }
-            }
+            });
         };
 
 
@@ -1890,7 +1890,7 @@ define('templating/dom',[],function() {
 
             trigger(location) {
                 if (this.started && location) {
-                    this.started = false;
+                    // this.started = false;
                     this.currLocation = location;
                     let parts = location.split('?', 2),
                         segments = this.getLocation(parts[0]);
@@ -1900,35 +1900,37 @@ define('templating/dom',[],function() {
                                 root:  segments,
                                 query: query
                             };
-                        this.execute(segments, params);
+                        this.execute(segments, params)
+                            .then(move=>this.setRoutes(move, segments, params))
+                            .then(move=> this.setLocation(move));
                     }
                 }
             };
 
             execute(location, params) {
-                let matched = location.replace(/^\/|$/g, '').split('/'),
-                    binder = this.root,
-                    active = binder.checkStatus(matched, params);
-                if (active.length > 0) {
-                    active.forEach((item)=> {
-                        item.handler((applied)=> {
-                            if (!item.triggered) {
-                                item.triggered = true;
-                                item.applied = applied;
-                                if (active.filter(item=>item.applied).length === active.length) {
-                                    active.forEach(item=>item.disable());
-                                    this.setRoutes(true, location, params);
-                                } else if (active.filter(item=>item.triggered).length === active.length) {
-                                    this.setRoutes(false);
+                return new Promise((resolve)=> {
+                    let matched = location.replace(/^\/|$/g, '').split('/'),
+                        binder = this.root,
+                        active = binder.checkStatus(matched, params);
+                    if (active.length > 0) {
+                        active.forEach((item)=> {
+                            item.handler.then((applied)=> {
+                                if (!item.triggered) {
+                                    item.triggered = true;
+                                    item.applied = applied;
+                                    if (active.filter(item=>item.applied).length === active.length) {
+                                        active.forEach(item=>item.disable());
+                                        resolve(true);
+                                    } else if (active.filter(item=>item.triggered).length === active.length) {
+                                        resolve(false);
+                                    }
                                 }
-                            }
+                            });
                         });
-                    });
-
-                } else {
-                    this.setRoutes(true, location, params);
-                }
-
+                    } else {
+                        resolve(true);
+                    }
+                });
             };
 
             setRoutes(move, location, params) {
@@ -1936,8 +1938,7 @@ define('templating/dom',[],function() {
                     this._handlers.forEach(handler=>handler());
                     this.root.triggerRoutes(location, params);
                 }
-                this.setLocation(move);
-
+                return move;
             };
 
             setListener(listener) {
@@ -1964,7 +1965,7 @@ define('templating/dom',[],function() {
             setLocation(move) {
                 let location = move ? this.currLocation : this.prevLocation;
                 this.prevLocation = location;
-                this.started = true;
+                // this.started = true;
                 this._listeners.forEach(listener=>listener(location, move));
             };
 
@@ -2015,7 +2016,7 @@ define('widget/App',[
             }
         });
 
-        router.onRouteChange(()=>{
+        router.onRouteChange(()=> {
             if (active.size > 0) {
                 active.forEach(handler=>handler());
                 active.clear();
@@ -2052,15 +2053,6 @@ define('widget/App',[
             this.options = options;
 
             this.beforeInit.apply(this, arguments);
-            this.context = Object.assign(this.setContext.apply(this, arguments), {
-                // Creating `EventBus` More info look in `Mediator` Section
-                eventBus: new Mediator(this.context, (channel, scope)=> {
-                    scope._globalEvents = scope._globalEvents || [];
-                    if (scope._globalEvents.indexOf(channel) === -1) {
-                        scope._globalEvents.push(channel);
-                    }
-                })
-            });
 
 
         }
@@ -2083,6 +2075,31 @@ define('widget/App',[
         //      @method setContext
         setContext() {
             return {};
+        };
+
+        set context(context) {
+            let router = new Router(this.options.rootRoute);
+            router.match((match)=> {
+                Object.assign(context, {
+                    // Creating `EventBus` More info look in `Mediator` Section
+                    eventBus: new Mediator(this.context, (channel, scope)=> {
+                        scope._globalEvents = scope._globalEvents || [];
+                        if (scope._globalEvents.indexOf(channel) === -1) {
+                            scope._globalEvents.push(channel);
+                        }
+                    }),
+                    active:   new Map(),
+                    match:    match
+
+                });
+
+                triggerRoute(router, context.active);
+                this._context = context;
+            })
+        }
+
+        get context() {
+            return this._context;
         }
 
         // Starting `App` in provided `Container`
@@ -2091,24 +2108,22 @@ define('widget/App',[
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
+
+                this.context = this.setContext.apply(this, arguments);
+
+
                 if (this.AppContainer !== undefined) {
-                    this.appContainer = new this.AppContainer({
-                        appContext: this.context
-                    });
+                    this.appContainer = new this.AppContainer();
                 }
-                
+
                 this.init.call(this, this.options);
 
                 this.el = container;
                 let el = document.createElement('div');
                 container.appendChild(el);
                 this.appContainer.ready(el);
+                this.appContainer.setContext(this.context);
 
-                let router = new Router(this.options.rootRoute),
-                    active = new Map();
-                router.match((match)=> this.appContainer._match({match, active}));
-
-                triggerRoute(router, active);
 
                 setTimeout(() => {
                     container.classList.add('show');
@@ -3009,26 +3024,26 @@ define('widget/parsers/applyBinders',[
 
     };
 
-    function applyBinders(context, obj, instance) {
+    function applyBinders(child, obj, instance) {
         let binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
-                    component._match(context.router);
-                    addChildren.elReady(context, component, obj);
-                    addChildren.elOnChange(context, component, obj);
+                    component.setContext(child.context);
+                    addChildren.elReady(child, component, obj);
+                    addChildren.elOnChange(child, component, obj);
                 });
             }
             let keys = Object.keys(binders);
             if (obj && keys.length > 0) {
                 keys.forEach((binderKey) => {
                     if (obj[binderKey] !== undefined) {
-                        binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                        binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                     } else {
                         let fn = (prop, action, newValue, oldValue) => {
                             if (newValue !== undefined && oldValue === undefined) {
-                                binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                                binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
                         }
@@ -3087,15 +3102,15 @@ define('widget/parsers/setRoutes',[
     }
 
 
-    function matchRoute(child, router) {
-        if (child._match) {
-            child._match(router)
+    function matchRoute(child, context) {
+        if (child.setContext) {
+            child.setContext(context);
         } else {
             let route = (child.data !== undefined) ? child.data.route : undefined;
             if (route !== undefined && child.data.type === 'rt') {
                 let id,
-                    match = router.match,
-                    active = router.active,
+                    match = context.match,
+                    active = context.active,
                     matches = match(route);
 
                 matches.to((...args)=> {
@@ -3119,7 +3134,7 @@ define('widget/parsers/setRoutes',[
                     });
                 });
                 matches.leave((done)=> {
-                    let items = 0,
+                        let items = 0,
                             stopped = false;
                         applyToGroup(child, (childInstance)=> {
                             let finish = ()=> {
@@ -3174,13 +3189,13 @@ define('widget/parsers/setRoutes',[
                 applyToGroup(child, instance=>instance._activeRoute = matches);
 
             } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                applyToChildren(child.children, instance=> matchRoute(instance, router));
+                applyToChildren(child.children, instance=> matchRoute(instance, context));
             }
         }
     }
 
-    function setRoutes(children, router) {
-        applyToChildren(children, child=> matchRoute(child, router));
+    function setRoutes(children, context) {
+        applyToChildren(children, child=> matchRoute(child, context));
 
     };
 
@@ -3274,8 +3289,6 @@ define('widget/Constructor',[
             addChildren) {
     'use strict';
 
-    //TODO: need better Solution later. Context is too global;
-    var context = {};
 
     function destroy(instance) {
         let keys = Object.keys(instance);
@@ -3319,29 +3332,17 @@ define('widget/Constructor',[
             this._options = options;
             this._rendered = false;
             this._arguments = arguments;
-
+            this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);
-
-            this.context = context;
-
-            if (options.appContext !== undefined) {
-                Object.assign(this.context, options.appContext);
-            }
 
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
 
-            this.beforeInit.apply(this, arguments);
+            this.beforeInit(...this._arguments);
 
-            if (!this.data) {
-                let keys = (dataSet) ? Object.keys(dataSet) : [],
-                    contextData = (keys.length > 0) ? dataSet : this.context.data;
-                if (contextData) {
-                    this.data = contextData[options.bind] || contextData;
-                }
-            }
+
         };
 
         ready(el) {
@@ -3349,19 +3350,37 @@ define('widget/Constructor',[
 
         }
 
-        _match(router) {
-            this.router = router;
-            
-            if (this.match) {
-                this.match(router.match);
-            }
+        setContext(context) {
+            this.context = context;
 
             if (!this.async) {
                 this.render();
             }
+            this.init(...this._arguments);
+        };
 
-            this.init.apply(this, this._arguments);
+        set context(context) {
+            if (!this.data) {
+                let keys = (this._dataSet) ? Object.keys(this._dataSet) : [],
+                    contextData = (keys.length > 0) ? this._dataSet : context.data;
+                if (contextData) {
+                    this.data = contextData[this._options.bind] || contextData;
+                }
+            }
+            context.match((match)=> {
+                if (this.match) {
+                    this.match(match);
+                }
+                
+                this._context = Object.assign({
+                    match: match
+                }, context);
+            });
         }
+
+        get context() {
+            return this._context;
+        };
 
         // method render called manually if flag async is true;
         //
@@ -3403,14 +3422,12 @@ define('widget/Constructor',[
                         this.applyBinders(this.data, this);
                     }
 
-                    setRoutes(this.children, this.router);
+                    setRoutes(this.children, this.context);
                     addChildren(this, this.root);
+                    this.rendered(...this._arguments);
                     this._rendered = true;
                 }
             }
-        };
-
-        init(data, children, dataSet) {
         };
 
         // Running before Constructor is initialised
@@ -3423,6 +3440,29 @@ define('widget/Constructor',[
         //      in template binders)
         beforeInit(data, children, dataSet) {
         };
+
+        // Running when Constructor is initialised
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        init(data, children, dataSet) {
+        };
+
+        // Running when widget is rendered
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        rendered(data, children, dataSet) {
+        };
+
 
         // Load external css style for third party modules.
         //
@@ -3543,7 +3583,7 @@ define('widget/Constructor',[
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
-            instance._match(this.router);
+            instance.setContext(this.context);
             this.children[name] = instance;
             return instance;
         };

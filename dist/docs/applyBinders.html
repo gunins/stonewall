@@ -245,26 +245,26 @@ define([
 
     };
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyBinders</span>(<span class="hljs-params">context, obj, instance</span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyBinders</span>(<span class="hljs-params">child, obj, instance</span>) </span>{
         <span class="hljs-keyword">let</span> binders = instance.bindings;
         <span class="hljs-keyword">if</span> (binders) {
             <span class="hljs-keyword">if</span> (binders[<span class="hljs-string">'__cp__'</span>].length &gt; <span class="hljs-number">0</span>) {
                 binders[<span class="hljs-string">'__cp__'</span>].forEach(binder=&gt; {
                     <span class="hljs-keyword">let</span> component = binder.run(obj);
-                    component._match(context.router);
-                    addChildren.elReady(context, component, obj);
-                    addChildren.elOnChange(context, component, obj);
+                    component.setContext(child.context);
+                    addChildren.elReady(child, component, obj);
+                    addChildren.elOnChange(child, component, obj);
                 });
             }
             <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(binders);
             <span class="hljs-keyword">if</span> (obj &amp;&amp; keys.length &gt; <span class="hljs-number">0</span>) {
                 keys.forEach((binderKey) =&gt; {
                     <span class="hljs-keyword">if</span> (obj[binderKey] !== <span class="hljs-literal">undefined</span>) {
-                        binders[binderKey].forEach(binder=&gt;parseBinder(context, binderKey, obj, binder));
+                        binders[binderKey].forEach(binder=&gt;parseBinder(child, binderKey, obj, binder));
                     } <span class="hljs-keyword">else</span> {
                         <span class="hljs-keyword">let</span> fn = (prop, action, newValue, oldValue) =&gt; {
                             <span class="hljs-keyword">if</span> (newValue !== <span class="hljs-literal">undefined</span> &amp;&amp; oldValue === <span class="hljs-literal">undefined</span>) {
-                                binders[binderKey].forEach(binder=&gt;parseBinder(context, binderKey, obj, binder));
+                                binders[binderKey].forEach(binder=&gt;parseBinder(child, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
                         }

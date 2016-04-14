@@ -886,26 +886,26 @@ define('widget/parsers/applyBinders',[
 
     };
 
-    function applyBinders(context, obj, instance) {
+    function applyBinders(child, obj, instance) {
         let binders = instance.bindings;
         if (binders) {
             if (binders['__cp__'].length > 0) {
                 binders['__cp__'].forEach(binder=> {
                     let component = binder.run(obj);
-                    component._match(context.router);
-                    addChildren.elReady(context, component, obj);
-                    addChildren.elOnChange(context, component, obj);
+                    component.setContext(child.context);
+                    addChildren.elReady(child, component, obj);
+                    addChildren.elOnChange(child, component, obj);
                 });
             }
             let keys = Object.keys(binders);
             if (obj && keys.length > 0) {
                 keys.forEach((binderKey) => {
                     if (obj[binderKey] !== undefined) {
-                        binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                        binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                     } else {
                         let fn = (prop, action, newValue, oldValue) => {
                             if (newValue !== undefined && oldValue === undefined) {
-                                binders[binderKey].forEach(binder=>parseBinder(context, binderKey, obj, binder));
+                                binders[binderKey].forEach(binder=>parseBinder(child, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
                         }
@@ -964,15 +964,15 @@ define('widget/parsers/setRoutes',[
     }
 
 
-    function matchRoute(child, router) {
-        if (child._match) {
-            child._match(router)
+    function matchRoute(child, context) {
+        if (child.setContext) {
+            child.setContext(context);
         } else {
             let route = (child.data !== undefined) ? child.data.route : undefined;
             if (route !== undefined && child.data.type === 'rt') {
                 let id,
-                    match = router.match,
-                    active = router.active,
+                    match = context.match,
+                    active = context.active,
                     matches = match(route);
 
                 matches.to((...args)=> {
@@ -996,7 +996,7 @@ define('widget/parsers/setRoutes',[
                     });
                 });
                 matches.leave((done)=> {
-                    let items = 0,
+                        let items = 0,
                             stopped = false;
                         applyToGroup(child, (childInstance)=> {
                             let finish = ()=> {
@@ -1051,13 +1051,13 @@ define('widget/parsers/setRoutes',[
                 applyToGroup(child, instance=>instance._activeRoute = matches);
 
             } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                applyToChildren(child.children, instance=> matchRoute(instance, router));
+                applyToChildren(child.children, instance=> matchRoute(instance, context));
             }
         }
     }
 
-    function setRoutes(children, router) {
-        applyToChildren(children, child=> matchRoute(child, router));
+    function setRoutes(children, context) {
+        applyToChildren(children, child=> matchRoute(child, context));
 
     };
 
@@ -1151,8 +1151,6 @@ define('widget/Constructor',[
             addChildren) {
     'use strict';
 
-    //TODO: need better Solution later. Context is too global;
-    var context = {};
 
     function destroy(instance) {
         let keys = Object.keys(instance);
@@ -1196,29 +1194,17 @@ define('widget/Constructor',[
             this._options = options;
             this._rendered = false;
             this._arguments = arguments;
-
+            this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);
-
-            this.context = context;
-
-            if (options.appContext !== undefined) {
-                Object.assign(this.context, options.appContext);
-            }
 
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
 
-            this.beforeInit.apply(this, arguments);
+            this.beforeInit(...this._arguments);
 
-            if (!this.data) {
-                let keys = (dataSet) ? Object.keys(dataSet) : [],
-                    contextData = (keys.length > 0) ? dataSet : this.context.data;
-                if (contextData) {
-                    this.data = contextData[options.bind] || contextData;
-                }
-            }
+
         };
 
         ready(el) {
@@ -1226,19 +1212,37 @@ define('widget/Constructor',[
 
         }
 
-        _match(router) {
-            this.router = router;
-            
-            if (this.match) {
-                this.match(router.match);
-            }
+        setContext(context) {
+            this.context = context;
 
             if (!this.async) {
                 this.render();
             }
+            this.init(...this._arguments);
+        };
 
-            this.init.apply(this, this._arguments);
+        set context(context) {
+            if (!this.data) {
+                let keys = (this._dataSet) ? Object.keys(this._dataSet) : [],
+                    contextData = (keys.length > 0) ? this._dataSet : context.data;
+                if (contextData) {
+                    this.data = contextData[this._options.bind] || contextData;
+                }
+            }
+            context.match((match)=> {
+                if (this.match) {
+                    this.match(match);
+                }
+                
+                this._context = Object.assign({
+                    match: match
+                }, context);
+            });
         }
+
+        get context() {
+            return this._context;
+        };
 
         // method render called manually if flag async is true;
         //
@@ -1280,14 +1284,12 @@ define('widget/Constructor',[
                         this.applyBinders(this.data, this);
                     }
 
-                    setRoutes(this.children, this.router);
+                    setRoutes(this.children, this.context);
                     addChildren(this, this.root);
+                    this.rendered(...this._arguments);
                     this._rendered = true;
                 }
             }
-        };
-
-        init(data, children, dataSet) {
         };
 
         // Running before Constructor is initialised
@@ -1300,6 +1302,29 @@ define('widget/Constructor',[
         //      in template binders)
         beforeInit(data, children, dataSet) {
         };
+
+        // Running when Constructor is initialised
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        init(data, children, dataSet) {
+        };
+
+        // Running when widget is rendered
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        rendered(data, children, dataSet) {
+        };
+
 
         // Load external css style for third party modules.
         //
@@ -1420,7 +1445,7 @@ define('widget/Constructor',[
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
-            instance._match(this.router);
+            instance.setContext(this.context);
             this.children[name] = instance;
             return instance;
         };

@@ -40,8 +40,6 @@ define([
             addChildren) {
     'use strict';
 
-    //TODO: need better Solution later. Context is too global;
-    var context = {};
 
     function destroy(instance) {
         let keys = Object.keys(instance);
@@ -85,29 +83,17 @@ define([
             this._options = options;
             this._rendered = false;
             this._arguments = arguments;
-
+            this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);
-
-            this.context = context;
-
-            if (options.appContext !== undefined) {
-                Object.assign(this.context, options.appContext);
-            }
 
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
 
-            this.beforeInit.apply(this, arguments);
+            this.beforeInit(...this._arguments);
 
-            if (!this.data) {
-                let keys = (dataSet) ? Object.keys(dataSet) : [],
-                    contextData = (keys.length > 0) ? dataSet : this.context.data;
-                if (contextData) {
-                    this.data = contextData[options.bind] || contextData;
-                }
-            }
+
         };
 
         ready(el) {
@@ -115,19 +101,37 @@ define([
 
         }
 
-        _match(router) {
-            this.router = router;
-            
-            if (this.match) {
-                this.match(router.match);
-            }
+        setContext(context) {
+            this.context = context;
 
             if (!this.async) {
                 this.render();
             }
+            this.init(...this._arguments);
+        };
 
-            this.init.apply(this, this._arguments);
+        set context(context) {
+            if (!this.data) {
+                let keys = (this._dataSet) ? Object.keys(this._dataSet) : [],
+                    contextData = (keys.length > 0) ? this._dataSet : context.data;
+                if (contextData) {
+                    this.data = contextData[this._options.bind] || contextData;
+                }
+            }
+            context.match((match)=> {
+                if (this.match) {
+                    this.match(match);
+                }
+                
+                this._context = Object.assign({
+                    match: match
+                }, context);
+            });
         }
+
+        get context() {
+            return this._context;
+        };
 
         // method render called manually if flag async is true;
         //
@@ -169,14 +173,12 @@ define([
                         this.applyBinders(this.data, this);
                     }
 
-                    setRoutes(this.children, this.router);
+                    setRoutes(this.children, this.context);
                     addChildren(this, this.root);
+                    this.rendered(...this._arguments);
                     this._rendered = true;
                 }
             }
-        };
-
-        init(data, children, dataSet) {
         };
 
         // Running before Constructor is initialised
@@ -189,6 +191,29 @@ define([
         //      in template binders)
         beforeInit(data, children, dataSet) {
         };
+
+        // Running when Constructor is initialised
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        init(data, children, dataSet) {
+        };
+
+        // Running when widget is rendered
+        //
+        //      @method beforeInit
+        //      @param {Object} data (comes from template data attributes)
+        //      @param {Object} children (comes placeholder content
+        //      from template)
+        //      @param {Object} datatSet (data passing if component is
+        //      in template binders)
+        rendered(data, children, dataSet) {
+        };
+
 
         // Load external css style for third party modules.
         //
@@ -309,7 +334,7 @@ define([
             }
             let component = this.setComponent(Component, options),
                 instance = component.run(options.container);
-            instance._match(this.router);
+            instance.setContext(this.context);
             this.children[name] = instance;
             return instance;
         };
