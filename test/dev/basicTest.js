@@ -22,11 +22,28 @@ define([
                 var data = app.context.data;
                 expect(data).to.deep.equal({
                     cmp: {
-                        item: 'Binded Item From App'
+                        item: {
+                            inner:'Binded Item From App',
+                            class:'binded'
+
+                        },
+                        list:['a','b','c'],
+                        lista:[
+                            {
+                                innera:'Binded Item From App1',
+                                class:'listIn'
+
+                            },
+                            {
+                                innera:'Binded Item From App2',
+                                class:'listIn2'
+
+                            }
+                        ]
                     }
                 });
                 expect(app.appContainer.context.data).to.equal(data);
-                expect(app.el).to.equal(app.appContainer.el);
+                expect(app.el).to.equal(container);
             });
         });
         describe('Test HTML and css structure rendered as expected', function () {
@@ -67,7 +84,7 @@ define([
 
                 it('Check if Binder are rendered correctly, css are applied, and content taked from App data', function () {
                     var el = $template.find('.binded');
-                    expect(el).to.have.$html('Binded Item From App');
+                    expect(el.find('div')).to.have.$html('Binded Item From App');
                     expect(el).to.have.$css('color', 'rgb(200, 200, 200)');
                 });
             });

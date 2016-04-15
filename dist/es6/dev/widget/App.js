@@ -814,7 +814,7 @@
 
 
             trigger(location) {
-                if (this.started && location) {
+                if (this.started) {
                     // this.started = false;
                     this.currLocation = location;
                     let parts = location.split('?', 2),

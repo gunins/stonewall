@@ -1,4 +1,13 @@
 (function(window) {
+
+    function assign(source, target) {
+        var keys = Object.keys(target);
+        keys.forEach(function(key) {
+            source[key] = target[key];
+        });
+        return source;
+    }
+
     function testGlobal(method) {
         return this[method] === undefined;
     }
@@ -49,26 +58,26 @@
     };
 
     var tests = [
-        /*  {
+           {
          path: ['test/basicTest'],
          name: 'Basic',
-         baseUrl: '../../examples/basic/src'
+               appRoot: '../../../../examples/basic/target/'
          },
          {
          path: ['test/bindTest'],
          name: 'BasicBind',
-         baseUrl: '../../examples/basicBind/src'
+             appRoot: '../../../../examples/basicBind/target/'
          },
          {
          path: ['test/routesTest'],
          name: 'Routes',
-         baseUrl: '../../examples/routes/src'
+             appRoot: '../../../../examples/routes/target/'
          },
-         {
-         path: ['test/elementTest'],
-         name: 'Element',
-         baseUrl: '../../examples/element/src'
-         },*/
+        {
+            path:    ['test/elementTest'],
+            name:    'Element',
+            appRoot: '../../../../examples/element/target/'
+        },
         {
             path: ['test/mediatorTest'],
             name: 'Mediator'
@@ -79,17 +88,16 @@
         }
     ];
     var paths = {
-        'test':           '../../../../test/dev',
-        'sinon':          '../../../../node_modules/sinon/lib/sinon',
-        'templating':     '../../../../node_modules/richtemplate/dist/' + target + '/dev/templating',
-        'coders':         '../../../../node_modules/richtemplate/dist/' + target + '/dev/coders',
-        'widget':         '../../../../dist/' + target + '/dev/widget',
-        'babel/polyfill': '../../../../dist/' + target + '/basic/babel/polyfill',
-        'router/Router':  '../../../../dist/' + target + '/dev/widget/App',
-        'widget/Mediator':  '../../../../dist/' + target + '/dev/widget/App'
+        'test':            '../../../../test/dev',
+        'sinon':           '../../../../node_modules/sinon/lib/sinon',
+        'templating':      '../../../../node_modules/richtemplate/dist/' + target + '/dev/templating',
+        'coders':          '../../../../node_modules/richtemplate/dist/' + target + '/dev/coders',
+        'widget':          '../../../../dist/' + target + '/dev/widget',
+        'babel/polyfill':  '../../../../dist/' + target + '/basic/babel/polyfill',
+        'router/Router':   '../../../../dist/' + target + '/dev/widget/App',
+        'widget/Mediator': '../../../../dist/' + target + '/dev/widget/App'
 
     }
-
     require.config({
         baseUrl:          '../../dist/' + target + '/dev/',
         templateCoders:   coders.templateCoders,
@@ -97,13 +105,20 @@
     });
 
     mocha.ui('bdd');
+
     testEs6(function run() {
+
             tests.forEach(function(test, index) {
+                var localPaths = {};
+                if (test.appRoot) {
+                    localPaths[test.name] = test.appRoot + target + '/' + test.name;
+                }
+                assign(localPaths, paths);
 
                 var config = {
                     context:          test.name,
                     baseUrl:          test.baseUrl,
-                    paths:            paths,
+                    paths:            localPaths,
                     templateCoders:   coders.templateCoders,
                     templateDecoders: coders.templateDecoders
                 };

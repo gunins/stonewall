@@ -941,7 +941,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function trigger(location) {
                 var _this3 = this;
 
-                if (this.started && location) {
+                if (this.started) {
                     (function () {
                         // this.started = false;
                         _this3.currLocation = location;

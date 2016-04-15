@@ -529,7 +529,6 @@ define('templating/dom',[],function() {
             if (el.children) {
                 destroy(el.children);
             }
-
             if (el.elGroup !== undefined) {
                 el.elGroup.delete(el.el);
             }
@@ -690,7 +689,7 @@ define('templating/dom',[],function() {
     }
     return DomFragment;
 }));
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         // AMD. Register as an anonymous module.
@@ -701,7 +700,7 @@ define('templating/dom',[],function() {
         // like Node.
         module.exports = factory(require('./utils/List'), require('./dom'), require('./DomFragment'));
     }
-}(this, function (List, dom, DomFragment) {
+}(this, function(List, dom, DomFragment) {
     'use strict';
     var _decoders = {};
 
@@ -780,7 +779,8 @@ define('templating/dom',[],function() {
             let resp = {},
                 _runAll = [];
             Object.keys(childNodes).forEach((name) => {
-                let child = childNodes[name],
+                let childFragment = fragment,
+                    child = childNodes[name],
                     children = child.children,
                     elGroup = new List(),
                     placeholder = document.createElement(child.data.tplSet.tag || 'div');
@@ -789,12 +789,12 @@ define('templating/dom',[],function() {
                 elGroup.onDelete((key, size)=> {
                     if (size === 0 && key.parentNode) {
                         key.parentNode.replaceChild(placeholder, key);
-                        fragment = ()=>placeholder;
+                        childFragment = ()=>placeholder;
                     }
                 })
                 if (child.template) {
                     let run = (force, index)=> {
-                        let template = fragment();
+                        let template = childFragment();
                         if (force instanceof HTMLElement === true) {
                             template = force;
                         }
@@ -836,7 +836,7 @@ define('templating/dom',[],function() {
                     };
 
                 } else {
-                    let element = new dom.Element(fragment().querySelector('#' + child.id), child);
+                    let element = new dom.Element(childFragment().querySelector('#' + child.id), child);
                     element.removeAttribute('id');
                     element.elGroup = elGroup;
                     elGroup.set(element.el, element);
@@ -1889,7 +1889,7 @@ define('templating/dom',[],function() {
 
 
             trigger(location) {
-                if (this.started && location) {
+                if (this.started) {
                     // this.started = false;
                     this.currLocation = location;
                     let parts = location.split('?', 2),

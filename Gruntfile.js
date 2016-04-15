@@ -134,21 +134,21 @@ module.exports = function(grunt) {
                     ]
                 }
             },
-            /*   element: {
-             options: {
-             baseUrl: 'examples/element/src',
-             removeCombined: true,
-             optimize: 'none',
-             templateCoders: coders.templateCoders,
-             templateDecoders: coders.templateDecoders,
-             stubModules: stubModules,
-             exclude: coders.exclude,
-             dir: "examples/element/target/es6",
-             paths: appPaths,
-             name: 'Element'
+            element:     {
+                options: {
+                    baseUrl:          'examples/element/src',
+                    removeCombined:   true,
+                    optimize:         'none',
+                    templateCoders:   coders.templateCoders,
+                    templateDecoders: coders.templateDecoders,
+                    stubModules:      stubModules,
+                    exclude:          coders.exclude,
+                    dir:              "examples/element/target/es6",
+                    paths:            appPaths,
+                    name:             'Element'
 
-             }
-             },*/
+                }
+            },
             basic:       {
                 options: {
                     baseUrl:          'examples/basic/src',
@@ -351,7 +351,7 @@ module.exports = function(grunt) {
                 ]
             },
             examplesES6:      {
-                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'element', 'routes', 'todo'].map(function(name) {
                     return {
                         expand: true,
                         cwd:    'target/es6/prod',
@@ -362,7 +362,7 @@ module.exports = function(grunt) {
                 })
             },
             examplesES5:      {
-                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'element', 'routes', 'todo'].map(function(name) {
                     return {
                         expand: true,
                         cwd:    'target/es5/prod',
@@ -373,7 +373,7 @@ module.exports = function(grunt) {
                 })
             },
             examplesToLoader: {
-                files: ['application', 'basic', 'basicBind', 'basicTable', 'routes', 'todo'].map(function(name) {
+                files: ['application', 'basic', 'basicBind', 'basicTable', 'element', 'routes', 'todo'].map(function(name) {
                     return {
                         expand: true,
                         cwd:    'target/',
@@ -460,6 +460,19 @@ module.exports = function(grunt) {
                         cwd:    'examples/basicTable/target/es6',
                         src:    'App.js',
                         dest:   'examples/basicTable/target/es5'
+                    }
+                ]
+            },  
+            element:  {
+                options: {
+                    sourceMap: false
+                },
+                files:   [
+                    {
+                        expand: true,
+                        cwd:    'examples/element/target/es6',
+                        src:    'Element.js',
+                        dest:   'examples/element/target/es5'
                     }
                 ]
             },

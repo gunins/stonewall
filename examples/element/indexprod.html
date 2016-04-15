@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Dashboard Template</title>
+    <title>DOM Element Example</title>
 
     <script src="../../bower_components/requirejs/require.js"></script>
     <script src="config.prod.js"></script>
@@ -16,12 +16,7 @@
         data-target?: location to container if not set, use document.body
         data-dev?: Define App is in development mode
     -->
-    <script src="../../src/loader.js"></script>
-    <script>
-        require(['Element'], function (element) {
-            console.log(element.render());
-        });
-    </script>
+    <script data-name="Element" src="target/loader.js"></script>
 </head>
 <body>
 </body>

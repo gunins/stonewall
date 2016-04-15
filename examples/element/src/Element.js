@@ -4,7 +4,16 @@
 define([
     'templating/parser!_element.html',
     'templating/Decoder'
-], function (Element, Decoder) {
+], function(Element, Decoder) {
     'use strict';
-    return new Decoder(Element);
+    function App() {
+        this.element = new Decoder(Element);
+    }
+
+    App.prototype.start = function() {
+        var el = this.element.render();
+        console.log(el);
+        return el
+    }
+    return App
 });

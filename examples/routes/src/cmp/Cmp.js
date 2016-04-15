@@ -27,10 +27,8 @@ define([
         template:    template,
         async:       true,
         init:        function(data) {
-            this.data = {
-                input: {
-                    value: ''
-                }
+            this.data.input = {
+                value: ''
             };
 
         },
@@ -47,7 +45,7 @@ define([
 
         },
         leave:       function(done) {
-            var close = confirm('Are You Sure?');
+            var close = true; //confirm('Are You Sure?');
             done(close);
             if (close) {
                 if (this.id !== 'Link id not dynamic') {

@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "requirejs": "2.1.20",
-    "richtemplate": "0.2.21",
+    "richtemplate": "1.0.1",
     "urlmanager": "^0.2.11"
   },
   "scripts": {
