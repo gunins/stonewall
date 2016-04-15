@@ -6,7 +6,7 @@ define([
     'container/Container',
     'data'
 ], function(App, Container, data) {
-    let rows = data(100);
+    let rows = data(100, 50);
     return App.extend({
 
         init:         function() {

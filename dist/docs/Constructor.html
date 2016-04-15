@@ -266,7 +266,7 @@ Basic Usage example</p>
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.match) {
                     <span class="hljs-keyword">this</span>.match(match);
                 }
-                
+
                 <span class="hljs-keyword">this</span>._context = <span class="hljs-built_in">Object</span>.assign({
                     match: match
                 }, context);
@@ -317,7 +317,8 @@ Basic Usage example</p>
 
 
                     <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(template.fragment, {
-                        name: <span class="hljs-string">'root'</span>
+                        name: <span class="hljs-string">'root'</span>,
+                        data: {}
                     });
 
                     <span class="hljs-keyword">this</span>.children = applyElement(template.children, options);

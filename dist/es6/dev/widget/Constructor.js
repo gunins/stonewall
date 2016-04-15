@@ -465,14 +465,66 @@
 
 }));
 /**
+ * Created by guntars on 15/03/2016.
+ */
+define('widget/parsers/addChildren',[], function() {
+    'use strict';
+    function addChildren(context, child, data) {
+        if (child && child.name && context) {
+            applyEvents(context, child, data);
+            elReady(context, child, data);
+            let handler = elOnChange(context, child);
+            if (handler) {
+                handler(data);
+            }
+            context.children[child.name] = child;
+            return child;
+        }
+    };
+
+    function elOnChange(context, child) {
+        if (context.elOnChange[child.name] !== undefined) {
+            return (data)=> context.elOnChange[child.name].call(context, child, data);
+        }
+        return false;
+    };
+
+    function elReady(context, child, data) {
+        if (context.elReady[child.name] !== undefined) {
+            context.elReady[child.name].call(context, child, data);
+        }
+    };
+
+    //Aplying Events to elements
+    //
+    //      @private applyEvents
+    //      @param {dom.Element} element
+    //      @param {Array} events
+    //      @param {Object} data
+    function applyEvents(context, child, data) {
+        var events = context.events[child.name];
+        if (events !== undefined && child.el !== undefined && child.data.type !== 'cp') {
+            events.forEach((event)=> {
+                context._events.push(child.on(event.name, event.action, context, data));
+            });
+        }
+    };
+
+
+    Object.assign(addChildren, {elOnChange, elReady, applyEvents});
+
+    return addChildren;
+});
+/**
  * Created by guntars on 11/11/14.
  */
 define('widget/parsers/applyAttribute',[
-    'watch'
-], function(WatchJS) {
+    'watch',
+    './addChildren'
+], function(WatchJS, addChildren) {
     var watch = WatchJS.watch;
 
-    function applyAttribute(childBinder, data) {
+    function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update === 'true';
         if (bind) {
@@ -530,7 +582,7 @@ define('widget/parsers/applyAttribute',[
                             childBinder.text(dataItem);
                         }
                         if (update === true) {
-                            watch(data, key, ()=> childBinder.text(dataItem));
+                            watch(data, key, ()=> childBinder.text(data[key]));
                         }
                         break;
                     default:
@@ -542,11 +594,19 @@ define('widget/parsers/applyAttribute',[
                         }
                 }
 
-                if (data.text !== undefined) {
+                if (data.text !== undefined && bindItem !== 'text') {
                     childBinder.text(data.text);
+                    if (update === true) {
+                        if (bindItem !== 'text') {
+                            watch(data, 'text', ()=> childBinder.text(data.text));
+                        }
+                    }
                 }
                 if (update === true) {
-                    watch(data, 'text', ()=> childBinder.text(data.text));
+                    let handler = addChildren.elOnChange(context, childBinder);
+                    if (handler) {
+                        watch(data, key, ()=> handler(data));
+                    }
                 }
 
             });
@@ -555,54 +615,6 @@ define('widget/parsers/applyAttribute',[
     }
 
     return applyAttribute;
-});
-/**
- * Created by guntars on 15/03/2016.
- */
-define('widget/parsers/addChildren',[], function() {
-    'use strict';
-    function addChildren(context, child, data) {
-        if (child && child.name && context) {
-            applyEvents(context, child, data);
-            elReady(context, child, data);
-            elOnChange(context, child, data);
-
-            context.children[child.name] = child;
-            return child;
-        }
-    };
-
-    function elOnChange(context, child, data) {
-        if (context.elOnChange[child.name] !== undefined) {
-            context.elOnChange[child.name].call(context, child, data);
-        }
-    };
-
-    function elReady(context, child, data) {
-        if (context.elReady[child.name] !== undefined) {
-            context.elReady[child.name].call(context, child, data);
-        }
-    };
-
-    //Aplying Events to elements
-    //
-    //      @private applyEvents
-    //      @param {dom.Element} element
-    //      @param {Array} events
-    //      @param {Object} data
-    function applyEvents(context, child, data) {
-        var events = context.events[child.name];
-        if (events !== undefined && child.el !== undefined && child.data.type !== 'cp') {
-            events.forEach((event)=> {
-                context._events.push(child.on(event.name, event.action, context, data));
-            });
-        }
-    };
-
-
-    Object.assign(addChildren, {elOnChange, elReady, applyEvents});
-
-    return addChildren;
 });
 /**
  * Created by guntars on 11/11/14.
@@ -773,12 +785,19 @@ define('widget/parsers/applyBinders',[
                     element.text(data);
                     addChildren.applyEvents(context, element, data);
                     addChildren.elReady(context, element, data);
-                    addChildren.elOnChange(context, element, data);
+                    let handler = addChildren.elOnChange(context, element);
+                    if (handler) {
+                        handler(data);
+                    }
+
 
                     if (element.data.tplSet.update === 'true') {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
-                            addChildren.elOnChange(context, element, obj[objKey]);
+                            let handler = addChildren.elOnChange(context, element);
+                            if (handler) {
+                                handler(obj[objKey]);
+                            }
                         });
                     }
                 } else if (utils.isArray(data)) {
@@ -795,7 +814,11 @@ define('widget/parsers/applyBinders',[
                                 if (element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, ()=> {
                                         element.text(item);
-                                        addChildren.elOnChange(context, element, item);
+                                        let handler = addChildren.elOnChange(context, element);
+                                        if (handler) {
+                                            handler(item);
+                                        }
+
                                     });
                                 }
                             }
@@ -806,10 +829,14 @@ define('widget/parsers/applyBinders',[
                             });
 
 
-                            applyAttribute(element, item);
+                            applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);
                             addChildren.elReady(context, element, item);
-                            addChildren.elOnChange(context, element, item);
+
+                            let handler = addChildren.elOnChange(context, element);
+                            if (handler) {
+                                handler(item);
+                            }
 
                             if (element.children) {
                                 element.bindings = setBinders(element.children);
@@ -869,10 +896,13 @@ define('widget/parsers/applyBinders',[
                 } else if (utils.isObject(data)) {
                     let element = binder.run(data);
                     if (element.data.type !== 'cp') {
-                        applyAttribute(element, data);
+                        applyAttribute(context, element, data);
                         addChildren.applyEvents(context, element, data);
                         addChildren.elReady(context, element, data);
-                        addChildren.elOnChange(context, element, data);
+                        let handler = addChildren.elOnChange(context, element);
+                        if (handler) {
+                            handler(data);
+                        }
                         if (element.children) {
                             element.bindings = setBinders(element.children);
                             applyBinders(context, data, element);
@@ -894,7 +924,11 @@ define('widget/parsers/applyBinders',[
                     let component = binder.run(obj);
                     component.setContext(child.context);
                     addChildren.elReady(child, component, obj);
-                    addChildren.elOnChange(child, component, obj);
+                    let handler = addChildren.elOnChange(child, component);
+                    if (handler) {
+                        handler(obj);
+                    }
+
                 });
             }
             let keys = Object.keys(binders);
@@ -1233,7 +1267,7 @@ define('widget/Constructor',[
                 if (this.match) {
                     this.match(match);
                 }
-                
+
                 this._context = Object.assign({
                     match: match
                 }, context);
@@ -1273,7 +1307,8 @@ define('widget/Constructor',[
 
 
                     this.root = new dom.Element(template.fragment, {
-                        name: 'root'
+                        name: 'root',
+                        data: {}
                     });
 
                     this.children = applyElement(template.children, options);

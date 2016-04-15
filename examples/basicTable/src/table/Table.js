@@ -6,53 +6,80 @@ define([
     'templating/parser!./_table.html'
 ], function(Constructor, template) {
     'use strict';
+    function getCoords(elem) {
+        var box = elem.getBoundingClientRect(),
+            body = document.body,
+            docEl = document.documentElement,
+            scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop,
+            scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft,
+            clientTop = docEl.clientTop || body.clientTop || 0,
+            clientLeft = docEl.clientLeft || body.clientLeft || 0,
+            top = box.top + scrollTop - clientTop,
+            left = box.left + scrollLeft - clientLeft;
+
+        return {top: Math.round(top), left: Math.round(left)};
+    }
 
     return Constructor.extend({
-        template: template,
-        elReady:  {
-            tooltip: function(el, data) {
-                this.eventBus.subscribe('over', function(over, obj) {
-                    if (obj.tooltip === data) {
-                        if (over) {
-                            el.addClass('fadein');
-                        } else {
-                            el.removeClass('fadein');
+        template:   template,
+        elReady:    {
+            tooltip:         function(el) {
+                this.eventBus.subscribe('over', function(over) {
+                    if (over) {
+                        el.addClass('fadein');
+                    } else {
+                        el.removeClass('fadein');
 
-                        }
                     }
                 });
-                this.eventBus.subscribe('move', function(over, obj) {
-                    if (obj.tooltip === data) {
-                        if (over) {
-                            el.setStyle({
-                                top:  over.offsetY + 'px',
-                                left: over.offsetX + 'px'
-                            });
-                        }
+                this.eventBus.subscribe('move', function(over) {
+                    el.setStyle({
+                        left: over.pageX + 'px',
+                        top:  over.pageY + 'px'
+                    });
+                });
+            },
+            tooltip_content: function(el) {
+                this.eventBus.subscribe('change', function(data) {
+                    if (el._data !== data) {
+                        el.text(data);
+                        el._data = data;
                     }
                 });
             }
         },
-        events:   {
+        elOnChange: {
+            value: function(el, data) {
+                if (this._active == el) {
+                    this.eventBus.publish('change', data.tooltip)
+                }
+
+            }
+        },
+        events:     {
             value: [{
                 name:   'mouseenter',
                 action: function(e, el, data) {
-                    this.eventBus.publish('over', true, data);
+                    this._active = el;
+                    this.eventBus.publish('over', true, data.tooltip);
+                    this.eventBus.publish('change', data.tooltip)
                 }
             }, {
                 name:   'mouseleave',
-                action: function(e, el, data) {
-                    this.eventBus.publish('over', false, data);
+                action: function(el) {
+                    this.eventBus.publish('over', false);
                 }
-            }, /*{
+            }],
+            root:  [{
                 name:   'mousemove',
-                action: function(e, el, data) {
+                action: function(e, el) {
+                    var offset = getCoords(el.el);
                     this.eventBus.publish('move', {
-                        offsetX: e.offsetX,
-                        offsetY: e.offsetY
-                    }, data);
+                        pageX: e.pageX - offset.left + 10,
+                        pageY: e.pageY - offset.top - 10
+                    });
                 }
-            }*/]
+            }]
         }
     });
 });

@@ -132,12 +132,19 @@ define([
                     element.text(data);
                     addChildren.applyEvents(context, element, data);
                     addChildren.elReady(context, element, data);
-                    addChildren.elOnChange(context, element, data);
+                    <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
+                    <span class="hljs-keyword">if</span> (handler) {
+                        handler(data);
+                    }
+
 
                     <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
                         watch(obj, objKey, () =&gt; {
                             element.text(obj[objKey]);
-                            addChildren.elOnChange(context, element, obj[objKey]);
+                            <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
+                            <span class="hljs-keyword">if</span> (handler) {
+                                handler(obj[objKey]);
+                            }
                         });
                     }
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isArray(data)) {
@@ -154,7 +161,11 @@ define([
                                 <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
                                     watch(obj, objKey, ()=&gt; {
                                         element.text(item);
-                                        addChildren.elOnChange(context, element, item);
+                                        <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
+                                        <span class="hljs-keyword">if</span> (handler) {
+                                            handler(item);
+                                        }
+
                                     });
                                 }
                             }
@@ -165,10 +176,14 @@ define([
                             });
 
 
-                            applyAttribute(element, item);
+                            applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);
                             addChildren.elReady(context, element, item);
-                            addChildren.elOnChange(context, element, item);
+
+                            <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
+                            <span class="hljs-keyword">if</span> (handler) {
+                                handler(item);
+                            }
 
                             <span class="hljs-keyword">if</span> (element.children) {
                                 element.bindings = setBinders(element.children);
@@ -228,10 +243,13 @@ define([
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isObject(data)) {
                     <span class="hljs-keyword">let</span> element = binder.run(data);
                     <span class="hljs-keyword">if</span> (element.data.type !== <span class="hljs-string">'cp'</span>) {
-                        applyAttribute(element, data);
+                        applyAttribute(context, element, data);
                         addChildren.applyEvents(context, element, data);
                         addChildren.elReady(context, element, data);
-                        addChildren.elOnChange(context, element, data);
+                        <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
+                        <span class="hljs-keyword">if</span> (handler) {
+                            handler(data);
+                        }
                         <span class="hljs-keyword">if</span> (element.children) {
                             element.bindings = setBinders(element.children);
                             applyBinders(context, data, element);
@@ -253,7 +271,11 @@ define([
                     <span class="hljs-keyword">let</span> component = binder.run(obj);
                     component.setContext(child.context);
                     addChildren.elReady(child, component, obj);
-                    addChildren.elOnChange(child, component, obj);
+                    <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(child, component);
+                    <span class="hljs-keyword">if</span> (handler) {
+                        handler(obj);
+                    }
+
                 });
             }
             <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(binders);

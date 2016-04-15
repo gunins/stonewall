@@ -2,42 +2,31 @@
  * Created by guntars on 28/10/14.
  */
 define(()=> {
-    return (count)=> {
+    return (count, timeout)=> {
         let rows = (count)=> {
                 let out = [];
                 for (let id = 0; id <= count; id++) {
                     let items = {
                         value: [{
-                            name:    'value :' + id,
-                            tooltip: {
-                                value: id
-                            }
+                            name:    'value:' + id,
+                            tooltip: 'value tooltip:' + id
                         }, {
-                            name:    'set :' + id,
-                            tooltip: {
-                                value: id
-                            }
+                            name:    'set:' + id,
+                            tooltip: 'set tooltip:' + id
                         }, {
-                            name:    'element :' + id,
-                            tooltip: {
-                                value: id
-                            }
+                            name:    'element:' + id,
+                            tooltip: 'element tooltip:' + id
                         }, {
-                            name:    'test :' + id,
-                            tooltip: {
-                                value: id
-                            }
+                            name:    'test:' + id,
+                            tooltip: 'test tooltip:' + id
                         }, {
-                            name:    'other :' + id,
-                            tooltip: {
-                                value: id
-                            }
+                            name:    'other:' + id,
+                            tooltip: 'other tooltip:' + id
                         }, {
-                            name:    'class :' + id,
-                            tooltip: {
-                                value: id
-                            }
-                        }]
+                            name:    'class:' + id,
+                            tooltip: 'class tooltip:' + id
+                        }],
+                        id:    id
                     };
                     out.push(items);
                 }
@@ -47,29 +36,30 @@ define(()=> {
 
         let data = {
             table: {
-                thead: {
-                    headvalue:   '#',
-                    headset:     'Set',
-                    headelement: 'Element',
-                    headtest:    'test',
-                    headother:   'Other'
-                },
+                thead: [
+                    '#',
+                    'Set',
+                    'Element',
+                    'test',
+                    'Other',
+                    'Class'
+                ],
                 tbody: result
-            }
+            },
         }
-        let id = count,
-            interval = false,
+        let interval = false,
             start = ()=> {
                 if (!interval) {
                     interval = setInterval(()=> {
                         result.forEach((items)=> {
+                            let id = items.id + 1;
                             items.value.forEach(item=> {
                                 item.name = item.name.split(':')[0] + ':' + id;
-                                item.tooltip.value = id;
-                            })
+                                item.tooltip = item.tooltip.split(':')[0] + ':' + id;
+                            });
+                            items.id = id;
                         });
-                        id++;
-                    }, 50)
+                    }, timeout);
                 }
             }, stop = ()=> {
                 if (interval) {
@@ -81,4 +71,5 @@ define(()=> {
 
         return {data, start, stop};
     }
-});
+})
+;

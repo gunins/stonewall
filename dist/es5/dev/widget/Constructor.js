@@ -474,12 +474,65 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
     return WatchJS;
 });
 /**
+ * Created by guntars on 15/03/2016.
+ */
+define('widget/parsers/addChildren', [], function () {
+    'use strict';
+
+    function addChildren(context, child, data) {
+        if (child && child.name && context) {
+            applyEvents(context, child, data);
+            elReady(context, child, data);
+            var handler = elOnChange(context, child);
+            if (handler) {
+                handler(data);
+            }
+            context.children[child.name] = child;
+            return child;
+        }
+    };
+
+    function elOnChange(context, child) {
+        if (context.elOnChange[child.name] !== undefined) {
+            return function (data) {
+                return context.elOnChange[child.name].call(context, child, data);
+            };
+        }
+        return false;
+    };
+
+    function elReady(context, child, data) {
+        if (context.elReady[child.name] !== undefined) {
+            context.elReady[child.name].call(context, child, data);
+        }
+    };
+
+    //Aplying Events to elements
+    //
+    //      @private applyEvents
+    //      @param {dom.Element} element
+    //      @param {Array} events
+    //      @param {Object} data
+    function applyEvents(context, child, data) {
+        var events = context.events[child.name];
+        if (events !== undefined && child.el !== undefined && child.data.type !== 'cp') {
+            events.forEach(function (event) {
+                context._events.push(child.on(event.name, event.action, context, data));
+            });
+        }
+    };
+
+    Object.assign(addChildren, { elOnChange: elOnChange, elReady: elReady, applyEvents: applyEvents });
+
+    return addChildren;
+});
+/**
  * Created by guntars on 11/11/14.
  */
-define('widget/parsers/applyAttribute', ['watch'], function (WatchJS) {
+define('widget/parsers/applyAttribute', ['watch', './addChildren'], function (WatchJS, addChildren) {
     var watch = WatchJS.watch;
 
-    function applyAttribute(childBinder, data) {
+    function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update === 'true';
         if (bind) {
@@ -544,7 +597,7 @@ define('widget/parsers/applyAttribute', ['watch'], function (WatchJS) {
                         }
                         if (update === true) {
                             watch(data, key, function () {
-                                return childBinder.text(dataItem);
+                                return childBinder.text(data[key]);
                             });
                         }
                         break;
@@ -559,67 +612,31 @@ define('widget/parsers/applyAttribute', ['watch'], function (WatchJS) {
                         }
                 }
 
-                if (data.text !== undefined) {
+                if (data.text !== undefined && bindItem !== 'text') {
                     childBinder.text(data.text);
+                    if (update === true) {
+                        if (bindItem !== 'text') {
+                            watch(data, 'text', function () {
+                                return childBinder.text(data.text);
+                            });
+                        }
+                    }
                 }
                 if (update === true) {
-                    watch(data, 'text', function () {
-                        return childBinder.text(data.text);
-                    });
+                    (function () {
+                        var handler = addChildren.elOnChange(context, childBinder);
+                        if (handler) {
+                            watch(data, key, function () {
+                                return handler(data);
+                            });
+                        }
+                    })();
                 }
             });
         }
     }
 
     return applyAttribute;
-});
-/**
- * Created by guntars on 15/03/2016.
- */
-define('widget/parsers/addChildren', [], function () {
-    'use strict';
-
-    function addChildren(context, child, data) {
-        if (child && child.name && context) {
-            applyEvents(context, child, data);
-            elReady(context, child, data);
-            elOnChange(context, child, data);
-
-            context.children[child.name] = child;
-            return child;
-        }
-    };
-
-    function elOnChange(context, child, data) {
-        if (context.elOnChange[child.name] !== undefined) {
-            context.elOnChange[child.name].call(context, child, data);
-        }
-    };
-
-    function elReady(context, child, data) {
-        if (context.elReady[child.name] !== undefined) {
-            context.elReady[child.name].call(context, child, data);
-        }
-    };
-
-    //Aplying Events to elements
-    //
-    //      @private applyEvents
-    //      @param {dom.Element} element
-    //      @param {Array} events
-    //      @param {Object} data
-    function applyEvents(context, child, data) {
-        var events = context.events[child.name];
-        if (events !== undefined && child.el !== undefined && child.data.type !== 'cp') {
-            events.forEach(function (event) {
-                context._events.push(child.on(event.name, event.action, context, data));
-            });
-        }
-    };
-
-    Object.assign(addChildren, { elOnChange: elOnChange, elReady: elReady, applyEvents: applyEvents });
-
-    return addChildren;
 });
 /**
  * Created by guntars on 11/11/14.
@@ -778,12 +795,18 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                         element.text(data);
                         addChildren.applyEvents(context, element, data);
                         addChildren.elReady(context, element, data);
-                        addChildren.elOnChange(context, element, data);
+                        var handler = addChildren.elOnChange(context, element);
+                        if (handler) {
+                            handler(data);
+                        }
 
                         if (element.data.tplSet.update === 'true') {
                             watch(obj, objKey, function () {
                                 element.text(obj[objKey]);
-                                addChildren.elOnChange(context, element, obj[objKey]);
+                                var handler = addChildren.elOnChange(context, element);
+                                if (handler) {
+                                    handler(obj[objKey]);
+                                }
                             });
                         }
                     })();
@@ -802,7 +825,10 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                                 if (element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, function () {
                                         element.text(item);
-                                        addChildren.elOnChange(context, element, item);
+                                        var handler = addChildren.elOnChange(context, element);
+                                        if (handler) {
+                                            handler(item);
+                                        }
                                     });
                                 }
                             }
@@ -812,10 +838,14 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                                 data: item
                             });
 
-                            applyAttribute(element, item);
+                            applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);
                             addChildren.elReady(context, element, item);
-                            addChildren.elOnChange(context, element, item);
+
+                            var handler = addChildren.elOnChange(context, element);
+                            if (handler) {
+                                handler(item);
+                            }
 
                             if (element.children) {
                                 element.bindings = setBinders(element.children);
@@ -876,10 +906,13 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                 } else if (utils.isObject(data)) {
                     var _element = binder.run(data);
                     if (_element.data.type !== 'cp') {
-                        applyAttribute(_element, data);
+                        applyAttribute(context, _element, data);
                         addChildren.applyEvents(context, _element, data);
                         addChildren.elReady(context, _element, data);
-                        addChildren.elOnChange(context, _element, data);
+                        var _handler = addChildren.elOnChange(context, _element);
+                        if (_handler) {
+                            _handler(data);
+                        }
                         if (_element.children) {
                             _element.bindings = setBinders(_element.children);
                             applyBinders(context, data, _element);
@@ -898,7 +931,10 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                     var component = binder.run(obj);
                     component.setContext(child.context);
                     addChildren.elReady(child, component, obj);
-                    addChildren.elOnChange(child, component, obj);
+                    var handler = addChildren.elOnChange(child, component);
+                    if (handler) {
+                        handler(obj);
+                    }
                 });
             }
             var keys = Object.keys(binders);
@@ -1278,7 +1314,8 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                         }
 
                         this.root = new dom.Element(template.fragment, {
-                            name: 'root'
+                            name: 'root',
+                            data: {}
                         });
 
                         this.children = applyElement(template.children, options);

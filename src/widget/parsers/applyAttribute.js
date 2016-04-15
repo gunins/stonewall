@@ -2,11 +2,12 @@
  * Created by guntars on 11/11/14.
  */
 define([
-    'watch'
-], function(WatchJS) {
+    'watch',
+    './addChildren'
+], function(WatchJS, addChildren) {
     var watch = WatchJS.watch;
 
-    function applyAttribute(childBinder, data) {
+    function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update === 'true';
         if (bind) {
@@ -64,7 +65,7 @@ define([
                             childBinder.text(dataItem);
                         }
                         if (update === true) {
-                            watch(data, key, ()=> childBinder.text(dataItem));
+                            watch(data, key, ()=> childBinder.text(data[key]));
                         }
                         break;
                     default:
@@ -76,11 +77,19 @@ define([
                         }
                 }
 
-                if (data.text !== undefined) {
+                if (data.text !== undefined && bindItem !== 'text') {
                     childBinder.text(data.text);
+                    if (update === true) {
+                        if (bindItem !== 'text') {
+                            watch(data, 'text', ()=> childBinder.text(data.text));
+                        }
+                    }
                 }
                 if (update === true) {
-                    watch(data, 'text', ()=> childBinder.text(data.text));
+                    let handler = addChildren.elOnChange(context, childBinder);
+                    if (handler) {
+                        watch(data, key, ()=> handler(data));
+                    }
                 }
 
             });

@@ -110,11 +110,12 @@
  * Created by guntars on 11/11/14.
  */</span>
 define([
-    <span class="hljs-string">'watch'</span>
-], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">WatchJS</span>) </span>{
+    <span class="hljs-string">'watch'</span>,
+    <span class="hljs-string">'./addChildren'</span>
+], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">WatchJS, addChildren</span>) </span>{
     <span class="hljs-keyword">var</span> watch = WatchJS.watch;
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyAttribute</span>(<span class="hljs-params">childBinder, data</span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyAttribute</span>(<span class="hljs-params">context, childBinder, data</span>) </span>{
         <span class="hljs-keyword">var</span> bind = childBinder.data.tplSet.bind,
             update = childBinder.data.tplSet.update === <span class="hljs-string">'true'</span>;
         <span class="hljs-keyword">if</span> (bind) {
@@ -172,7 +173,7 @@ define([
                             childBinder.text(dataItem);
                         }
                         <span class="hljs-keyword">if</span> (update === <span class="hljs-literal">true</span>) {
-                            watch(data, key, ()=&gt; childBinder.text(dataItem));
+                            watch(data, key, ()=&gt; childBinder.text(data[key]));
                         }
                         <span class="hljs-keyword">break</span>;
                     <span class="hljs-keyword">default</span>:
@@ -184,11 +185,19 @@ define([
                         }
                 }
 
-                <span class="hljs-keyword">if</span> (data.text !== <span class="hljs-literal">undefined</span>) {
+                <span class="hljs-keyword">if</span> (data.text !== <span class="hljs-literal">undefined</span> &amp;&amp; bindItem !== <span class="hljs-string">'text'</span>) {
                     childBinder.text(data.text);
+                    <span class="hljs-keyword">if</span> (update === <span class="hljs-literal">true</span>) {
+                        <span class="hljs-keyword">if</span> (bindItem !== <span class="hljs-string">'text'</span>) {
+                            watch(data, <span class="hljs-string">'text'</span>, ()=&gt; childBinder.text(data.text));
+                        }
+                    }
                 }
                 <span class="hljs-keyword">if</span> (update === <span class="hljs-literal">true</span>) {
-                    watch(data, <span class="hljs-string">'text'</span>, ()=&gt; childBinder.text(data.text));
+                    <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, childBinder);
+                    <span class="hljs-keyword">if</span> (handler) {
+                        watch(data, key, ()=&gt; handler(data));
+                    }
                 }
 
             });

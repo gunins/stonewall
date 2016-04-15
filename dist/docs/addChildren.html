@@ -115,17 +115,20 @@ define([], <span class="hljs-function"><span class="hljs-keyword">function</span
         <span class="hljs-keyword">if</span> (child &amp;&amp; child.name &amp;&amp; context) {
             applyEvents(context, child, data);
             elReady(context, child, data);
-            elOnChange(context, child, data);
-
+            <span class="hljs-keyword">let</span> handler = elOnChange(context, child);
+            <span class="hljs-keyword">if</span> (handler) {
+                handler(data);
+            }
             context.children[child.name] = child;
             <span class="hljs-keyword">return</span> child;
         }
     };
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elOnChange</span>(<span class="hljs-params">context, child, data</span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elOnChange</span>(<span class="hljs-params">context, child</span>) </span>{
         <span class="hljs-keyword">if</span> (context.elOnChange[child.name] !== <span class="hljs-literal">undefined</span>) {
-            context.elOnChange[child.name].call(context, child, data);
+            <span class="hljs-keyword">return</span> (data)=&gt; context.elOnChange[child.name].call(context, child, data);
         }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
     };
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">elReady</span>(<span class="hljs-params">context, child, data</span>) </span>{

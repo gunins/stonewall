@@ -24,12 +24,19 @@ define([
                     element.text(data);
                     addChildren.applyEvents(context, element, data);
                     addChildren.elReady(context, element, data);
-                    addChildren.elOnChange(context, element, data);
+                    let handler = addChildren.elOnChange(context, element);
+                    if (handler) {
+                        handler(data);
+                    }
+
 
                     if (element.data.tplSet.update === 'true') {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
-                            addChildren.elOnChange(context, element, obj[objKey]);
+                            let handler = addChildren.elOnChange(context, element);
+                            if (handler) {
+                                handler(obj[objKey]);
+                            }
                         });
                     }
                 } else if (utils.isArray(data)) {
@@ -46,7 +53,11 @@ define([
                                 if (element.data.tplSet.update === 'true') {
                                     watch(obj, objKey, ()=> {
                                         element.text(item);
-                                        addChildren.elOnChange(context, element, item);
+                                        let handler = addChildren.elOnChange(context, element);
+                                        if (handler) {
+                                            handler(item);
+                                        }
+
                                     });
                                 }
                             }
@@ -57,10 +68,14 @@ define([
                             });
 
 
-                            applyAttribute(element, item);
+                            applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);
                             addChildren.elReady(context, element, item);
-                            addChildren.elOnChange(context, element, item);
+
+                            let handler = addChildren.elOnChange(context, element);
+                            if (handler) {
+                                handler(item);
+                            }
 
                             if (element.children) {
                                 element.bindings = setBinders(element.children);
@@ -120,10 +135,13 @@ define([
                 } else if (utils.isObject(data)) {
                     let element = binder.run(data);
                     if (element.data.type !== 'cp') {
-                        applyAttribute(element, data);
+                        applyAttribute(context, element, data);
                         addChildren.applyEvents(context, element, data);
                         addChildren.elReady(context, element, data);
-                        addChildren.elOnChange(context, element, data);
+                        let handler = addChildren.elOnChange(context, element);
+                        if (handler) {
+                            handler(data);
+                        }
                         if (element.children) {
                             element.bindings = setBinders(element.children);
                             applyBinders(context, data, element);
@@ -145,7 +163,11 @@ define([
                     let component = binder.run(obj);
                     component.setContext(child.context);
                     addChildren.elReady(child, component, obj);
-                    addChildren.elOnChange(child, component, obj);
+                    let handler = addChildren.elOnChange(child, component);
+                    if (handler) {
+                        handler(obj);
+                    }
+
                 });
             }
             let keys = Object.keys(binders);

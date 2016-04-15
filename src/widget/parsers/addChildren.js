@@ -7,17 +7,20 @@ define([], function() {
         if (child && child.name && context) {
             applyEvents(context, child, data);
             elReady(context, child, data);
-            elOnChange(context, child, data);
-
+            let handler = elOnChange(context, child);
+            if (handler) {
+                handler(data);
+            }
             context.children[child.name] = child;
             return child;
         }
     };
 
-    function elOnChange(context, child, data) {
+    function elOnChange(context, child) {
         if (context.elOnChange[child.name] !== undefined) {
-            context.elOnChange[child.name].call(context, child, data);
+            return (data)=> context.elOnChange[child.name].call(context, child, data);
         }
+        return false;
     };
 
     function elReady(context, child, data) {

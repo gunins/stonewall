@@ -122,7 +122,7 @@ define([
                 if (this.match) {
                     this.match(match);
                 }
-                
+
                 this._context = Object.assign({
                     match: match
                 }, context);
@@ -162,7 +162,8 @@ define([
 
 
                     this.root = new dom.Element(template.fragment, {
-                        name: 'root'
+                        name: 'root',
+                        data: {}
                     });
 
                     this.children = applyElement(template.children, options);
