@@ -420,7 +420,7 @@ define([
         //          }
         //      },
         elReady:    {},
-        // Applying methods to element when data is changed to Element
+        // Applying methods to element every time when data is changed for Element
         // Usage Example
         //
         //      elOnChange: {
