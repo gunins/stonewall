@@ -35,8 +35,8 @@ module.exports = function(grunt) {
             ]
         },
         appPaths = {
-            'coders':         '../../../node_modules/richtemplate/dist/es5/dev/coders',
-            'templating':     '../../../node_modules/richtemplate/dist/es5/dev/templating',
+            'coders':         '../../../node_modules/richtemplate/es5/dev/coders',
+            'templating':     '../../../node_modules/richtemplate/es5/dev/templating',
             'widget':         '../../../src/widget',
             'watch':          '../../../lib/watch/src/watch',
             'd3':             '../../../bower_components/d3/d3',
@@ -49,8 +49,8 @@ module.exports = function(grunt) {
         stubModules = ['templating/parser', 'widget/parser'],
         rootPaths = {
             'watch':          '../lib/watch/src/watch',
-            'templating':     '../node_modules/richtemplate/dist/es6/dev/templating',
-            'coders':         '../node_modules/richtemplate/dist/es6/dev/coders',
+            'templating':     '../node_modules/richtemplate/es6/dev/templating',
+            'coders':         '../node_modules/richtemplate/es6/dev/coders',
             'router':         '../bower_components/urlmanager/dist/es6/dev/router',
             'babel/polyfill': '../node_modules/babel-polyfill/dist/polyfill'
         },
@@ -313,7 +313,7 @@ module.exports = function(grunt) {
             },
             Widget:  {
                 src:  [
-                    'node_modules/richtemplate/dist/es6/prod/templating/Decoder.js',
+                    'node_modules/richtemplate/es6/prod/templating/Decoder.js',
                     'target/es6/prod/widget/App.js',
                     'target/es6/prod/widget/Constructor.js'
                 ],

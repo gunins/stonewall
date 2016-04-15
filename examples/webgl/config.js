@@ -17,8 +17,8 @@ require.config({
         'coders/style/styleDecoder'
     ],
     paths: {
-        'coders': '../../../node_modules/richtemplate/dist/es6/dev/coders',
-        'templating': '../../../node_modules/richtemplate/dist/es6/dev/templating',
+        'coders': '../../../node_modules/richtemplate/es6/dev/coders',
+        'templating': '../../../node_modules/richtemplate/es6/dev/templating',
         'widget': '../../../src/widget',
         'routerCoders': '../../../src/routerCoders',
         'watch':'../../../lib/watch/src/watch',

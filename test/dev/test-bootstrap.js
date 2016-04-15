@@ -90,8 +90,8 @@
     var paths = {
         'test':            '../../../../test/dev',
         'sinon':           '../../../../node_modules/sinon/lib/sinon',
-        'templating':      '../../../../node_modules/richtemplate/dist/' + target + '/dev/templating',
-        'coders':          '../../../../node_modules/richtemplate/dist/' + target + '/dev/coders',
+        'templating':      '../../../../node_modules/richtemplate/' + target + '/dev/templating',
+        'coders':          '../../../../node_modules/richtemplate/' + target + '/dev/coders',
         'widget':          '../../../../dist/' + target + '/dev/widget',
         'babel/polyfill':  '../../../../dist/' + target + '/basic/babel/polyfill',
         'router/Router':   '../../../../dist/' + target + '/dev/widget/App',
