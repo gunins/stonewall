@@ -220,13 +220,12 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">this</span>.instance = <span class="hljs-keyword">this</span>;
-            <span class="hljs-keyword">this</span>._appliedRoutes = [];
             <span class="hljs-keyword">this</span>._events = [];
             <span class="hljs-keyword">this</span>._globalEvents = [];
             <span class="hljs-keyword">this</span>._parentChildren = parentChildren;
             <span class="hljs-keyword">this</span>._options = options;
             <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">false</span>;
-            <span class="hljs-keyword">this</span>._arguments = <span class="hljs-built_in">arguments</span>;
+            <span class="hljs-keyword">this</span>._arguments = <span class="hljs-built_in">Array</span>.from(<span class="hljs-built_in">arguments</span>);
             <span class="hljs-keyword">this</span>._dataSet = dataSet;
 
             <span class="hljs-keyword">this</span>.eventBus = <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>);

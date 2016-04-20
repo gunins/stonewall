@@ -30,6 +30,9 @@
         try {
             eval('class Foo {}');
             eval('var bar = (x) => x+1');
+            eval('function Bar(a="a"){};');
+            eval('function Foo(...a){return [...a]}');
+            eval('var [a,b,c]=[1,2,3]');
         } catch (e) {
             return false;
         }
@@ -39,6 +42,7 @@
 
 
     var target = check ? 'es6' : 'es5'
+    console.log('This browser version supporting: ' + target);
 
     var coders = {
         templateCoders:   [
@@ -58,21 +62,21 @@
     };
 
     var tests = [
-           {
-         path: ['test/basicTest'],
-         name: 'Basic',
-               appRoot: '../../../../examples/basic/target/'
-         },
-         {
-         path: ['test/bindTest'],
-         name: 'BasicBind',
-             appRoot: '../../../../examples/basicBind/target/'
-         },
-         {
-         path: ['test/routesTest'],
-         name: 'Routes',
-             appRoot: '../../../../examples/routes/target/'
-         },
+        {
+            path:    ['test/basicTest'],
+            name:    'Basic',
+            appRoot: '../../../../examples/basic/target/'
+        },
+        {
+            path:    ['test/bindTest'],
+            name:    'BasicBind',
+            appRoot: '../../../../examples/basicBind/target/'
+        },
+        {
+            path:    ['test/routesTest'],
+            name:    'Routes',
+            appRoot: '../../../../examples/routes/target/'
+        },
         {
             path:    ['test/elementTest'],
             name:    'Element',
@@ -93,7 +97,7 @@
         'templating':      '../../../../node_modules/richtemplate/' + target + '/dev/templating',
         'coders':          '../../../../node_modules/richtemplate/' + target + '/dev/coders',
         'widget':          '../../../../dist/' + target + '/dev/widget',
-        'babel/polyfill':  '../../../../dist/' + target + '/basic/babel/polyfill',
+        'babel/polyfill':  '../../../../dist/' + target + '/dev/babel/polyfill',
         'router/Router':   '../../../../dist/' + target + '/dev/widget/App',
         'widget/Mediator': '../../../../dist/' + target + '/dev/widget/App'
 

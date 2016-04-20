@@ -50,23 +50,12 @@ define([
                             let element = binder.run(true, index);
                             if (isString) {
                                 element.text(item);
-                                if (element.data.tplSet.update === 'true') {
-                                    watch(obj, objKey, ()=> {
-                                        element.text(item);
-                                        let handler = addChildren.elOnChange(context, element);
-                                        if (handler) {
-                                            handler(item);
-                                        }
-
-                                    });
-                                }
                             }
 
                             bindedData.push({
                                 binder: element,
                                 data:   item
                             });
-
 
                             applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);

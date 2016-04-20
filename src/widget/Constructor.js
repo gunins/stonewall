@@ -76,13 +76,12 @@ define([
         constructor(options = {}, parentChildren, dataSet = {}, node) {
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
             this._parentChildren = parentChildren;
             this._options = options;
             this._rendered = false;
-            this._arguments = arguments;
+            this._arguments = Array.from(arguments);
             this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);

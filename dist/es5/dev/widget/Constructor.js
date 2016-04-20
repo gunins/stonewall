@@ -822,15 +822,6 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                             var element = binder.run(true, index);
                             if (isString) {
                                 element.text(item);
-                                if (element.data.tplSet.update === 'true') {
-                                    watch(obj, objKey, function () {
-                                        element.text(item);
-                                        var handler = addChildren.elOnChange(context, element);
-                                        if (handler) {
-                                            handler(item);
-                                        }
-                                    });
-                                }
                             }
 
                             bindedData.push({
@@ -1249,13 +1240,12 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
 
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
             this._parentChildren = parentChildren;
             this._options = options;
             this._rendered = false;
-            this._arguments = arguments;
+            this._arguments = Array.from(arguments);
             this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);

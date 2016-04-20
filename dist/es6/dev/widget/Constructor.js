@@ -811,23 +811,12 @@ define('widget/parsers/applyBinders',[
                             let element = binder.run(true, index);
                             if (isString) {
                                 element.text(item);
-                                if (element.data.tplSet.update === 'true') {
-                                    watch(obj, objKey, ()=> {
-                                        element.text(item);
-                                        let handler = addChildren.elOnChange(context, element);
-                                        if (handler) {
-                                            handler(item);
-                                        }
-
-                                    });
-                                }
                             }
 
                             bindedData.push({
                                 binder: element,
                                 data:   item
                             });
-
 
                             applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);
@@ -1221,13 +1210,12 @@ define('widget/Constructor',[
         constructor(options = {}, parentChildren, dataSet = {}, node) {
             //TODO: for Backwards compatability later need to remove
             this.instance = this;
-            this._appliedRoutes = [];
             this._events = [];
             this._globalEvents = [];
             this._parentChildren = parentChildren;
             this._options = options;
             this._rendered = false;
-            this._arguments = arguments;
+            this._arguments = Array.from(arguments);
             this._dataSet = dataSet;
 
             this.eventBus = new Mediator(this);

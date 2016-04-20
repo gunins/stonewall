@@ -1151,7 +1151,6 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
             _classCallCheck(this, App);
 
             this.options = options;
-
             this.beforeInit.apply(this, arguments);
         }
 
@@ -1191,7 +1190,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
             //      @param {HTMLElement} container
             value: function start(container) {
                 if (container instanceof HTMLElement === true) {
-
+                    this.el = container;
                     this.context = this.setContext.apply(this, arguments);
 
                     if (this.AppContainer !== undefined) {
@@ -1200,9 +1199,8 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
 
                     this.init.call(this, this.options);
 
-                    this.el = container;
                     var el = document.createElement('div');
-                    container.appendChild(el);
+                    this.el.appendChild(el);
                     this.appContainer.ready(el);
                     this.appContainer.setContext(this.context);
 
@@ -1229,7 +1227,8 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
                             }
                         }),
                         active: new Map(),
-                        match: match
+                        match: match,
+                        container: _this6.el
 
                     });
 

@@ -122,6 +122,9 @@
         <span class="hljs-keyword">try</span> {
             <span class="hljs-built_in">eval</span>(<span class="hljs-string">'class Foo {}'</span>);
             <span class="hljs-built_in">eval</span>(<span class="hljs-string">'var bar = (x) =&gt; x+1'</span>);
+            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'function Bar(a="a"){};'</span>);
+            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'function Foo(...a){return [...a]}'</span>);
+            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'var [a,b,c]=[1,2,3]'</span>);
         } <span class="hljs-keyword">catch</span> (e) {
             <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
         }

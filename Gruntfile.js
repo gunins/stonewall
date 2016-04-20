@@ -314,8 +314,8 @@ module.exports = function(grunt) {
             Widget:  {
                 src:  [
                     'node_modules/richtemplate/es6/prod/templating/Decoder.js',
-                    'target/es6/prod/widget/App.js',
-                    'target/es6/prod/widget/Constructor.js'
+                    'target/es6/prod/widget/Constructor.js',
+                    'target/es6/prod/widget/App.js'
                 ],
                 dest: 'target/es6/prod/widget/App.js'
             }
@@ -462,8 +462,8 @@ module.exports = function(grunt) {
                         dest:   'examples/basicTable/target/es5'
                     }
                 ]
-            },  
-            element:  {
+            },
+            element:     {
                 options: {
                     sourceMap: false
                 },
@@ -505,7 +505,11 @@ module.exports = function(grunt) {
         },
         uglify:    {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                mangle: false,
+                compress: {
+                    drop_console: true
+                }
             },
             prod:    {
                 files: [{
@@ -526,20 +530,20 @@ module.exports = function(grunt) {
         },
 
         mocha_phantomjs: {
-            dev: {
+            dev:  {
                 options: {
                     urls: [
                         'http://localhost:8000/test/dev/index.html'
                     ]
                 }
             },
-            /*  prod: {
-             options: {
-             urls: [
-             'http://localhost:8000/test/prod/index.html'
-             ]
-             }
-             }*/
+            prod: {
+                options: {
+                    urls: [
+                        'http://localhost:8000/test/prod/index.html'
+                    ]
+                }
+            }
         },
         connect:         {
             server: {

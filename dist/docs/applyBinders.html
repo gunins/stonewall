@@ -158,23 +158,12 @@ define([
                             <span class="hljs-keyword">let</span> element = binder.run(<span class="hljs-literal">true</span>, index);
                             <span class="hljs-keyword">if</span> (isString) {
                                 element.text(item);
-                                <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
-                                    watch(obj, objKey, ()=&gt; {
-                                        element.text(item);
-                                        <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
-                                        <span class="hljs-keyword">if</span> (handler) {
-                                            handler(item);
-                                        }
-
-                                    });
-                                }
                             }
 
                             bindedData.push({
                                 binder: element,
                                 data:   item
                             });
-
 
                             applyAttribute(context, element, item);
                             addChildren.applyEvents(context, element, item);

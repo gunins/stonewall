@@ -976,7 +976,6 @@ define('widget/App',[
 
         constructor(options = {}) {
             this.options = options;
-
             this.beforeInit.apply(this, arguments);
 
 
@@ -1007,14 +1006,15 @@ define('widget/App',[
             router.match((match)=> {
                 Object.assign(context, {
                     // Creating `EventBus` More info look in `Mediator` Section
-                    eventBus: new Mediator(this.context, (channel, scope)=> {
+                    eventBus:  new Mediator(this.context, (channel, scope)=> {
                         scope._globalEvents = scope._globalEvents || [];
                         if (scope._globalEvents.indexOf(channel) === -1) {
                             scope._globalEvents.push(channel);
                         }
                     }),
-                    active:   new Map(),
-                    match:    match
+                    active:    new Map(),
+                    match:     match,
+                    container: this.el
 
                 });
 
@@ -1033,9 +1033,8 @@ define('widget/App',[
         //      @param {HTMLElement} container
         start(container) {
             if (container instanceof HTMLElement === true) {
-
+                this.el = container;
                 this.context = this.setContext.apply(this, arguments);
-
 
                 if (this.AppContainer !== undefined) {
                     this.appContainer = new this.AppContainer();
@@ -1043,9 +1042,8 @@ define('widget/App',[
 
                 this.init.call(this, this.options);
 
-                this.el = container;
                 let el = document.createElement('div');
-                container.appendChild(el);
+                this.el.appendChild(el);
                 this.appContainer.ready(el);
                 this.appContainer.setContext(this.context);
 

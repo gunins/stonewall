@@ -21,7 +21,7 @@
     "grunt-contrib-connect": "0.11.2",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-contrib-uglify": "^0.11.0",
+    "grunt-contrib-uglify": "1.0.1",
     "grunt-docco": "^0.3.3",
     "grunt-exec": "^0.4.6",
     "grunt-mocha-phantomjs": "3.0.0",
@@ -32,8 +32,8 @@
     "sinon": "^1.17.3"
   },
   "dependencies": {
-    "requirejs": "2.1.20",
-    "richtemplate": "1.0.2",
+    "requirejs": "2.2.0",
+    "richtemplate": "1.0.5",
     "urlmanager": "0.4.2"
   },
   "scripts": {

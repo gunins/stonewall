@@ -195,7 +195,6 @@ Usage Example</p>
 
         <span class="hljs-keyword">constructor</span>(options = {}) {
             <span class="hljs-keyword">this</span>.options = options;
-
             <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
 
 
@@ -271,14 +270,15 @@ Usage Example</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    eventBus: <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>.context, (channel, scope)=&gt; {
+            <div class="content"><div class='highlight'><pre>                    eventBus:  <span class="hljs-keyword">new</span> Mediator(<span class="hljs-keyword">this</span>.context, (channel, scope)=&gt; {
                         scope._globalEvents = scope._globalEvents || [];
                         <span class="hljs-keyword">if</span> (scope._globalEvents.indexOf(channel) === <span class="hljs-number">-1</span>) {
                             scope._globalEvents.push(channel);
                         }
                     }),
-                    active:   <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(),
-                    match:    match
+                    active:    <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(),
+                    match:     match,
+                    container: <span class="hljs-keyword">this</span>.el
 
                 });
 
@@ -308,9 +308,8 @@ Usage Example</p>
             
             <div class="content"><div class='highlight'><pre>        start(container) {
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
-
+                <span class="hljs-keyword">this</span>.el = container;
                 <span class="hljs-keyword">this</span>.context = <span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
-
 
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer();
@@ -318,9 +317,8 @@ Usage Example</p>
 
                 <span class="hljs-keyword">this</span>.init.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.options);
 
-                <span class="hljs-keyword">this</span>.el = container;
                 <span class="hljs-keyword">let</span> el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
-                container.appendChild(el);
+                <span class="hljs-keyword">this</span>.el.appendChild(el);
                 <span class="hljs-keyword">this</span>.appContainer.ready(el);
                 <span class="hljs-keyword">this</span>.appContainer.setContext(<span class="hljs-keyword">this</span>.context);
 

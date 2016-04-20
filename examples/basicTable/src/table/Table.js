@@ -6,14 +6,12 @@ define([
     'templating/parser!./_table.html'
 ], function(Constructor, template) {
     'use strict';
-    function getCoords(elem) {
-        var box = elem.getBoundingClientRect(),
-            body = document.body,
-            docEl = document.documentElement,
-            scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop,
-            scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft,
-            clientTop = docEl.clientTop || body.clientTop || 0,
-            clientLeft = docEl.clientLeft || body.clientLeft || 0,
+    function getCoords(elem, body) {
+        let box = elem.el.getBoundingClientRect(),
+            scrollTop = body.scrollTop,
+            scrollLeft = body.scrollLeft,
+            clientTop = body.clientTop || 0,
+            clientLeft = body.clientLeft || 0,
             top = box.top + scrollTop - clientTop,
             left = box.left + scrollLeft - clientLeft;
 
@@ -73,7 +71,7 @@ define([
             root:  [{
                 name:   'mousemove',
                 action: function(e, el) {
-                    var offset = getCoords(el.el);
+                    var offset = getCoords(el, this.context.container);
                     this.eventBus.publish('move', {
                         pageX: e.pageX - offset.left + 10,
                         pageY: e.pageY - offset.top - 10

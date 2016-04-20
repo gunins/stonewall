@@ -17,6 +17,9 @@
         try {
             eval('class Foo {}');
             eval('var bar = (x) => x+1');
+            eval('function Bar(a="a"){};');
+            eval('function Foo(...a){return [...a]}');
+            eval('var [a,b,c]=[1,2,3]');
         } catch (e) {
             return false;
         }
