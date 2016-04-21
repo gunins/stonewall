@@ -83,7 +83,7 @@
 
             }];
             if (dataset.dev !== 'true') {
-                config.unshift({baseUrl: './target/' + target})
+                config.unshift({baseUrl: (dataset.baseurl ? dataset.baseurl : './target/') + target})
             }
             require.apply(global, config);
 

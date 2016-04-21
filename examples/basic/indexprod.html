@@ -18,9 +18,11 @@
     <script src="config.prod.js"></script>
     <!--
         data-name: location to app
-                data-target?: location to container if not set, use document.body         data-dev?: Define App is in development mode
+                data-target?: location to container if not set, use document.body
+                data-dev?: Define App is in development mode
+                data-baseurl?: Define baseUrl for app
     -->
-    <script data-name="Basic" src="target/loader.js"></script>
+    <script data-name="Basic" data-baseurl="target/" src="target/loader.js"></script>
 
 </head>
 <body>

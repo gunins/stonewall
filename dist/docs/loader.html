@@ -188,7 +188,7 @@
 
             }];
             <span class="hljs-keyword">if</span> (dataset.dev !== <span class="hljs-string">'true'</span>) {
-                config.unshift({baseUrl: <span class="hljs-string">'./target/'</span> + target})
+                config.unshift({baseUrl: (dataset.baseurl ? dataset.baseurl : <span class="hljs-string">'./target/'</span>) + target})
             }
             <span class="hljs-built_in">require</span>.apply(global, config);
 
