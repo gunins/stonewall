@@ -3622,7 +3622,7 @@ define('widget/App',[
     }
 
     // ### App Class
-    // Creater App, EventBus and context for App.
+    // Create App, EventBus and context for App.
     // Usage Example
     //
     //      var app= new App();

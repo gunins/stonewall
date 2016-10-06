@@ -195,7 +195,7 @@ module.exports = function(grunt) {
 
                 }
             },
-            /*         webGL: {
+                 /*    webGL: {
              options: {
              baseUrl: 'examples/webgl/src',
              removeCombined: true,

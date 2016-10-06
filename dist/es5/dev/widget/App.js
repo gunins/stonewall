@@ -1116,7 +1116,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
     }
 
     // ### App Class
-    // Creater App, EventBus and context for App.
+    // Create App, EventBus and context for App.
     // Usage Example
     //
     //      var app= new App();

@@ -115,24 +115,23 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">global</span>) </span>{
-    <span class="hljs-keyword">var</span> checkEs6 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-<span class="hljs-meta">        'use strict'</span>;
+    <span class="hljs-keyword">var</span> es6Samples = [
+            <span class="hljs-string">'class Foo {}'</span>,
+            <span class="hljs-string">'const bar = (x) =&gt; x+1'</span>,
+            <span class="hljs-string">'function Bar(a="a"){};'</span>,
+            <span class="hljs-string">'function Foo(...a){return [...a]}'</span>,
+            <span class="hljs-string">'let [a,b,c]=[1,2,3]'</span>
+        ],
+        checkEs6 = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+<span class="hljs-meta">            'use strict'</span>;
+            <span class="hljs-keyword">try</span> {
+                es6Samples.forEach(<span class="hljs-built_in">eval</span>);
+            } <span class="hljs-keyword">catch</span> (e) {
+                <span class="hljs-keyword">return</span> <span class="hljs-string">'es5'</span>;
+            }
 
-        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">Symbol</span> == <span class="hljs-string">'undefined'</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-        <span class="hljs-keyword">try</span> {
-            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'class Foo {}'</span>);
-            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'var bar = (x) =&gt; x+1'</span>);
-            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'function Bar(a="a"){};'</span>);
-            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'function Foo(...a){return [...a]}'</span>);
-            <span class="hljs-built_in">eval</span>(<span class="hljs-string">'var [a,b,c]=[1,2,3]'</span>);
-        } <span class="hljs-keyword">catch</span> (e) {
-            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-        }
-
-        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-    }();
-    <span class="hljs-keyword">var</span> target = checkEs6 ? <span class="hljs-string">'es6'</span> : <span class="hljs-string">'es5'</span>;
-
+            <span class="hljs-keyword">return</span> <span class="hljs-string">'es6'</span>;
+        }();
     define(<span class="hljs-string">'es6Features'</span>, [<span class="hljs-string">'require'</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">require</span>) </span>{
         <span class="hljs-keyword">var</span> methods = [<span class="hljs-string">'Map'</span>, <span class="hljs-string">'Set'</span>, <span class="hljs-string">'Symbol'</span>];
 
@@ -188,7 +187,15 @@
 
             }];
             <span class="hljs-keyword">if</span> (dataset.dev !== <span class="hljs-string">'true'</span>) {
-                config.unshift({baseUrl: (dataset.baseurl ? dataset.baseurl : <span class="hljs-string">'./target/'</span>) + target})
+                config.unshift({
+                    baseUrl:          (dataset.baseurl ? dataset.baseurl : <span class="hljs-string">'./target/'</span>) + checkEs6,
+                    templateDecoders: [
+                        <span class="hljs-string">'coders/component/cpDecoder'</span>,
+                        <span class="hljs-string">'coders/placeholders/plDecoder'</span>,
+                        <span class="hljs-string">'coders/databind/bdDecoder'</span>,
+                        <span class="hljs-string">'coders/style/styleCoder'</span>
+                    ]
+                })
             }
             <span class="hljs-built_in">require</span>.apply(global, config);
 

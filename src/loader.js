@@ -10,24 +10,23 @@
 //      `<script data-name="App" data-target="body"
 //          src="../../src/loader.js"></script>`
 (function(global) {
-    var checkEs6 = function() {
-        'use strict';
+    var es6Samples = [
+            'class Foo {}',
+            'const bar = (x) => x+1',
+            'function Bar(a="a"){};',
+            'function Foo(...a){return [...a]}',
+            'let [a,b,c]=[1,2,3]'
+        ],
+        checkEs6 = function() {
+            'use strict';
+            try {
+                es6Samples.forEach(eval);
+            } catch (e) {
+                return 'es5';
+            }
 
-        if (typeof Symbol == 'undefined') return false;
-        try {
-            eval('class Foo {}');
-            eval('var bar = (x) => x+1');
-            eval('function Bar(a="a"){};');
-            eval('function Foo(...a){return [...a]}');
-            eval('var [a,b,c]=[1,2,3]');
-        } catch (e) {
-            return false;
-        }
-
-        return true;
-    }();
-    var target = checkEs6 ? 'es6' : 'es5';
-
+            return 'es6';
+        }();
     define('es6Features', ['require'], function(require) {
         var methods = ['Map', 'Set', 'Symbol'];
 
@@ -83,7 +82,15 @@
 
             }];
             if (dataset.dev !== 'true') {
-                config.unshift({baseUrl: (dataset.baseurl ? dataset.baseurl : './target/') + target})
+                config.unshift({
+                    baseUrl:          (dataset.baseurl ? dataset.baseurl : './target/') + checkEs6,
+                    templateDecoders: [
+                        'coders/component/cpDecoder',
+                        'coders/placeholders/plDecoder',
+                        'coders/databind/bdDecoder',
+                        'coders/style/styleCoder'
+                    ]
+                })
             }
             require.apply(global, config);
 
