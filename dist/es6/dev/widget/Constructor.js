@@ -526,7 +526,7 @@ define('widget/parsers/applyAttribute',[
 
     function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update === 'true';
+            update = childBinder.data.tplSet.update;
         if (bind) {
             Object.keys(bind).forEach((bindItem)=> {
                 let key = bind[bindItem],
@@ -647,7 +647,7 @@ define('widget/parsers/applyParent',[
                         }
 
                     } else if (context.nodes[name] !== undefined &&
-                        child.data.tplSet.noattach === 'true') {
+                        child.data.tplSet.noattach) {
                         context.nodes[name].call(context, child, data);
                         add = false;
                     }
@@ -791,7 +791,7 @@ define('widget/parsers/applyBinders',[
                     }
 
 
-                    if (element.data.tplSet.update === 'true') {
+                    if (element.data.tplSet.update) {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
                             let handler = addChildren.elOnChange(context, element);
@@ -838,7 +838,7 @@ define('widget/parsers/applyBinders',[
                     data.forEach(addItem);
 
                     let update = binder.data.tplSet.update;
-                    if (update === 'true') {
+                    if (update) {
                         let removeMethodNames = ['pop', 'shift', 'splice'],
                             insertMethodNames = ['push', 'unshift'],
                             sortingMethodNames = ['reverse', 'sort'];

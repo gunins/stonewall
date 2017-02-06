@@ -30,7 +30,7 @@ define([
                     }
 
 
-                    if (element.data.tplSet.update === 'true') {
+                    if (element.data.tplSet.update) {
                         watch(obj, objKey, () => {
                             element.text(obj[objKey]);
                             let handler = addChildren.elOnChange(context, element);
@@ -77,7 +77,7 @@ define([
                     data.forEach(addItem);
 
                     let update = binder.data.tplSet.update;
-                    if (update === 'true') {
+                    if (update) {
                         let removeMethodNames = ['pop', 'shift', 'splice'],
                             insertMethodNames = ['push', 'unshift'],
                             sortingMethodNames = ['reverse', 'sort'];

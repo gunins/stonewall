@@ -138,7 +138,7 @@ define([
                     }
 
 
-                    <span class="hljs-keyword">if</span> (element.data.tplSet.update === <span class="hljs-string">'true'</span>) {
+                    <span class="hljs-keyword">if</span> (element.data.tplSet.update) {
                         watch(obj, objKey, () =&gt; {
                             element.text(obj[objKey]);
                             <span class="hljs-keyword">let</span> handler = addChildren.elOnChange(context, element);
@@ -185,7 +185,7 @@ define([
                     data.forEach(addItem);
 
                     <span class="hljs-keyword">let</span> update = binder.data.tplSet.update;
-                    <span class="hljs-keyword">if</span> (update === <span class="hljs-string">'true'</span>) {
+                    <span class="hljs-keyword">if</span> (update) {
                         <span class="hljs-keyword">let</span> removeMethodNames = [<span class="hljs-string">'pop'</span>, <span class="hljs-string">'shift'</span>, <span class="hljs-string">'splice'</span>],
                             insertMethodNames = [<span class="hljs-string">'push'</span>, <span class="hljs-string">'unshift'</span>],
                             sortingMethodNames = [<span class="hljs-string">'reverse'</span>, <span class="hljs-string">'sort'</span>];

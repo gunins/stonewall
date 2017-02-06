@@ -29,7 +29,7 @@ define([
                         }
 
                     } else if (context.nodes[name] !== undefined &&
-                        child.data.tplSet.noattach === 'true') {
+                        child.data.tplSet.noattach) {
                         context.nodes[name].call(context, child, data);
                         add = false;
                     }

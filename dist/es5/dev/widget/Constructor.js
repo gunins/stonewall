@@ -534,7 +534,7 @@ define('widget/parsers/applyAttribute', ['watch', './addChildren'], function (Wa
 
     function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update === 'true';
+            update = childBinder.data.tplSet.update;
         if (bind) {
             Object.keys(bind).forEach(function (bindItem) {
                 var key = bind[bindItem],
@@ -666,7 +666,7 @@ define('widget/parsers/applyParent', ['templating/dom', './addChildren'], functi
                                     child = parentChild.run(child.el);
                                 }
                             }
-                        } else if (context.nodes[name] !== undefined && child.data.tplSet.noattach === 'true') {
+                        } else if (context.nodes[name] !== undefined && child.data.tplSet.noattach) {
                             context.nodes[name].call(context, child, data);
                             add = false;
                         }
@@ -800,7 +800,7 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                             handler(data);
                         }
 
-                        if (element.data.tplSet.update === 'true') {
+                        if (element.data.tplSet.update) {
                             watch(obj, objKey, function () {
                                 element.text(obj[objKey]);
                                 var handler = addChildren.elOnChange(context, element);
@@ -847,7 +847,7 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                         data.forEach(addItem);
 
                         var update = binder.data.tplSet.update;
-                        if (update === 'true') {
+                        if (update) {
                             (function () {
                                 var removeMethodNames = ['pop', 'shift', 'splice'],
                                     insertMethodNames = ['push', 'unshift'],

@@ -9,7 +9,7 @@ define([
 
     function applyAttribute(context, childBinder, data) {
         var bind = childBinder.data.tplSet.bind,
-            update = childBinder.data.tplSet.update === 'true';
+            update = childBinder.data.tplSet.update;
         if (bind) {
             Object.keys(bind).forEach((bindItem)=> {
                 let key = bind[bindItem],

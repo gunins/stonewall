@@ -137,7 +137,7 @@ define([
                         }
 
                     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (context.nodes[name] !== <span class="hljs-literal">undefined</span> &amp;&amp;
-                        child.data.tplSet.noattach === <span class="hljs-string">'true'</span>) {
+                        child.data.tplSet.noattach) {
                         context.nodes[name].call(context, child, data);
                         add = <span class="hljs-literal">false</span>;
                     }
