@@ -88,7 +88,8 @@
                         'coders/component/cpDecoder',
                         'coders/placeholders/plDecoder',
                         'coders/databind/bdDecoder',
-                        'coders/style/styleCoder'
+                        'coders/style/styleCoder',
+                        'coders/router/routerDecoder'
                     ]
                 })
             }
