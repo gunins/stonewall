@@ -12,7 +12,7 @@ define([
         let fnStr = func.toString().replace(STRIP_COMMENTS, ''),
             argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
             result = argsList.match(ARGUMENT_NAMES);
-        return (result === null) ? [] : result.map(item=>item.replace(/[\s,]/g, ''));
+        return (result === null) ? [] : result.map(item => item.replace(/[\s,]/g, ''));
     }
 
     function destroyComponent(cp) {
@@ -24,7 +24,7 @@ define([
 
     function applyToChildren(children, cb) {
         if (children !== undefined) {
-            Object.keys(children).forEach((name)=> {
+            Object.keys(children).forEach((name) => {
                 let instance = children[name];
                 if (!applyToGroup(instance, cb)) {
                     cb(instance);
@@ -35,7 +35,7 @@ define([
 
     function applyToGroup(child, cb) {
         if (child.elGroup && child.elGroup.size > 0) {
-            child.elGroup.forEach((childInstance)=> {
+            child.elGroup.forEach((childInstance) => {
                 cb(childInstance);
             });
             return true;
@@ -55,89 +55,89 @@ define([
                     active = context.active,
                     matches = match(route);
 
-                matches.to((...args)=> {
+                matches.to((...args) => {
                     let params = args.pop();
                     id = (args.length > 0) ? params.getLocation() + '_' + args.join('_') : undefined;
 
-                    if (!applyToGroup(child, instance=>dom.attach(instance))) {
+                    if (!applyToGroup(child, instance => dom.attach(instance))) {
                         let childInstance = child.run(true);
-                        applyToChildren(childInstance.children, instance=> {
+                        applyToChildren(childInstance.children, instance => {
                             if (instance) {
-                                match(route, match=> matchRoute(instance, {match, active}));
+                                match(route, match => matchRoute(instance, {match, active}));
                             }
                         });
                     }
-                    applyToGroup(child, (childInstance)=> {
-                        applyToChildren(childInstance.children, instance=> {
+                    applyToGroup(child, (childInstance) => {
+                        applyToChildren(childInstance.children, instance => {
                             if (instance && instance.to) {
                                 instance.to(...args.concat(params));
                             }
                         });
                     });
                 });
-                matches.leave((done)=> {
-                        let items = 0,
-                            stopped = false;
-                        applyToGroup(child, (childInstance)=> {
-                            let finish = ()=> {
-                                    if (!id) {
-                                        dom.detach(childInstance);
-                                    } else {
-                                        destroyComponent(childInstance);
-                                    }
-                                },
-                                close = (close = true)=> {
-                                    if (close) {
-                                        items--;
-                                    } else {
-                                        stopped = true;
-                                        done(false);
-                                    }
-
-                                    if (items === 0 && !stopped) {
-                                        active.set(childInstance, finish);
-                                        done(true);
-                                    }
-
-                                };
-
-                            applyToChildren(childInstance.children, instance=> {
-                                if (instance && instance.leave !== undefined) {
-                                    let args = getArgs(instance.leave);
-                                    if (args.length > 0) {
-                                        items++
-                                    }
-                                    instance.leave(close);
+                //TODO: strange bug done=> causing error (done)=> not
+                matches.leave(done=> {
+                    let items = 0,
+                        stopped = false;
+                    applyToGroup(child, (childInstance) => {
+                        let finish = () => {
+                                if (!id) {
+                                    dom.detach(childInstance);
+                                } else {
+                                    destroyComponent(childInstance);
                                 }
-                            });
+                            },
+                            close = (close = true) => {
+                                if (close) {
+                                    items--;
+                                } else {
+                                    stopped = true;
+                                    done(false);
+                                }
 
-                            if (items === 0) {
-                                active.set(childInstance, finish);
-                                done(true);
+                                if (items === 0 && !stopped) {
+                                    active.set(childInstance, finish);
+                                    done(true);
+                                }
+
+                            };
+
+                        applyToChildren(childInstance.children, instance => {
+                            if (instance && instance.leave !== undefined) {
+                                let args = getArgs(instance.leave);
+                                if (args.length > 0) {
+                                    items++
+                                }
+                                instance.leave(close);
                             }
                         });
-                    }
-                );
 
-                matches.query((params)=> {
-                    applyToGroup(child, (childInstance)=> {
-                        applyToChildren(childInstance.children, (instance)=> {
+                        if (items === 0) {
+                            active.set(childInstance, finish);
+                            done(true);
+                        }
+                    });
+                });
+
+                matches.query((params) => {
+                    applyToGroup(child, (childInstance) => {
+                        applyToChildren(childInstance.children, (instance) => {
                             if (instance && instance.query !== undefined) {
                                 instance.query(params);
                             }
                         });
                     });
                 });
-                applyToGroup(child, instance=>instance._activeRoute = matches);
+                applyToGroup(child, instance => instance._activeRoute = matches);
 
             } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                applyToChildren(child.children, instance=> matchRoute(instance, context));
+                applyToChildren(child.children, instance => matchRoute(instance, context));
             }
         }
     }
 
     function setRoutes(children, context) {
-        applyToChildren(children, child=> matchRoute(child, context));
+        applyToChildren(children, child => matchRoute(child, context));
 
     };
 

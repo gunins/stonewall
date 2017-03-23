@@ -336,7 +336,7 @@
 
     function iterateQueryString(queryString, callback) {
         let keyValues = queryString.split('&');
-        keyValues.forEach((keyValue)=> {
+        keyValues.forEach((keyValue) => {
             let arr = keyValue.split('=');
             callback(arr.shift(), arr.join('='));
         });
@@ -345,7 +345,7 @@
     function setQuery(parts) {
         let query = {};
         if (parts) {
-            iterateQueryString(parts, (name, value)=> {
+            iterateQueryString(parts, (name, value) => {
                 value = parseParams(value);
                 if (!query[name]) {
                     query[name] = value;
@@ -421,10 +421,15 @@
         ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
 
     function getArgs(func) {
-        let fnStr = func.toString().replace(STRIP_COMMENTS, ''),
-            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+        let oneOf = (...patterns) => (string, pos) => patterns
+                .map(pattern => string.indexOf(pattern))
+                .filter(index => index === pos).length > 0,
+            fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            first = oneOf('(', 'function (', 'function(')(fnStr, 0) ? fnStr.indexOf('(') + 1 : 0,
+            last = !oneOf('=>')(fnStr, -1) ? fnStr.indexOf('=>') : fnStr.indexOf(')'),
+            argsList = fnStr.slice(first, last).trim(),
             result = argsList.match(ARGUMENT_NAMES);
-        return (result === null) ? [] : result.map(item=>item.replace(/[\s,]/g, ''));
+        return (result === null) ? [] : result.map(item => item.replace(/[\s,]/g, ''));
     }
 
     return {

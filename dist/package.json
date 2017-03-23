@@ -24,17 +24,19 @@
     "grunt-contrib-uglify": "1.0.1",
     "grunt-docco": "^0.3.3",
     "grunt-exec": "^0.4.6",
+    "grunt-execute": "^0.2.2",
     "grunt-mocha-phantomjs": "3.0.0",
     "jquery": "^2.1.3",
     "less": "2.6.1",
     "mocha": "2.3.0",
     "node-static": "^0.7.6",
-    "sinon": "^1.17.3"
+    "sinon": "^1.17.3",
+    "uglify-js": "github:mishoo/UglifyJS2#harmony"
   },
   "dependencies": {
     "requirejs": "2.2.0",
     "richtemplate": "1.0.6",
-    "urlmanager": "0.4.2"
+    "urlmanager": "0.4.3"
   },
   "scripts": {
     "start": "node server.js",

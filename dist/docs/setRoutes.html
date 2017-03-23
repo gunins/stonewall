@@ -120,7 +120,7 @@ define([
         <span class="hljs-keyword">let</span> fnStr = func.toString().replace(STRIP_COMMENTS, <span class="hljs-string">''</span>),
             argsList = fnStr.slice(fnStr.indexOf(<span class="hljs-string">'('</span>) + <span class="hljs-number">1</span>, fnStr.indexOf(<span class="hljs-string">')'</span>)),
             result = argsList.match(ARGUMENT_NAMES);
-        <span class="hljs-keyword">return</span> (result === <span class="hljs-literal">null</span>) ? [] : result.map(item=&gt;item.replace(<span class="hljs-regexp">/[\s,]/g</span>, <span class="hljs-string">''</span>));
+        <span class="hljs-keyword">return</span> (result === <span class="hljs-literal">null</span>) ? [] : result.map(item =&gt; item.replace(<span class="hljs-regexp">/[\s,]/g</span>, <span class="hljs-string">''</span>));
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroyComponent</span>(<span class="hljs-params">cp</span>) </span>{
@@ -132,7 +132,7 @@ define([
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyToChildren</span>(<span class="hljs-params">children, cb</span>) </span>{
         <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">Object</span>.keys(children).forEach((name)=&gt; {
+            <span class="hljs-built_in">Object</span>.keys(children).forEach((name) =&gt; {
                 <span class="hljs-keyword">let</span> instance = children[name];
                 <span class="hljs-keyword">if</span> (!applyToGroup(instance, cb)) {
                     cb(instance);
@@ -143,7 +143,7 @@ define([
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyToGroup</span>(<span class="hljs-params">child, cb</span>) </span>{
         <span class="hljs-keyword">if</span> (child.elGroup &amp;&amp; child.elGroup.size &gt; <span class="hljs-number">0</span>) {
-            child.elGroup.forEach((childInstance)=&gt; {
+            child.elGroup.forEach((childInstance) =&gt; {
                 cb(childInstance);
             });
             <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
@@ -163,89 +163,102 @@ define([
                     active = context.active,
                     matches = match(route);
 
-                matches.to((...args)=&gt; {
+                matches.to((...args) =&gt; {
                     <span class="hljs-keyword">let</span> params = args.pop();
                     id = (args.length &gt; <span class="hljs-number">0</span>) ? params.getLocation() + <span class="hljs-string">'_'</span> + args.join(<span class="hljs-string">'_'</span>) : <span class="hljs-literal">undefined</span>;
 
-                    <span class="hljs-keyword">if</span> (!applyToGroup(child, instance=&gt;dom.attach(instance))) {
+                    <span class="hljs-keyword">if</span> (!applyToGroup(child, instance =&gt; dom.attach(instance))) {
                         <span class="hljs-keyword">let</span> childInstance = child.run(<span class="hljs-literal">true</span>);
-                        applyToChildren(childInstance.children, instance=&gt; {
+                        applyToChildren(childInstance.children, instance =&gt; {
                             <span class="hljs-keyword">if</span> (instance) {
-                                match(route, match=&gt; matchRoute(instance, {match, active}));
+                                match(route, match =&gt; matchRoute(instance, {match, active}));
                             }
                         });
                     }
-                    applyToGroup(child, (childInstance)=&gt; {
-                        applyToChildren(childInstance.children, instance=&gt; {
+                    applyToGroup(child, (childInstance) =&gt; {
+                        applyToChildren(childInstance.children, instance =&gt; {
                             <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.to) {
                                 instance.to(...args.concat(params));
                             }
                         });
                     });
-                });
-                matches.leave((done)=&gt; {
-                        <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
-                            stopped = <span class="hljs-literal">false</span>;
-                        applyToGroup(child, (childInstance)=&gt; {
-                            <span class="hljs-keyword">let</span> finish = ()=&gt; {
-                                    <span class="hljs-keyword">if</span> (!id) {
-                                        dom.detach(childInstance);
-                                    } <span class="hljs-keyword">else</span> {
-                                        destroyComponent(childInstance);
-                                    }
-                                },
-                                close = (close = <span class="hljs-literal">true</span>)=&gt; {
-                                    <span class="hljs-keyword">if</span> (close) {
-                                        items--;
-                                    } <span class="hljs-keyword">else</span> {
-                                        stopped = <span class="hljs-literal">true</span>;
-                                        done(<span class="hljs-literal">false</span>);
-                                    }
+                });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO: strange bug done=&gt; causing error (done)=&gt; not</p>
 
-                                    <span class="hljs-keyword">if</span> (items === <span class="hljs-number">0</span> &amp;&amp; !stopped) {
-                                        active.set(childInstance, finish);
-                                        done(<span class="hljs-literal">true</span>);
-                                    }
-
-                                };
-
-                            applyToChildren(childInstance.children, instance=&gt; {
-                                <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.leave !== <span class="hljs-literal">undefined</span>) {
-                                    <span class="hljs-keyword">let</span> args = getArgs(instance.leave);
-                                    <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
-                                        items++
-                                    }
-                                    instance.leave(close);
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                matches.leave(done=&gt; {
+                    <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
+                        stopped = <span class="hljs-literal">false</span>;
+                    applyToGroup(child, (childInstance) =&gt; {
+                        <span class="hljs-keyword">let</span> finish = () =&gt; {
+                                <span class="hljs-keyword">if</span> (!id) {
+                                    dom.detach(childInstance);
+                                } <span class="hljs-keyword">else</span> {
+                                    destroyComponent(childInstance);
                                 }
-                            });
+                            },
+                            close = (close = <span class="hljs-literal">true</span>) =&gt; {
+                                <span class="hljs-keyword">if</span> (close) {
+                                    items--;
+                                } <span class="hljs-keyword">else</span> {
+                                    stopped = <span class="hljs-literal">true</span>;
+                                    done(<span class="hljs-literal">false</span>);
+                                }
 
-                            <span class="hljs-keyword">if</span> (items === <span class="hljs-number">0</span>) {
-                                active.set(childInstance, finish);
-                                done(<span class="hljs-literal">true</span>);
+                                <span class="hljs-keyword">if</span> (items === <span class="hljs-number">0</span> &amp;&amp; !stopped) {
+                                    active.set(childInstance, finish);
+                                    done(<span class="hljs-literal">true</span>);
+                                }
+
+                            };
+
+                        applyToChildren(childInstance.children, instance =&gt; {
+                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.leave !== <span class="hljs-literal">undefined</span>) {
+                                <span class="hljs-keyword">let</span> args = getArgs(instance.leave);
+                                <span class="hljs-keyword">if</span> (args.length &gt; <span class="hljs-number">0</span>) {
+                                    items++
+                                }
+                                instance.leave(close);
                             }
                         });
-                    }
-                );
 
-                matches.query((params)=&gt; {
-                    applyToGroup(child, (childInstance)=&gt; {
-                        applyToChildren(childInstance.children, (instance)=&gt; {
+                        <span class="hljs-keyword">if</span> (items === <span class="hljs-number">0</span>) {
+                            active.set(childInstance, finish);
+                            done(<span class="hljs-literal">true</span>);
+                        }
+                    });
+                });
+
+                matches.query((params) =&gt; {
+                    applyToGroup(child, (childInstance) =&gt; {
+                        applyToChildren(childInstance.children, (instance) =&gt; {
                             <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
                                 instance.query(params);
                             }
                         });
                     });
                 });
-                applyToGroup(child, instance=&gt;instance._activeRoute = matches);
+                applyToGroup(child, instance =&gt; instance._activeRoute = matches);
 
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (child.children !== <span class="hljs-literal">undefined</span> &amp;&amp; [<span class="hljs-string">'cp'</span>].indexOf(child.data.type) === <span class="hljs-number">-1</span>) {
-                applyToChildren(child.children, instance=&gt; matchRoute(instance, context));
+                applyToChildren(child.children, instance =&gt; matchRoute(instance, context));
             }
         }
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setRoutes</span>(<span class="hljs-params">children, context</span>) </span>{
-        applyToChildren(children, child=&gt; matchRoute(child, context));
+        applyToChildren(children, child =&gt; matchRoute(child, context));
 
     };
 

@@ -1040,6 +1040,7 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                                 });
                             });
                         });
+                        //TODO: strange bug done=> causing error (done)=> not
                         matches.leave(function (done) {
                             var items = 0,
                                 stopped = false;

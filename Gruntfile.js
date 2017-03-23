@@ -75,7 +75,8 @@ module.exports = function(grunt) {
         clean:     ['target', 'dist', 'examples/**/target'],
         exec:      {
             npmpack: 'npm pack dist',
-            publish: 'npm publish dist'
+            publish: 'npm publish dist',
+            uglifyEs6:'./node_modules/.bin/uglifyjs target/es6/prod/widget/App.js -o target/es6/prod/widget/App.js -c -m -r done'
         },
         requirejs: {
             prod:        {
@@ -590,7 +591,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bump');
 
     grunt.registerTask('test', ['connect', 'mocha_phantomjs']);
-    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'babel', 'uglify', 'copy', 'test', 'docco']);
+    grunt.registerTask('default', ['clean', 'requirejs', 'concat', 'babel', 'uglify', 'exec:uglifyEs6', 'copy', 'test', 'docco']);
     grunt.registerTask('publish', ['default', 'bump', 'exec:publish']);
 
 };

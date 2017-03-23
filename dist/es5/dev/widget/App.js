@@ -506,8 +506,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         ARGUMENT_NAMES = /(?:^|,)\s*([^\s,=]+)/g;
 
     function getArgs(func) {
-        var fnStr = func.toString().replace(STRIP_COMMENTS, ''),
-            argsList = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')),
+        var oneOf = function oneOf() {
+            for (var _len2 = arguments.length, patterns = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                patterns[_key2] = arguments[_key2];
+            }
+
+            return function (string, pos) {
+                return patterns.map(function (pattern) {
+                    return string.indexOf(pattern);
+                }).filter(function (index) {
+                    return index === pos;
+                }).length > 0;
+            };
+        },
+            fnStr = func.toString().replace(STRIP_COMMENTS, ''),
+            first = oneOf('(', 'function (', 'function(')(fnStr, 0) ? fnStr.indexOf('(') + 1 : 0,
+            last = !oneOf('=>')(fnStr, -1) ? fnStr.indexOf('=>') : fnStr.indexOf(')'),
+            argsList = fnStr.slice(first, last).trim(),
             result = argsList.match(ARGUMENT_NAMES);
         return result === null ? [] : result.map(function (item) {
             return item.replace(/[\s,]/g, '');
