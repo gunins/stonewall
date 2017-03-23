@@ -234,7 +234,6 @@ Basic Usage example</p>
                 <span class="hljs-keyword">this</span>.name = node.name;
             }
 
-            <span class="hljs-keyword">this</span>.beforeInit(...this._arguments);
 
 
         };
@@ -246,6 +245,7 @@ Basic Usage example</p>
 
         setContext(context) {
             <span class="hljs-keyword">this</span>.context = context;
+            <span class="hljs-keyword">this</span>.beforeInit(...this._arguments);
 
             <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.async) {
                 <span class="hljs-keyword">this</span>.render();

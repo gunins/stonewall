@@ -1224,7 +1224,6 @@ define('widget/Constructor',[
                 this.name = node.name;
             }
 
-            this.beforeInit(...this._arguments);
 
 
         };
@@ -1236,6 +1235,7 @@ define('widget/Constructor',[
 
         setContext(context) {
             this.context = context;
+            this.beforeInit(...this._arguments);
 
             if (!this.async) {
                 this.render();
