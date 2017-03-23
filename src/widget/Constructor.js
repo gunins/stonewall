@@ -44,11 +44,11 @@ define([
     function destroy(instance) {
         let keys = Object.keys(instance);
         if (keys.length > 0) {
-            keys.forEach((key)=> {
+            keys.forEach((key) => {
                 if (key !== 'root') {
                     let children = instance[key];
                     if (children.elGroup !== undefined && children.elGroup.size > 0) {
-                        children.elGroup.forEach(child=> {
+                        children.elGroup.forEach(child => {
                             if (child !== undefined && child.remove !== undefined) {
                                 child.remove(true);
                             }
@@ -117,13 +117,13 @@ define([
                     this.data = contextData[this._options.bind] || contextData;
                 }
             }
-            context.match((match)=> {
+            context.match((match) => {
                 if (this.match) {
                     this.match(match);
                 }
 
                 this._context = Object.assign({
-                    match: match
+                    match:     match
                 }, context);
             });
         }
@@ -220,7 +220,6 @@ define([
         //      @method loadCss
         //      @param {string} url
         loadCss(url) {
-            this.context._cssReady = this.context._cssReady || [];
             if (this.context._cssReady.indexOf(url) === -1) {
                 this.context._cssReady.push(url);
                 let linkRef = document.createElement("link");
@@ -346,7 +345,7 @@ define([
                     tag:  'div',
                     type: 'cp'
                 },
-                run:  (container)=> {
+                run:  (container) => {
                     options.appContext = this.context;
                     let cp = new Component(options, options.children, options.data),
                         el = document.createElement('div');

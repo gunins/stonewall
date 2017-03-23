@@ -1372,7 +1372,6 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             //      @method loadCss
             //      @param {string} url
             value: function loadCss(url) {
-                this.context._cssReady = this.context._cssReady || [];
                 if (this.context._cssReady.indexOf(url) === -1) {
                     this.context._cssReady.push(url);
                     var linkRef = document.createElement("link");

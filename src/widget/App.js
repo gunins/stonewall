@@ -102,7 +102,8 @@ define([
                     }),
                     active:    new Map(),
                     match:     match,
-                    container: this.el
+                    container: this.el,
+                    _cssReady: context._cssReady || []
 
                 });
 

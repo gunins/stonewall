@@ -1243,7 +1243,8 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
                         }),
                         active: new Map(),
                         match: match,
-                        container: _this6.el
+                        container: _this6.el,
+                        _cssReady: context._cssReady || []
 
                     });
 

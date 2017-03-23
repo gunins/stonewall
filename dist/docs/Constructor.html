@@ -164,11 +164,11 @@ Basic Usage example</p>
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroy</span>(<span class="hljs-params">instance</span>) </span>{
         <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(instance);
         <span class="hljs-keyword">if</span> (keys.length &gt; <span class="hljs-number">0</span>) {
-            keys.forEach((key)=&gt; {
+            keys.forEach((key) =&gt; {
                 <span class="hljs-keyword">if</span> (key !== <span class="hljs-string">'root'</span>) {
                     <span class="hljs-keyword">let</span> children = instance[key];
                     <span class="hljs-keyword">if</span> (children.elGroup !== <span class="hljs-literal">undefined</span> &amp;&amp; children.elGroup.size &gt; <span class="hljs-number">0</span>) {
-                        children.elGroup.forEach(child=&gt; {
+                        children.elGroup.forEach(child =&gt; {
                             <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span> &amp;&amp; child.remove !== <span class="hljs-literal">undefined</span>) {
                                 child.remove(<span class="hljs-literal">true</span>);
                             }
@@ -261,13 +261,13 @@ Basic Usage example</p>
                     <span class="hljs-keyword">this</span>.data = contextData[<span class="hljs-keyword">this</span>._options.bind] || contextData;
                 }
             }
-            context.match((match)=&gt; {
+            context.match((match) =&gt; {
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.match) {
                     <span class="hljs-keyword">this</span>.match(match);
                 }
 
                 <span class="hljs-keyword">this</span>._context = <span class="hljs-built_in">Object</span>.assign({
-                    match: match
+                    match:     match
                 }, context);
             });
         }
@@ -418,7 +418,6 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        loadCss(url) {
-            <span class="hljs-keyword">this</span>.context._cssReady = <span class="hljs-keyword">this</span>.context._cssReady || [];
             <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.context._cssReady.indexOf(url) === <span class="hljs-number">-1</span>) {
                 <span class="hljs-keyword">this</span>.context._cssReady.push(url);
                 <span class="hljs-keyword">let</span> linkRef = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">"link"</span>);
@@ -612,7 +611,7 @@ Basic Usage example</p>
                     tag:  <span class="hljs-string">'div'</span>,
                     type: <span class="hljs-string">'cp'</span>
                 },
-                run:  (container)=&gt; {
+                run:  (container) =&gt; {
                     options.appContext = <span class="hljs-keyword">this</span>.context;
                     <span class="hljs-keyword">let</span> cp = <span class="hljs-keyword">new</span> Component(options, options.children, options.data),
                         el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
