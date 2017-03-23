@@ -49,14 +49,14 @@
             'coders/component/CpCoder',
             'coders/placeholders/plCoder',
             'coders/databind/bdCoder',
-            'coders/router/RouterCoder',
+            'coders/router/routerCoder',
             'coders/style/styleCoder'
         ],
         templateDecoders: [
             'coders/component/CpDecoder',
             'coders/placeholders/plDecoder',
             'coders/databind/bdDecoder',
-            'coders/router/RouterDecoder',
+            'coders/router/routerDecoder',
             'coders/style/styleDecoder'
         ]
     };

@@ -5,7 +5,7 @@ require.config({
         'coders/component/CpDecoder',
         'coders/placeholders/plDecoder',
         'coders/databind/bdDecoder',
-        'coders/router/RouterDecoder',
+        'coders/router/routerDecoder',
         'coders/style/styleDecoder'
     ]
 });
