@@ -90,8 +90,6 @@ define([
                 this.name = node.name;
             }
 
-            this.beforeInit(...this._arguments);
-
 
         };
 
@@ -102,6 +100,7 @@ define([
 
         setContext(context) {
             this.context = context;
+            this.beforeInit(...this._arguments);
 
             if (!this.async) {
                 this.render();
@@ -123,7 +122,7 @@ define([
                 }
 
                 this._context = Object.assign({
-                    match:     match
+                    match: match
                 }, context);
             });
         }
