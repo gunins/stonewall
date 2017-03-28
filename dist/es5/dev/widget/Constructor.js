@@ -1254,6 +1254,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
+            this.beforeInit.apply(this, _toConsumableArray(this._arguments));
         }
 
         _createClass(Constructor, [{
@@ -1265,7 +1266,6 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             key: 'setContext',
             value: function setContext(context) {
                 this.context = context;
-                this.beforeInit.apply(this, _toConsumableArray(this._arguments));
 
                 if (!this.async) {
                     this.render();

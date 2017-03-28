@@ -233,19 +233,15 @@ Basic Usage example</p>
             <span class="hljs-keyword">if</span> (node !== <span class="hljs-literal">undefined</span> &amp;&amp; node.name !== <span class="hljs-literal">undefined</span>) {
                 <span class="hljs-keyword">this</span>.name = node.name;
             }
-
-
-
+            <span class="hljs-keyword">this</span>.beforeInit(...this._arguments);
         };
 
         ready(el) {
             <span class="hljs-keyword">this</span>.el = el;
-
         }
 
         setContext(context) {
             <span class="hljs-keyword">this</span>.context = context;
-            <span class="hljs-keyword">this</span>.beforeInit(...this._arguments);
 
             <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.async) {
                 <span class="hljs-keyword">this</span>.render();
@@ -267,7 +263,7 @@ Basic Usage example</p>
                 }
 
                 <span class="hljs-keyword">this</span>._context = <span class="hljs-built_in">Object</span>.assign({
-                    match:     match
+                    match: match
                 }, context);
             });
         }

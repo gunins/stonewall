@@ -89,18 +89,15 @@ define([
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
-
-
+            this.beforeInit(...this._arguments);
         };
 
         ready(el) {
             this.el = el;
-
         }
 
         setContext(context) {
             this.context = context;
-            this.beforeInit(...this._arguments);
 
             if (!this.async) {
                 this.render();

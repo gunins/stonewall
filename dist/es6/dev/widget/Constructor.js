@@ -1223,19 +1223,15 @@ define('widget/Constructor',[
             if (node !== undefined && node.name !== undefined) {
                 this.name = node.name;
             }
-
-
-
+            this.beforeInit(...this._arguments);
         };
 
         ready(el) {
             this.el = el;
-
         }
 
         setContext(context) {
             this.context = context;
-            this.beforeInit(...this._arguments);
 
             if (!this.async) {
                 this.render();
@@ -1257,7 +1253,7 @@ define('widget/Constructor',[
                 }
 
                 this._context = Object.assign({
-                    match:     match
+                    match: match
                 }, context);
             });
         }
