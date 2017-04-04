@@ -201,7 +201,7 @@ define([
 
         // Running when widget is rendered
         //
-        //      @method beforeInit
+        //      @method rendered
         //      @param {Object} data (comes from template data attributes)
         //      @param {Object} children (comes placeholder content
         //      from template)
@@ -297,15 +297,22 @@ define([
         //  @method setChildren
         //  @param {Element} el
         //  @param {Object} data
+        //TODO: need to write tests for async operations.
         setChildren(el, data) {
             let name = el.data.name,
                 instance = this.children[name];
+
             if (instance !== undefined && instance.el !== undefined) {
                 instance.remove();
             }
 
-            instance = el.run(data || true);
-            addChildren(this, instance, data);
+            let newInstance = el.run(data || true);
+            if (newInstance.setContext) {
+                newInstance.setContext(this.context);
+            }
+            addChildren(this, newInstance, data);
+            return newInstance;
+
         };
 
         // Adding Dynamic components

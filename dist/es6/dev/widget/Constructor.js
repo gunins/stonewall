@@ -469,15 +469,15 @@
  */
 define('widget/parsers/addChildren',[], function() {
     'use strict';
-    function addChildren(context, child, data) {
-        if (child && child.name && context) {
-            applyEvents(context, child, data);
-            elReady(context, child, data);
-            let handler = elOnChange(context, child);
+    function addChildren(parent, child, data) {
+        if (child && child.name && parent) {
+            applyEvents(parent, child, data);
+            elReady(parent, child, data);
+            let handler = elOnChange(parent, child);
             if (handler) {
                 handler(data);
             }
-            context.children[child.name] = child;
+            parent.children[child.name] = child;
             return child;
         }
     };
@@ -1018,7 +1018,7 @@ define('widget/parsers/setRoutes',[
                         });
                     });
                 });
-                //TODO: strange bug done=> causing error (done)=> not
+
                 matches.leave(done=> {
                     let items = 0,
                         stopped = false;
@@ -1335,7 +1335,7 @@ define('widget/Constructor',[
 
         // Running when widget is rendered
         //
-        //      @method beforeInit
+        //      @method rendered
         //      @param {Object} data (comes from template data attributes)
         //      @param {Object} children (comes placeholder content
         //      from template)
@@ -1431,15 +1431,22 @@ define('widget/Constructor',[
         //  @method setChildren
         //  @param {Element} el
         //  @param {Object} data
+        //TODO: need to write tests for async operations.
         setChildren(el, data) {
             let name = el.data.name,
                 instance = this.children[name];
+
             if (instance !== undefined && instance.el !== undefined) {
                 instance.remove();
             }
 
-            instance = el.run(data || true);
-            addChildren(this, instance, data);
+            let newInstance = el.run(data || true);
+            if (newInstance.setContext) {
+                newInstance.setContext(this.context);
+            }
+            addChildren(this, newInstance, data);
+            return newInstance;
+
         };
 
         // Adding Dynamic components

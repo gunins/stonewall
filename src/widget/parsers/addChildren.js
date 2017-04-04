@@ -3,15 +3,15 @@
  */
 define([], function() {
     'use strict';
-    function addChildren(context, child, data) {
-        if (child && child.name && context) {
-            applyEvents(context, child, data);
-            elReady(context, child, data);
-            let handler = elOnChange(context, child);
+    function addChildren(parent, child, data) {
+        if (child && child.name && parent) {
+            applyEvents(parent, child, data);
+            elReady(parent, child, data);
+            let handler = elOnChange(parent, child);
             if (handler) {
                 handler(data);
             }
-            context.children[child.name] = child;
+            parent.children[child.name] = child;
             return child;
         }
     };

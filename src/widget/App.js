@@ -64,9 +64,7 @@ define([
 
         constructor(options = {}) {
             this.options = options;
-            this.beforeInit.apply(this, arguments);
-
-
+            this.beforeInit(...arguments);
         }
 
 
@@ -123,13 +121,13 @@ define([
         start(container) {
             if (container instanceof HTMLElement === true) {
                 this.el = container;
-                this.context = this.setContext.apply(this, arguments);
+                this.context = this.setContext(...arguments);
 
                 if (this.AppContainer !== undefined) {
                     this.appContainer = new this.AppContainer();
                 }
 
-                this.init.call(this, this.options);
+                this.init(this.options);
 
                 let el = document.createElement('div');
                 this.el.appendChild(el);

@@ -42,8 +42,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var Subscriber = function () {
         function Subscriber(fn, options) {
-            var context = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-            var channel = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+            var context = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+            var channel = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
             _classCallCheck(this, Subscriber);
 
@@ -61,7 +61,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // or options object. It takes in an object and looks for fn, context, or
             // options keys.
             value: function update() {
-                var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
                 Object.assign(this, options);
                 if (this.channel) {
@@ -164,7 +164,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // through the Mediator instance.
 
             value: function addSubscriber(fn, options) {
-                var context = arguments.length <= 2 || arguments[2] === undefined ? this.context : arguments[2];
+                var context = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.context;
 
                 return new Subscriber(fn, options, context, this);
             }
@@ -291,8 +291,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var Mediator = function () {
         function Mediator() {
-            var context = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-            var hook = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var context = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            var hook = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             _classCallCheck(this, Mediator);
 
@@ -328,7 +328,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // index.
 
             value: function subscribe(channelName, fn) {
-                var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+                var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
                 var context = arguments[3];
 
                 if (channelName && channelName !== '') {
@@ -349,7 +349,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // index.
 
             value: function once(channelName, fn) {
-                var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+                var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
                 var context = arguments[3];
 
                 options.calls = 1;
@@ -465,7 +465,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return params.query;
             },
             getLocation: function getLocation() {
-                var fragment = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+                var fragment = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
                 var isQuery = arguments[1];
 
                 var current = params.root.substring(0, params.root.length - pattern.length),
@@ -727,7 +727,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function applyHandlers(handlers) {
                 var _this = this;
 
-                var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+                var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
                 if (handlers && handlers.size > 0) {
                     handlers.forEach(function (item) {
@@ -751,7 +751,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 items++;
                             }
                             item.handler(function () {
-                                var done = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+                                var done = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
                                 if (done) {
                                     items--;
@@ -957,26 +957,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this3 = this;
 
                 if (this.started) {
-                    (function () {
-                        // this.started = false;
-                        _this3.currLocation = location;
-                        var parts = location.split('?', 2),
-                            segments = _this3.getLocation(parts[0]);
-                        if (segments || segments === '') {
-                            (function () {
-                                var query = utils.setQuery(parts[1]),
-                                    params = {
-                                    root: segments,
-                                    query: query
-                                };
-                                _this3.execute(segments, params).then(function (move) {
-                                    return _this3.setRoutes(move, segments, params);
-                                }).then(function (move) {
-                                    return _this3.setLocation(move);
-                                });
-                            })();
-                        }
-                    })();
+                    // this.started = false;
+                    this.currLocation = location;
+                    var parts = location.split('?', 2),
+                        segments = this.getLocation(parts[0]);
+                    if (segments || segments === '') {
+                        var query = utils.setQuery(parts[1]),
+                            params = {
+                            root: segments,
+                            query: query
+                        };
+                        this.execute(segments, params).then(function (move) {
+                            return _this3.setRoutes(move, segments, params);
+                        }).then(function (move) {
+                            return _this3.setLocation(move);
+                        });
+                    }
                 }
             }
         }, {
@@ -1141,7 +1137,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
         _createClass(App, null, [{
             key: 'extend',
             value: function extend() {
-                var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
                 var Surrogate = function (_App) {
                     _inherits(Surrogate, _App);
@@ -1149,7 +1145,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
                     function Surrogate() {
                         _classCallCheck(this, Surrogate);
 
-                        return _possibleConstructorReturn(this, Object.getPrototypeOf(Surrogate).apply(this, arguments));
+                        return _possibleConstructorReturn(this, (Surrogate.__proto__ || Object.getPrototypeOf(Surrogate)).apply(this, arguments));
                     }
 
                     return Surrogate;
@@ -1161,7 +1157,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
         }]);
 
         function App() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
             _classCallCheck(this, App);
 
@@ -1212,7 +1208,7 @@ define('widget/App', ['./Mediator', 'router/Router'], function (Mediator, Router
                         this.appContainer = new this.AppContainer();
                     }
 
-                    this.init.call(this, this.options);
+                    this.init(this.options);
 
                     var el = document.createElement('div');
                     this.el.appendChild(el);

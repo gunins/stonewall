@@ -75,7 +75,7 @@ define([
                         });
                     });
                 });
-                //TODO: strange bug done=> causing error (done)=> not
+
                 matches.leave(done=> {
                     let items = 0,
                         stopped = false;

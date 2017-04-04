@@ -479,15 +479,15 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 define('widget/parsers/addChildren', [], function () {
     'use strict';
 
-    function addChildren(context, child, data) {
-        if (child && child.name && context) {
-            applyEvents(context, child, data);
-            elReady(context, child, data);
-            var handler = elOnChange(context, child);
+    function addChildren(parent, child, data) {
+        if (child && child.name && parent) {
+            applyEvents(parent, child, data);
+            elReady(parent, child, data);
+            var handler = elOnChange(parent, child);
             if (handler) {
                 handler(data);
             }
-            context.children[child.name] = child;
+            parent.children[child.name] = child;
             return child;
         }
     };
@@ -623,14 +623,12 @@ define('widget/parsers/applyAttribute', ['watch', './addChildren'], function (Wa
                     }
                 }
                 if (update === true) {
-                    (function () {
-                        var handler = addChildren.elOnChange(context, childBinder);
-                        if (handler) {
-                            watch(data, key, function () {
-                                return handler(data);
-                            });
-                        }
-                    })();
+                    var handler = addChildren.elOnChange(context, childBinder);
+                    if (handler) {
+                        watch(data, key, function () {
+                            return handler(data);
+                        });
+                    }
                 }
             });
         }
@@ -644,38 +642,36 @@ define('widget/parsers/applyAttribute', ['watch', './addChildren'], function (Wa
 define('widget/parsers/applyParent', ['templating/dom', './addChildren'], function (dom, addChildren) {
 
     function setChildren(context) {
-        var parentChildren = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-        var data = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+        var parentChildren = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
         if (context) {
-            (function () {
-                var elements = context.children;
+            var elements = context.children;
 
-                if (elements) {
-                    Object.keys(elements).forEach(function (name) {
-                        var add = true,
-                            child = elements[name],
-                            parentChild = parentChildren[name];
-                        if (parentChild !== undefined) {
-                            if (context.nodes[name] !== undefined) {
-                                context.nodes[name].call(context, child, parentChild, data);
-                            } else if (child !== undefined) {
-                                if (typeof parentChild === 'string') {
-                                    dom.text(child, parentChild);
-                                } else {
-                                    child = parentChild.run(child.el);
-                                }
+            if (elements) {
+                Object.keys(elements).forEach(function (name) {
+                    var add = true,
+                        child = elements[name],
+                        parentChild = parentChildren[name];
+                    if (parentChild !== undefined) {
+                        if (context.nodes[name] !== undefined) {
+                            context.nodes[name].call(context, child, parentChild, data);
+                        } else if (child !== undefined) {
+                            if (typeof parentChild === 'string') {
+                                dom.text(child, parentChild);
+                            } else {
+                                child = parentChild.run(child.el);
                             }
-                        } else if (context.nodes[name] !== undefined && child.data.tplSet.noattach) {
-                            context.nodes[name].call(context, child, data);
-                            add = false;
                         }
-                        if (add && child.elGroup.size > 0) {
-                            addChildren(context, child, data);
-                        }
-                    });
-                }
-            })();
+                    } else if (context.nodes[name] !== undefined && child.data.tplSet.noattach) {
+                        context.nodes[name].call(context, child, data);
+                        add = false;
+                    }
+                    if (add && child.elGroup.size > 0) {
+                        addChildren(context, child, data);
+                    }
+                });
+            }
         }
     }
 
@@ -790,110 +786,104 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                 context.nodes[objKey].call(context, binder, data);
             } else {
                 if (!utils.isArray(data) && !utils.isObject(data)) {
-                    (function () {
-                        var element = binder.run(true);
-                        element.text(data);
-                        addChildren.applyEvents(context, element, data);
-                        addChildren.elReady(context, element, data);
-                        var handler = addChildren.elOnChange(context, element);
-                        if (handler) {
-                            handler(data);
-                        }
+                    var element = binder.run(true);
+                    element.text(data);
+                    addChildren.applyEvents(context, element, data);
+                    addChildren.elReady(context, element, data);
+                    var handler = addChildren.elOnChange(context, element);
+                    if (handler) {
+                        handler(data);
+                    }
 
-                        if (element.data.tplSet.update) {
-                            watch(obj, objKey, function () {
-                                element.text(obj[objKey]);
-                                var handler = addChildren.elOnChange(context, element);
-                                if (handler) {
-                                    handler(obj[objKey]);
-                                }
-                            });
-                        }
-                    })();
-                } else if (utils.isArray(data)) {
-                    (function () {
-
-                        var bindedData = [],
-                            addItem = function addItem(item, index) {
-                            var isString = false;
-                            if (!utils.isArray(item) && !utils.isObject(item)) {
-                                isString = true;
-                            }
-                            var element = binder.run(true, index);
-                            if (isString) {
-                                element.text(item);
-                            }
-
-                            bindedData.push({
-                                binder: element,
-                                data: item
-                            });
-
-                            applyAttribute(context, element, item);
-                            addChildren.applyEvents(context, element, item);
-                            addChildren.elReady(context, element, item);
-
+                    if (element.data.tplSet.update) {
+                        watch(obj, objKey, function () {
+                            element.text(obj[objKey]);
                             var handler = addChildren.elOnChange(context, element);
                             if (handler) {
-                                handler(item);
+                                handler(obj[objKey]);
                             }
+                        });
+                    }
+                } else if (utils.isArray(data)) {
 
-                            if (element.children) {
-                                element.bindings = setBinders(element.children);
-                                applyBinders(context, item, element);
-                            }
-                        };
+                    var bindedData = [],
+                        addItem = function addItem(item, index) {
+                        var isString = false;
+                        if (!utils.isArray(item) && !utils.isObject(item)) {
+                            isString = true;
+                        }
+                        var element = binder.run(true, index);
+                        if (isString) {
+                            element.text(item);
+                        }
 
-                        data.forEach(addItem);
+                        bindedData.push({
+                            binder: element,
+                            data: item
+                        });
 
-                        var update = binder.data.tplSet.update;
-                        if (update) {
-                            (function () {
-                                var removeMethodNames = ['pop', 'shift', 'splice'],
-                                    insertMethodNames = ['push', 'unshift'],
-                                    sortingMethodNames = ['reverse', 'sort'];
-                                watch(obj, objKey, function (prop, action, newValue, oldValue) {
-                                    var clonedData = bindedData.slice(0);
-                                    if (oldValue === undefined && insertMethodNames.indexOf(action) !== -1) {
-                                        var filter = clonedData.filter(function (item) {
-                                            return item.data === newValue[0];
-                                        });
+                        applyAttribute(context, element, item);
+                        addChildren.applyEvents(context, element, item);
+                        addChildren.elReady(context, element, item);
 
-                                        if (filter.length === 0) {
-                                            addItem(newValue[0], action === 'unshift' ? 0 : clonedData.length);
-                                        }
-                                    } else if (removeMethodNames.indexOf(action) !== -1) {
-                                        clonedData.forEach(function (binder) {
-                                            if (obj[objKey].indexOf(binder.data) === -1) {
-                                                binder.binder.remove();
-                                                bindedData.splice(bindedData.indexOf(binder), 1);
-                                            }
-                                        });
+                        var handler = addChildren.elOnChange(context, element);
+                        if (handler) {
+                            handler(item);
+                        }
 
-                                        if (action === 'splice') {
-                                            var vals = Array.prototype.slice.call(newValue, 2);
-                                            if (vals && vals.length > 0) {
-                                                vals.forEach(function (val) {
-                                                    var index = obj[objKey].indexOf(val);
-                                                    if (index !== -1) {
-                                                        addItem(val, index);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    } else if (sortingMethodNames.indexOf(action) !== -1) {
-                                        data.forEach(function (value, index) {
-                                            var element = clonedData.filter(function (item) {
-                                                return item.data === value;
-                                            })[0];
-                                            bindedData.splice(index, 0, bindedData.splice(bindedData.indexOf(element), 1)[0]);
-                                            element.binder.changePosition(index);
-                                        });
+                        if (element.children) {
+                            element.bindings = setBinders(element.children);
+                            applyBinders(context, item, element);
+                        }
+                    };
+
+                    data.forEach(addItem);
+
+                    var update = binder.data.tplSet.update;
+                    if (update) {
+                        var removeMethodNames = ['pop', 'shift', 'splice'],
+                            insertMethodNames = ['push', 'unshift'],
+                            sortingMethodNames = ['reverse', 'sort'];
+                        watch(obj, objKey, function (prop, action, newValue, oldValue) {
+                            var clonedData = bindedData.slice(0);
+                            if (oldValue === undefined && insertMethodNames.indexOf(action) !== -1) {
+                                var filter = clonedData.filter(function (item) {
+                                    return item.data === newValue[0];
+                                });
+
+                                if (filter.length === 0) {
+                                    addItem(newValue[0], action === 'unshift' ? 0 : clonedData.length);
+                                }
+                            } else if (removeMethodNames.indexOf(action) !== -1) {
+                                clonedData.forEach(function (binder) {
+                                    if (obj[objKey].indexOf(binder.data) === -1) {
+                                        binder.binder.remove();
+                                        bindedData.splice(bindedData.indexOf(binder), 1);
                                     }
                                 });
-                            })();
-                        }
-                    })();
+
+                                if (action === 'splice') {
+                                    var vals = Array.prototype.slice.call(newValue, 2);
+                                    if (vals && vals.length > 0) {
+                                        vals.forEach(function (val) {
+                                            var index = obj[objKey].indexOf(val);
+                                            if (index !== -1) {
+                                                addItem(val, index);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (sortingMethodNames.indexOf(action) !== -1) {
+                                data.forEach(function (value, index) {
+                                    var element = clonedData.filter(function (item) {
+                                        return item.data === value;
+                                    })[0];
+                                    bindedData.splice(index, 0, bindedData.splice(bindedData.indexOf(element), 1)[0]);
+                                    element.binder.changePosition(index);
+                                });
+                            }
+                        });
+                    }
                 } else if (utils.isObject(data)) {
                     var _element = binder.run(data);
                     if (_element.data.type !== 'cp') {
@@ -936,17 +926,15 @@ define('widget/parsers/applyBinders', ['templating/dom', '../utils', 'watch', '.
                             return parseBinder(child, binderKey, obj, binder);
                         });
                     } else {
-                        (function () {
-                            var fn = function fn(prop, action, newValue, oldValue) {
-                                if (newValue !== undefined && oldValue === undefined) {
-                                    binders[binderKey].forEach(function (binder) {
-                                        return parseBinder(child, binderKey, obj, binder);
-                                    });
-                                    unwatch(obj, binderKey, fn);
-                                }
-                            };
-                            watch(obj, binderKey, fn, 0);
-                        })();
+                        var fn = function fn(prop, action, newValue, oldValue) {
+                            if (newValue !== undefined && oldValue === undefined) {
+                                binders[binderKey].forEach(function (binder) {
+                                    return parseBinder(child, binderKey, obj, binder);
+                                });
+                                unwatch(obj, binderKey, fn);
+                            }
+                        };
+                        watch(obj, binderKey, fn, 0);
                     }
                 });
             }
@@ -1003,107 +991,103 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
         if (child.setContext) {
             child.setContext(context);
         } else {
-            (function () {
-                var route = child.data !== undefined ? child.data.route : undefined;
-                if (route !== undefined && child.data.type === 'rt') {
-                    (function () {
-                        var id = void 0,
-                            match = context.match,
-                            active = context.active,
-                            matches = match(route);
+            var route = child.data !== undefined ? child.data.route : undefined;
+            if (route !== undefined && child.data.type === 'rt') {
+                var id = void 0,
+                    match = context.match,
+                    active = context.active,
+                    matches = match(route);
 
-                        matches.to(function () {
-                            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                                args[_key] = arguments[_key];
-                            }
+                matches.to(function () {
+                    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                        args[_key] = arguments[_key];
+                    }
 
-                            var params = args.pop();
-                            id = args.length > 0 ? params.getLocation() + '_' + args.join('_') : undefined;
+                    var params = args.pop();
+                    id = args.length > 0 ? params.getLocation() + '_' + args.join('_') : undefined;
 
-                            if (!applyToGroup(child, function (instance) {
-                                return dom.attach(instance);
-                            })) {
-                                var childInstance = child.run(true);
-                                applyToChildren(childInstance.children, function (instance) {
-                                    if (instance) {
-                                        match(route, function (match) {
-                                            return matchRoute(instance, { match: match, active: active });
-                                        });
-                                    }
+                    if (!applyToGroup(child, function (instance) {
+                        return dom.attach(instance);
+                    })) {
+                        var childInstance = child.run(true);
+                        applyToChildren(childInstance.children, function (instance) {
+                            if (instance) {
+                                match(route, function (match) {
+                                    return matchRoute(instance, { match: match, active: active });
                                 });
                             }
-                            applyToGroup(child, function (childInstance) {
-                                applyToChildren(childInstance.children, function (instance) {
-                                    if (instance && instance.to) {
-                                        instance.to.apply(instance, _toConsumableArray(args.concat(params)));
-                                    }
-                                });
-                            });
                         });
-                        //TODO: strange bug done=> causing error (done)=> not
-                        matches.leave(function (done) {
-                            var items = 0,
-                                stopped = false;
-                            applyToGroup(child, function (childInstance) {
-                                var finish = function finish() {
-                                    if (!id) {
-                                        dom.detach(childInstance);
-                                    } else {
-                                        destroyComponent(childInstance);
-                                    }
-                                },
-                                    close = function close() {
-                                    var close = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
-
-                                    if (close) {
-                                        items--;
-                                    } else {
-                                        stopped = true;
-                                        done(false);
-                                    }
-
-                                    if (items === 0 && !stopped) {
-                                        active.set(childInstance, finish);
-                                        done(true);
-                                    }
-                                };
-
-                                applyToChildren(childInstance.children, function (instance) {
-                                    if (instance && instance.leave !== undefined) {
-                                        var args = getArgs(instance.leave);
-                                        if (args.length > 0) {
-                                            items++;
-                                        }
-                                        instance.leave(close);
-                                    }
-                                });
-
-                                if (items === 0) {
-                                    active.set(childInstance, finish);
-                                    done(true);
-                                }
-                            });
+                    }
+                    applyToGroup(child, function (childInstance) {
+                        applyToChildren(childInstance.children, function (instance) {
+                            if (instance && instance.to) {
+                                instance.to.apply(instance, _toConsumableArray(args.concat(params)));
+                            }
                         });
-
-                        matches.query(function (params) {
-                            applyToGroup(child, function (childInstance) {
-                                applyToChildren(childInstance.children, function (instance) {
-                                    if (instance && instance.query !== undefined) {
-                                        instance.query(params);
-                                    }
-                                });
-                            });
-                        });
-                        applyToGroup(child, function (instance) {
-                            return instance._activeRoute = matches;
-                        });
-                    })();
-                } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
-                    applyToChildren(child.children, function (instance) {
-                        return matchRoute(instance, context);
                     });
-                }
-            })();
+                });
+
+                matches.leave(function (done) {
+                    var items = 0,
+                        stopped = false;
+                    applyToGroup(child, function (childInstance) {
+                        var finish = function finish() {
+                            if (!id) {
+                                dom.detach(childInstance);
+                            } else {
+                                destroyComponent(childInstance);
+                            }
+                        },
+                            close = function close() {
+                            var close = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+                            if (close) {
+                                items--;
+                            } else {
+                                stopped = true;
+                                done(false);
+                            }
+
+                            if (items === 0 && !stopped) {
+                                active.set(childInstance, finish);
+                                done(true);
+                            }
+                        };
+
+                        applyToChildren(childInstance.children, function (instance) {
+                            if (instance && instance.leave !== undefined) {
+                                var args = getArgs(instance.leave);
+                                if (args.length > 0) {
+                                    items++;
+                                }
+                                instance.leave(close);
+                            }
+                        });
+
+                        if (items === 0) {
+                            active.set(childInstance, finish);
+                            done(true);
+                        }
+                    });
+                });
+
+                matches.query(function (params) {
+                    applyToGroup(child, function (childInstance) {
+                        applyToChildren(childInstance.children, function (instance) {
+                            if (instance && instance.query !== undefined) {
+                                instance.query(params);
+                            }
+                        });
+                    });
+                });
+                applyToGroup(child, function (instance) {
+                    return instance._activeRoute = matches;
+                });
+            } else if (child.children !== undefined && ['cp'].indexOf(child.data.type) === -1) {
+                applyToChildren(child.children, function (instance) {
+                    return matchRoute(instance, context);
+                });
+            }
         }
     }
 
@@ -1124,37 +1108,33 @@ define('widget/parsers/applyElement', ['templating/dom'], function (dom) {
     //      @private applyElement
     //      @param {Object} elements
     function applyElement() {
-        var elements = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var elements = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var params = arguments[1];
 
         var instances = {};
         Object.keys(elements).forEach(function (key) {
             var instance = elements[key];
             if (typeof instance !== 'string') {
-                (function () {
-                    var element = instance.elGroup.first;
-                    if (element) {
-                        instances[key] = element;
-                        if (element instanceof dom.Element === true && ['pl'].indexOf(element.data.type) !== -1) {
-                            (function () {
-                                var bind = element.data.tplSet.bind;
-                                if (bind) {
-                                    Object.keys(bind).forEach(function (attr) {
-                                        if (params[bind[attr]] !== undefined) {
-                                            if (attr !== 'class') {
-                                                element.setAttribute(attr, params[bind[attr]]);
-                                            } else {
-                                                element.addClass(params[bind[attr]]);
-                                            }
-                                        }
-                                    });
+                var element = instance.elGroup.first;
+                if (element) {
+                    instances[key] = element;
+                    if (element instanceof dom.Element === true && ['pl'].indexOf(element.data.type) !== -1) {
+                        var bind = element.data.tplSet.bind;
+                        if (bind) {
+                            Object.keys(bind).forEach(function (attr) {
+                                if (params[bind[attr]] !== undefined) {
+                                    if (attr !== 'class') {
+                                        element.setAttribute(attr, params[bind[attr]]);
+                                    } else {
+                                        element.addClass(params[bind[attr]]);
+                                    }
                                 }
-                            })();
+                            });
                         }
-                    } else {
-                        instances[key] = instance;
                     }
-                })();
+                } else {
+                    instances[key] = instance;
+                }
             }
         });
 
@@ -1212,7 +1192,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
         _createClass(Constructor, null, [{
             key: 'extend',
             value: function extend() {
-                var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
                 var Surrogate = function (_Constructor) {
                     _inherits(Surrogate, _Constructor);
@@ -1220,7 +1200,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                     function Surrogate() {
                         _classCallCheck(this, Surrogate);
 
-                        return _possibleConstructorReturn(this, Object.getPrototypeOf(Surrogate).apply(this, arguments));
+                        return _possibleConstructorReturn(this, (Surrogate.__proto__ || Object.getPrototypeOf(Surrogate)).apply(this, arguments));
                     }
 
                     return Surrogate;
@@ -1232,9 +1212,9 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
         }]);
 
         function Constructor() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var parentChildren = arguments[1];
-            var dataSet = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+            var dataSet = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
             var node = arguments[3];
 
             _classCallCheck(this, Constructor);
@@ -1355,7 +1335,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
 
             // Running when widget is rendered
             //
-            //      @method beforeInit
+            //      @method rendered
             //      @param {Object} data (comes from template data attributes)
             //      @param {Object} children (comes placeholder content
             //      from template)
@@ -1460,18 +1440,24 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             //  @method setChildren
             //  @param {Element} el
             //  @param {Object} data
+            //TODO: need to write tests for async operations.
 
         }, {
             key: 'setChildren',
             value: function setChildren(el, data) {
                 var name = el.data.name,
                     instance = this.children[name];
+
                 if (instance !== undefined && instance.el !== undefined) {
                     instance.remove();
                 }
 
-                instance = el.run(data || true);
-                addChildren(this, instance, data);
+                var newInstance = el.run(data || true);
+                if (newInstance.setContext) {
+                    newInstance.setContext(this.context);
+                }
+                addChildren(this, newInstance, data);
+                return newInstance;
             }
         }, {
             key: 'addComponent',

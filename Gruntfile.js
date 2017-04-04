@@ -388,6 +388,9 @@ module.exports = function(grunt) {
         babel:     {
             options:     {
                 presets: ['es2015'],
+                ignore:[
+                    'babel/polyfill.js'
+                ],
                 compact: false
             },
             dev:         {

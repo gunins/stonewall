@@ -386,7 +386,7 @@ Basic Usage example</p>
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Running when widget is rendered</p>
-<pre><code> @method beforeInit
+<pre><code> @method rendered
  @param {<span class="hljs-built_in">Object</span>} data (comes <span class="hljs-keyword">from</span> template data attributes)
  @param {<span class="hljs-built_in">Object</span>} children (comes placeholder content
  <span class="hljs-keyword">from</span> template)
@@ -547,19 +547,26 @@ Basic Usage example</p>
               <p>Adding Childrens manually after initialization.
  @method setChildren
  @param {Element} el
- @param {Object} data</p>
+ @param {Object} data
+TODO: need to write tests for async operations.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>        setChildren(el, data) {
             <span class="hljs-keyword">let</span> name = el.data.name,
                 instance = <span class="hljs-keyword">this</span>.children[name];
+
             <span class="hljs-keyword">if</span> (instance !== <span class="hljs-literal">undefined</span> &amp;&amp; instance.el !== <span class="hljs-literal">undefined</span>) {
                 instance.remove();
             }
 
-            instance = el.run(data || <span class="hljs-literal">true</span>);
-            addChildren(<span class="hljs-keyword">this</span>, instance, data);
+            <span class="hljs-keyword">let</span> newInstance = el.run(data || <span class="hljs-literal">true</span>);
+            <span class="hljs-keyword">if</span> (newInstance.setContext) {
+                newInstance.setContext(<span class="hljs-keyword">this</span>.context);
+            }
+            addChildren(<span class="hljs-keyword">this</span>, newInstance, data);
+            <span class="hljs-keyword">return</span> newInstance;
+
         };</pre></div></div>
             
         </li>

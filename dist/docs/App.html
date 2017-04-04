@@ -195,9 +195,7 @@ Usage Example</p>
 
         <span class="hljs-keyword">constructor</span>(options = {}) {
             <span class="hljs-keyword">this</span>.options = options;
-            <span class="hljs-keyword">this</span>.beforeInit.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
-
-
+            <span class="hljs-keyword">this</span>.beforeInit(...arguments);
         }</pre></div></div>
             
         </li>
@@ -310,13 +308,13 @@ Usage Example</p>
             <div class="content"><div class='highlight'><pre>        start(container) {
             <span class="hljs-keyword">if</span> (container <span class="hljs-keyword">instanceof</span> HTMLElement === <span class="hljs-literal">true</span>) {
                 <span class="hljs-keyword">this</span>.el = container;
-                <span class="hljs-keyword">this</span>.context = <span class="hljs-keyword">this</span>.setContext.apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+                <span class="hljs-keyword">this</span>.context = <span class="hljs-keyword">this</span>.setContext(...arguments);
 
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.AppContainer !== <span class="hljs-literal">undefined</span>) {
                     <span class="hljs-keyword">this</span>.appContainer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">this</span>.AppContainer();
                 }
 
-                <span class="hljs-keyword">this</span>.init.call(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.options);
+                <span class="hljs-keyword">this</span>.init(<span class="hljs-keyword">this</span>.options);
 
                 <span class="hljs-keyword">let</span> el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
                 <span class="hljs-keyword">this</span>.el.appendChild(el);
