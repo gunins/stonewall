@@ -16,73 +16,75 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="loader.html">
-                loader.js
-              </a>
-            
+                
+                <a class="source" href="loader.html">
+                  loader.js
+                </a>
               
-              <a class="source" href="App.html">
-                App.js
-              </a>
-            
+                
+                <a class="source" href="App.html">
+                  App.js
+                </a>
               
-              <a class="source" href="Constructor.html">
-                Constructor.js
-              </a>
-            
+                
+                <a class="source" href="Constructor.html">
+                  Constructor.js
+                </a>
               
-              <a class="source" href="Mediator.html">
-                Mediator.js
-              </a>
-            
+                
+                <a class="source" href="Mediator.html">
+                  Mediator.js
+                </a>
               
-              <a class="source" href="parser.html">
-                parser.js
-              </a>
-            
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
               
-              <a class="source" href="addChildren.html">
-                addChildren.js
-              </a>
-            
+                
+                <a class="source" href="addChildren.html">
+                  addChildren.js
+                </a>
               
-              <a class="source" href="applyAttribute.html">
-                applyAttribute.js
-              </a>
-            
+                
+                <a class="source" href="applyAttribute.html">
+                  applyAttribute.js
+                </a>
               
-              <a class="source" href="applyBinders.html">
-                applyBinders.js
-              </a>
-            
+                
+                <a class="source" href="applyBinders.html">
+                  applyBinders.js
+                </a>
               
-              <a class="source" href="applyElement.html">
-                applyElement.js
-              </a>
-            
+                
+                <a class="source" href="applyElement.html">
+                  applyElement.js
+                </a>
               
-              <a class="source" href="applyParent.html">
-                applyParent.js
-              </a>
-            
+                
+                <a class="source" href="applyParent.html">
+                  applyParent.js
+                </a>
               
-              <a class="source" href="setBinders.html">
-                setBinders.js
-              </a>
-            
+                
+                <a class="source" href="setBinders.html">
+                  setBinders.js
+                </a>
               
-              <a class="source" href="setRoutes.html">
-                setRoutes.js
-              </a>
-            
+                
+                <a class="source" href="setRoutes.html">
+                  setRoutes.js
+                </a>
               
-              <a class="source" href="utils.html">
-                utils.js
-              </a>
-            
+                
+                <a class="source" href="utils.html">
+                  utils.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -128,7 +130,7 @@
  ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">App, Container</span>) </span>{
 <span class="hljs-meta">     'use strict'</span>;
      <span class="hljs-keyword">return</span> App.extend({
-         AppContainer: Container
+         <span class="hljs-attr">AppContainer</span>: Container
      });
  });
 </code></pre>
@@ -142,16 +144,16 @@
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">triggerRoute</span>(<span class="hljs-params">router, active</span>) </span>{
         <span class="hljs-keyword">var</span> activeLocation = <span class="hljs-string">''</span>;
 
-        router.setListener((location, move)=&gt; {
+        router.setListener(<span class="hljs-function">(<span class="hljs-params">location, move</span>)=&gt;</span> {
             activeLocation = location;
             <span class="hljs-keyword">if</span> (!move) {
                 <span class="hljs-built_in">window</span>.location.hash = location;
             }
         });
 
-        router.onRouteChange(()=&gt; {
+        router.onRouteChange(<span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span> {
             <span class="hljs-keyword">if</span> (active.size &gt; <span class="hljs-number">0</span>) {
-                active.forEach(handler=&gt;handler());
+                active.forEach(<span class="hljs-function"><span class="hljs-params">handler</span>=&gt;</span>handler());
                 active.clear();
             }
         });
@@ -186,7 +188,7 @@ Usage Example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">App</span> </span>{
-        static extend(options = {}) {
+        <span class="hljs-keyword">static</span> extend(options = {}) {
             <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Surrogate</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">App</span> </span>{
             }
             <span class="hljs-built_in">Object</span>.assign(Surrogate.prototype, options);
@@ -252,7 +254,7 @@ Usage Example</p>
 
         set context(context) {
             <span class="hljs-keyword">let</span> router = <span class="hljs-keyword">new</span> Router(<span class="hljs-keyword">this</span>.options.rootRoute);
-            router.match((match)=&gt; {
+            router.match(<span class="hljs-function">(<span class="hljs-params">match</span>)=&gt;</span> {
                 <span class="hljs-built_in">Object</span>.assign(context, {</pre></div></div>
             
         </li>
@@ -274,10 +276,10 @@ Usage Example</p>
                             scope._globalEvents.push(channel);
                         }
                     }),
-                    active:    <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(),
-                    match:     match,
-                    container: <span class="hljs-keyword">this</span>.el,
-                    _cssReady: context._cssReady || []
+                    <span class="hljs-attr">active</span>:    <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(),
+                    <span class="hljs-attr">match</span>:     match,
+                    <span class="hljs-attr">container</span>: <span class="hljs-keyword">this</span>.el,
+                    <span class="hljs-attr">_cssReady</span>: context._cssReady || []
 
                 });
 
@@ -322,7 +324,7 @@ Usage Example</p>
                 <span class="hljs-keyword">this</span>.appContainer.setContext(<span class="hljs-keyword">this</span>.context);
 
 
-                setTimeout(() =&gt; {
+                setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
                     container.classList.add(<span class="hljs-string">'show'</span>);
                 }, <span class="hljs-number">100</span>);
             } <span class="hljs-keyword">else</span> {

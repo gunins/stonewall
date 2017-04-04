@@ -16,73 +16,75 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="loader.html">
-                loader.js
-              </a>
-            
+                
+                <a class="source" href="loader.html">
+                  loader.js
+                </a>
               
-              <a class="source" href="App.html">
-                App.js
-              </a>
-            
+                
+                <a class="source" href="App.html">
+                  App.js
+                </a>
               
-              <a class="source" href="Constructor.html">
-                Constructor.js
-              </a>
-            
+                
+                <a class="source" href="Constructor.html">
+                  Constructor.js
+                </a>
               
-              <a class="source" href="Mediator.html">
-                Mediator.js
-              </a>
-            
+                
+                <a class="source" href="Mediator.html">
+                  Mediator.js
+                </a>
               
-              <a class="source" href="parser.html">
-                parser.js
-              </a>
-            
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
               
-              <a class="source" href="addChildren.html">
-                addChildren.js
-              </a>
-            
+                
+                <a class="source" href="addChildren.html">
+                  addChildren.js
+                </a>
               
-              <a class="source" href="applyAttribute.html">
-                applyAttribute.js
-              </a>
-            
+                
+                <a class="source" href="applyAttribute.html">
+                  applyAttribute.js
+                </a>
               
-              <a class="source" href="applyBinders.html">
-                applyBinders.js
-              </a>
-            
+                
+                <a class="source" href="applyBinders.html">
+                  applyBinders.js
+                </a>
               
-              <a class="source" href="applyElement.html">
-                applyElement.js
-              </a>
-            
+                
+                <a class="source" href="applyElement.html">
+                  applyElement.js
+                </a>
               
-              <a class="source" href="applyParent.html">
-                applyParent.js
-              </a>
-            
+                
+                <a class="source" href="applyParent.html">
+                  applyParent.js
+                </a>
               
-              <a class="source" href="setBinders.html">
-                setBinders.js
-              </a>
-            
+                
+                <a class="source" href="setBinders.html">
+                  setBinders.js
+                </a>
               
-              <a class="source" href="setRoutes.html">
-                setRoutes.js
-              </a>
-            
+                
+                <a class="source" href="setRoutes.html">
+                  setRoutes.js
+                </a>
               
-              <a class="source" href="utils.html">
-                utils.js
-              </a>
-            
+                
+                <a class="source" href="utils.html">
+                  utils.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -150,7 +152,7 @@ define([
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (utils.isArray(data)) {
 
                     <span class="hljs-keyword">let</span> bindedData = [],
-                        addItem = (item, index)=&gt; {
+                        addItem = <span class="hljs-function">(<span class="hljs-params">item, index</span>)=&gt;</span> {
                             <span class="hljs-keyword">let</span> isString = <span class="hljs-literal">false</span>;
                             <span class="hljs-keyword">if</span> (!utils.isArray(item) &amp;&amp; !utils.isObject(item)) {
                                 isString = <span class="hljs-literal">true</span>;
@@ -161,8 +163,8 @@ define([
                             }
 
                             bindedData.push({
-                                binder: element,
-                                data:   item
+                                <span class="hljs-attr">binder</span>: element,
+                                <span class="hljs-attr">data</span>:   item
                             });
 
                             applyAttribute(context, element, item);
@@ -192,13 +194,13 @@ define([
                         watch(obj, objKey, (prop, action, newValue, oldValue)=&gt; {
                             <span class="hljs-keyword">let</span> clonedData = bindedData.slice(<span class="hljs-number">0</span>);
                             <span class="hljs-keyword">if</span> (oldValue === <span class="hljs-literal">undefined</span> &amp;&amp; insertMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-                                <span class="hljs-keyword">let</span> filter = clonedData.filter((item)=&gt; item.data === newValue[<span class="hljs-number">0</span>]);
+                                <span class="hljs-keyword">let</span> filter = clonedData.filter(<span class="hljs-function">(<span class="hljs-params">item</span>)=&gt;</span> item.data === newValue[<span class="hljs-number">0</span>]);
 
                                 <span class="hljs-keyword">if</span> (filter.length === <span class="hljs-number">0</span>) {
                                     addItem(newValue[<span class="hljs-number">0</span>], (action === <span class="hljs-string">'unshift'</span>) ? <span class="hljs-number">0</span> : clonedData.length);
                                 }
                             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (removeMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-                                clonedData.forEach((binder)=&gt; {
+                                clonedData.forEach(<span class="hljs-function">(<span class="hljs-params">binder</span>)=&gt;</span> {
                                     <span class="hljs-keyword">if</span> (obj[objKey].indexOf(binder.data) === <span class="hljs-number">-1</span>) {
                                         binder.binder.remove();
                                         bindedData.splice(bindedData.indexOf(binder), <span class="hljs-number">1</span>);
@@ -208,7 +210,7 @@ define([
                                 <span class="hljs-keyword">if</span> (action === <span class="hljs-string">'splice'</span>) {
                                     <span class="hljs-keyword">let</span> vals = <span class="hljs-built_in">Array</span>.prototype.slice.call(newValue, <span class="hljs-number">2</span>);
                                     <span class="hljs-keyword">if</span> (vals &amp;&amp; vals.length &gt; <span class="hljs-number">0</span>) {
-                                        vals.forEach((val)=&gt; {
+                                        vals.forEach(<span class="hljs-function">(<span class="hljs-params">val</span>)=&gt;</span> {
                                             <span class="hljs-keyword">let</span> index = obj[objKey].indexOf(val);
                                             <span class="hljs-keyword">if</span> (index !== <span class="hljs-number">-1</span>) {
                                                 addItem(val, index);
@@ -217,8 +219,8 @@ define([
                                     }
                                 }
                             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (sortingMethodNames.indexOf(action) !== <span class="hljs-number">-1</span>) {
-                                data.forEach((value, index)=&gt; {
-                                    <span class="hljs-keyword">let</span> element = clonedData.filter(item=&gt;item.data === value)[<span class="hljs-number">0</span>];
+                                data.forEach(<span class="hljs-function">(<span class="hljs-params">value, index</span>)=&gt;</span> {
+                                    <span class="hljs-keyword">let</span> element = clonedData.filter(<span class="hljs-function"><span class="hljs-params">item</span>=&gt;</span>item.data === value)[<span class="hljs-number">0</span>];
                                     bindedData.splice(index, <span class="hljs-number">0</span>, bindedData.splice(bindedData.indexOf(element), <span class="hljs-number">1</span>)[<span class="hljs-number">0</span>]);
                                     element.binder.changePosition(index);
 
@@ -256,7 +258,7 @@ define([
         <span class="hljs-keyword">let</span> binders = instance.bindings;
         <span class="hljs-keyword">if</span> (binders) {
             <span class="hljs-keyword">if</span> (binders[<span class="hljs-string">'__cp__'</span>].length &gt; <span class="hljs-number">0</span>) {
-                binders[<span class="hljs-string">'__cp__'</span>].forEach(binder=&gt; {
+                binders[<span class="hljs-string">'__cp__'</span>].forEach(<span class="hljs-function"><span class="hljs-params">binder</span>=&gt;</span> {
                     <span class="hljs-keyword">let</span> component = binder.run(obj);
                     component.setContext(child.context);
                     addChildren.elReady(child, component, obj);
@@ -269,13 +271,13 @@ define([
             }
             <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(binders);
             <span class="hljs-keyword">if</span> (obj &amp;&amp; keys.length &gt; <span class="hljs-number">0</span>) {
-                keys.forEach((binderKey) =&gt; {
+                keys.forEach(<span class="hljs-function">(<span class="hljs-params">binderKey</span>) =&gt;</span> {
                     <span class="hljs-keyword">if</span> (obj[binderKey] !== <span class="hljs-literal">undefined</span>) {
-                        binders[binderKey].forEach(binder=&gt;parseBinder(child, binderKey, obj, binder));
+                        binders[binderKey].forEach(<span class="hljs-function"><span class="hljs-params">binder</span>=&gt;</span>parseBinder(child, binderKey, obj, binder));
                     } <span class="hljs-keyword">else</span> {
-                        <span class="hljs-keyword">let</span> fn = (prop, action, newValue, oldValue) =&gt; {
+                        <span class="hljs-keyword">let</span> fn = <span class="hljs-function">(<span class="hljs-params">prop, action, newValue, oldValue</span>) =&gt;</span> {
                             <span class="hljs-keyword">if</span> (newValue !== <span class="hljs-literal">undefined</span> &amp;&amp; oldValue === <span class="hljs-literal">undefined</span>) {
-                                binders[binderKey].forEach(binder=&gt;parseBinder(child, binderKey, obj, binder));
+                                binders[binderKey].forEach(<span class="hljs-function"><span class="hljs-params">binder</span>=&gt;</span>parseBinder(child, binderKey, obj, binder));
                                 unwatch(obj, binderKey, fn);
                             }
                         }

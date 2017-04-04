@@ -16,73 +16,75 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="loader.html">
-                loader.js
-              </a>
-            
+                
+                <a class="source" href="loader.html">
+                  loader.js
+                </a>
               
-              <a class="source" href="App.html">
-                App.js
-              </a>
-            
+                
+                <a class="source" href="App.html">
+                  App.js
+                </a>
               
-              <a class="source" href="Constructor.html">
-                Constructor.js
-              </a>
-            
+                
+                <a class="source" href="Constructor.html">
+                  Constructor.js
+                </a>
               
-              <a class="source" href="Mediator.html">
-                Mediator.js
-              </a>
-            
+                
+                <a class="source" href="Mediator.html">
+                  Mediator.js
+                </a>
               
-              <a class="source" href="parser.html">
-                parser.js
-              </a>
-            
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
               
-              <a class="source" href="addChildren.html">
-                addChildren.js
-              </a>
-            
+                
+                <a class="source" href="addChildren.html">
+                  addChildren.js
+                </a>
               
-              <a class="source" href="applyAttribute.html">
-                applyAttribute.js
-              </a>
-            
+                
+                <a class="source" href="applyAttribute.html">
+                  applyAttribute.js
+                </a>
               
-              <a class="source" href="applyBinders.html">
-                applyBinders.js
-              </a>
-            
+                
+                <a class="source" href="applyBinders.html">
+                  applyBinders.js
+                </a>
               
-              <a class="source" href="applyElement.html">
-                applyElement.js
-              </a>
-            
+                
+                <a class="source" href="applyElement.html">
+                  applyElement.js
+                </a>
               
-              <a class="source" href="applyParent.html">
-                applyParent.js
-              </a>
-            
+                
+                <a class="source" href="applyParent.html">
+                  applyParent.js
+                </a>
               
-              <a class="source" href="setBinders.html">
-                setBinders.js
-              </a>
-            
+                
+                <a class="source" href="setBinders.html">
+                  setBinders.js
+                </a>
               
-              <a class="source" href="setRoutes.html">
-                setRoutes.js
-              </a>
-            
+                
+                <a class="source" href="setRoutes.html">
+                  setRoutes.js
+                </a>
               
-              <a class="source" href="utils.html">
-                utils.js
-              </a>
-            
+                
+                <a class="source" href="utils.html">
+                  utils.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -130,7 +132,7 @@ Usage Example</p>
      <span class="hljs-string">'widget/Constructor'</span>
  ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
      <span class="hljs-keyword">var</span> Widget = Constructor.extend({
-         template: template
+         <span class="hljs-attr">template</span>: template
      });
      <span class="hljs-keyword">return</span> Widget;
  });
@@ -144,8 +146,8 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
     }
 
     <span class="hljs-keyword">return</span> {
-        version: <span class="hljs-string">"0.1.0"</span>,
-        load: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">moduleName, req, onLoad, config</span>) </span>{
+        <span class="hljs-attr">version</span>: <span class="hljs-string">"0.1.0"</span>,
+        <span class="hljs-attr">load</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">moduleName, req, onLoad, config</span>) </span>{
             moduleName = (getName(moduleName) !== <span class="hljs-literal">undefined</span>) ? moduleName : moduleName + <span class="hljs-string">'.html'</span>;
             define(moduleName,
                 [
@@ -153,7 +155,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
                     <span class="hljs-string">'widget/Constructor'</span>
                 ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
                     <span class="hljs-keyword">var</span> Widget = Constructor.extend({
-                        template: template
+                        <span class="hljs-attr">template</span>: template
                     });
                     <span class="hljs-keyword">return</span> Widget;
                 });
@@ -161,7 +163,7 @@ define(<span class="hljs-function"><span class="hljs-keyword">function</span> (<
                 onLoad(Widget);
             });
         },
-        write: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pluginName, moduleName, write</span>) </span>{
+        <span class="hljs-attr">write</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pluginName, moduleName, write</span>) </span>{
             <span class="hljs-keyword">var</span> Name = (getName(moduleName) !== <span class="hljs-literal">undefined</span>) ? moduleName : moduleName + <span class="hljs-string">'.html'</span>;
             write(<span class="hljs-string">'define("'</span> + pluginName + <span class="hljs-string">'!'</span> + moduleName + <span class="hljs-string">'", '</span> +
                   <span class="hljs-string">'['</span> +

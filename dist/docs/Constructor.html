@@ -16,73 +16,75 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="loader.html">
-                loader.js
-              </a>
-            
+                
+                <a class="source" href="loader.html">
+                  loader.js
+                </a>
               
-              <a class="source" href="App.html">
-                App.js
-              </a>
-            
+                
+                <a class="source" href="App.html">
+                  App.js
+                </a>
               
-              <a class="source" href="Constructor.html">
-                Constructor.js
-              </a>
-            
+                
+                <a class="source" href="Constructor.html">
+                  Constructor.js
+                </a>
               
-              <a class="source" href="Mediator.html">
-                Mediator.js
-              </a>
-            
+                
+                <a class="source" href="Mediator.html">
+                  Mediator.js
+                </a>
               
-              <a class="source" href="parser.html">
-                parser.js
-              </a>
-            
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
               
-              <a class="source" href="addChildren.html">
-                addChildren.js
-              </a>
-            
+                
+                <a class="source" href="addChildren.html">
+                  addChildren.js
+                </a>
               
-              <a class="source" href="applyAttribute.html">
-                applyAttribute.js
-              </a>
-            
+                
+                <a class="source" href="applyAttribute.html">
+                  applyAttribute.js
+                </a>
               
-              <a class="source" href="applyBinders.html">
-                applyBinders.js
-              </a>
-            
+                
+                <a class="source" href="applyBinders.html">
+                  applyBinders.js
+                </a>
               
-              <a class="source" href="applyElement.html">
-                applyElement.js
-              </a>
-            
+                
+                <a class="source" href="applyElement.html">
+                  applyElement.js
+                </a>
               
-              <a class="source" href="applyParent.html">
-                applyParent.js
-              </a>
-            
+                
+                <a class="source" href="applyParent.html">
+                  applyParent.js
+                </a>
               
-              <a class="source" href="setBinders.html">
-                setBinders.js
-              </a>
-            
+                
+                <a class="source" href="setBinders.html">
+                  setBinders.js
+                </a>
               
-              <a class="source" href="setRoutes.html">
-                setRoutes.js
-              </a>
-            
+                
+                <a class="source" href="setRoutes.html">
+                  setRoutes.js
+                </a>
               
-              <a class="source" href="utils.html">
-                utils.js
-              </a>
-            
+                
+                <a class="source" href="utils.html">
+                  utils.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -128,7 +130,7 @@ Basic Usage example</p>
      <span class="hljs-string">'widget/Constructor'</span>
  ], <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">template, Constructor</span>) </span>{
      <span class="hljs-keyword">var</span> Widget = Constructor.extend({
-         template: template
+         <span class="hljs-attr">template</span>: template
      });
      <span class="hljs-keyword">return</span> Widget;
  });
@@ -164,11 +166,11 @@ Basic Usage example</p>
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroy</span>(<span class="hljs-params">instance</span>) </span>{
         <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(instance);
         <span class="hljs-keyword">if</span> (keys.length &gt; <span class="hljs-number">0</span>) {
-            keys.forEach((key) =&gt; {
+            keys.forEach(<span class="hljs-function">(<span class="hljs-params">key</span>) =&gt;</span> {
                 <span class="hljs-keyword">if</span> (key !== <span class="hljs-string">'root'</span>) {
                     <span class="hljs-keyword">let</span> children = instance[key];
                     <span class="hljs-keyword">if</span> (children.elGroup !== <span class="hljs-literal">undefined</span> &amp;&amp; children.elGroup.size &gt; <span class="hljs-number">0</span>) {
-                        children.elGroup.forEach(child =&gt; {
+                        children.elGroup.forEach(<span class="hljs-function"><span class="hljs-params">child</span> =&gt;</span> {
                             <span class="hljs-keyword">if</span> (child !== <span class="hljs-literal">undefined</span> &amp;&amp; child.remove !== <span class="hljs-literal">undefined</span>) {
                                 child.remove(<span class="hljs-literal">true</span>);
                             }
@@ -197,7 +199,7 @@ Basic Usage example</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Constructor</span> </span>{
-        static extend(options = {}) {
+        <span class="hljs-keyword">static</span> extend(options = {}) {
             <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Surrogate</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Constructor</span> </span>{
             }
             <span class="hljs-built_in">Object</span>.assign(Surrogate.prototype, options);
@@ -257,13 +259,13 @@ Basic Usage example</p>
                     <span class="hljs-keyword">this</span>.data = contextData[<span class="hljs-keyword">this</span>._options.bind] || contextData;
                 }
             }
-            context.match((match) =&gt; {
+            context.match(<span class="hljs-function">(<span class="hljs-params">match</span>) =&gt;</span> {
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.match) {
                     <span class="hljs-keyword">this</span>.match(match);
                 }
 
                 <span class="hljs-keyword">this</span>._context = <span class="hljs-built_in">Object</span>.assign({
-                    match: match
+                    <span class="hljs-attr">match</span>: match
                 }, context);
             });
         }
@@ -312,8 +314,8 @@ Basic Usage example</p>
 
 
                     <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(template.fragment, {
-                        name: <span class="hljs-string">'root'</span>,
-                        data: {}
+                        <span class="hljs-attr">name</span>: <span class="hljs-string">'root'</span>,
+                        <span class="hljs-attr">data</span>: {}
                     });
 
                     <span class="hljs-keyword">this</span>.children = applyElement(template.children, options);
@@ -609,12 +611,12 @@ TODO: need to write tests for async operations.</p>
 
         setComponent(Component, options) {
             <span class="hljs-keyword">let</span> instance = {
-                name: options.name,
-                data: {
-                    tag:  <span class="hljs-string">'div'</span>,
-                    type: <span class="hljs-string">'cp'</span>
+                <span class="hljs-attr">name</span>: options.name,
+                <span class="hljs-attr">data</span>: {
+                    <span class="hljs-attr">tag</span>:  <span class="hljs-string">'div'</span>,
+                    <span class="hljs-attr">type</span>: <span class="hljs-string">'cp'</span>
                 },
-                run:  (container) =&gt; {
+                <span class="hljs-attr">run</span>:  <span class="hljs-function">(<span class="hljs-params">container</span>) =&gt;</span> {
                     options.appContext = <span class="hljs-keyword">this</span>.context;
                     <span class="hljs-keyword">let</span> cp = <span class="hljs-keyword">new</span> Component(options, options.children, options.data),
                         el = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
@@ -673,7 +675,7 @@ TODO: need to write tests for async operations.</p>
               <p><code>nodes</code> Object override default methods to Elements.
 Usage Example</p>
 <pre><code> nodes: {
-     listItem: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, parent, data</span>) </span>{
+     <span class="hljs-attr">listItem</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, parent, data</span>) </span>{
          el.add(parent);
          el.text(data);
      }
@@ -696,10 +698,10 @@ Usage Example</p>
 You can apply more than one event on element
 Usage Example</p>
 <pre><code> events: {
-     <span class="hljs-keyword">delete</span>: [
+     <span class="hljs-attr">delete</span>: [
          {
-             name: <span class="hljs-string">'click'</span>,
-             action: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+             <span class="hljs-attr">name</span>: <span class="hljs-string">'click'</span>,
+             <span class="hljs-attr">action</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
                  <span class="hljs-keyword">this</span>.data.remove = <span class="hljs-literal">true</span>
                  <span class="hljs-keyword">this</span>.destroy();
              }
@@ -722,7 +724,7 @@ Usage Example</p>
               <p>Applying extra methods to Element
 Usage Example</p>
 <pre><code> elReady: {
-     links: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
+     <span class="hljs-attr">links</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
          <span class="hljs-keyword">if</span>(data.class===<span class="hljs-string">'active'</span>){
              el.addClass(<span class="hljs-string">'active'</span>);
          }
@@ -745,7 +747,7 @@ Usage Example</p>
               <p>Applying methods to element every time when data is changed for Element
 Usage Example</p>
 <pre><code> elOnChange: {
-     links: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
+     <span class="hljs-attr">links</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">el, data</span>) </span>{
          <span class="hljs-keyword">if</span>(data.class===<span class="hljs-string">'active'</span>){
              el.addClass(<span class="hljs-string">'active'</span>);
          }

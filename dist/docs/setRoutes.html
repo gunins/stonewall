@@ -16,73 +16,75 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="loader.html">
-                loader.js
-              </a>
-            
+                
+                <a class="source" href="loader.html">
+                  loader.js
+                </a>
               
-              <a class="source" href="App.html">
-                App.js
-              </a>
-            
+                
+                <a class="source" href="App.html">
+                  App.js
+                </a>
               
-              <a class="source" href="Constructor.html">
-                Constructor.js
-              </a>
-            
+                
+                <a class="source" href="Constructor.html">
+                  Constructor.js
+                </a>
               
-              <a class="source" href="Mediator.html">
-                Mediator.js
-              </a>
-            
+                
+                <a class="source" href="Mediator.html">
+                  Mediator.js
+                </a>
               
-              <a class="source" href="parser.html">
-                parser.js
-              </a>
-            
+                
+                <a class="source" href="parser.html">
+                  parser.js
+                </a>
               
-              <a class="source" href="addChildren.html">
-                addChildren.js
-              </a>
-            
+                
+                <a class="source" href="addChildren.html">
+                  addChildren.js
+                </a>
               
-              <a class="source" href="applyAttribute.html">
-                applyAttribute.js
-              </a>
-            
+                
+                <a class="source" href="applyAttribute.html">
+                  applyAttribute.js
+                </a>
               
-              <a class="source" href="applyBinders.html">
-                applyBinders.js
-              </a>
-            
+                
+                <a class="source" href="applyBinders.html">
+                  applyBinders.js
+                </a>
               
-              <a class="source" href="applyElement.html">
-                applyElement.js
-              </a>
-            
+                
+                <a class="source" href="applyElement.html">
+                  applyElement.js
+                </a>
               
-              <a class="source" href="applyParent.html">
-                applyParent.js
-              </a>
-            
+                
+                <a class="source" href="applyParent.html">
+                  applyParent.js
+                </a>
               
-              <a class="source" href="setBinders.html">
-                setBinders.js
-              </a>
-            
+                
+                <a class="source" href="setBinders.html">
+                  setBinders.js
+                </a>
               
-              <a class="source" href="setRoutes.html">
-                setRoutes.js
-              </a>
-            
+                
+                <a class="source" href="setRoutes.html">
+                  setRoutes.js
+                </a>
               
-              <a class="source" href="utils.html">
-                utils.js
-              </a>
-            
+                
+                <a class="source" href="utils.html">
+                  utils.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -120,7 +122,7 @@ define([
         <span class="hljs-keyword">let</span> fnStr = func.toString().replace(STRIP_COMMENTS, <span class="hljs-string">''</span>),
             argsList = fnStr.slice(fnStr.indexOf(<span class="hljs-string">'('</span>) + <span class="hljs-number">1</span>, fnStr.indexOf(<span class="hljs-string">')'</span>)),
             result = argsList.match(ARGUMENT_NAMES);
-        <span class="hljs-keyword">return</span> (result === <span class="hljs-literal">null</span>) ? [] : result.map(item =&gt; item.replace(<span class="hljs-regexp">/[\s,]/g</span>, <span class="hljs-string">''</span>));
+        <span class="hljs-keyword">return</span> (result === <span class="hljs-literal">null</span>) ? [] : result.map(<span class="hljs-function"><span class="hljs-params">item</span> =&gt;</span> item.replace(<span class="hljs-regexp">/[\s,]/g</span>, <span class="hljs-string">''</span>));
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroyComponent</span>(<span class="hljs-params">cp</span>) </span>{
@@ -132,7 +134,7 @@ define([
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyToChildren</span>(<span class="hljs-params">children, cb</span>) </span>{
         <span class="hljs-keyword">if</span> (children !== <span class="hljs-literal">undefined</span>) {
-            <span class="hljs-built_in">Object</span>.keys(children).forEach((name) =&gt; {
+            <span class="hljs-built_in">Object</span>.keys(children).forEach(<span class="hljs-function">(<span class="hljs-params">name</span>) =&gt;</span> {
                 <span class="hljs-keyword">let</span> instance = children[name];
                 <span class="hljs-keyword">if</span> (!applyToGroup(instance, cb)) {
                     cb(instance);
@@ -143,7 +145,7 @@ define([
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyToGroup</span>(<span class="hljs-params">child, cb</span>) </span>{
         <span class="hljs-keyword">if</span> (child.elGroup &amp;&amp; child.elGroup.size &gt; <span class="hljs-number">0</span>) {
-            child.elGroup.forEach((childInstance) =&gt; {
+            child.elGroup.forEach(<span class="hljs-function">(<span class="hljs-params">childInstance</span>) =&gt;</span> {
                 cb(childInstance);
             });
             <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
@@ -163,7 +165,7 @@ define([
                     active = context.active,
                     matches = match(route);
 
-                matches.to((...args) =&gt; {
+                matches.to(<span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> {
                     <span class="hljs-keyword">let</span> params = args.pop();
                     id = (args.length &gt; <span class="hljs-number">0</span>) ? params.getLocation() + <span class="hljs-string">'_'</span> + args.join(<span class="hljs-string">'_'</span>) : <span class="hljs-literal">undefined</span>;
 
@@ -184,18 +186,18 @@ define([
                     });
                 });
 
-                matches.leave(done=&gt; {
+                matches.leave(<span class="hljs-function"><span class="hljs-params">done</span>=&gt;</span> {
                     <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
                         stopped = <span class="hljs-literal">false</span>;
                     applyToGroup(child, (childInstance) =&gt; {
-                        <span class="hljs-keyword">let</span> finish = () =&gt; {
+                        <span class="hljs-keyword">let</span> finish = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
                                 <span class="hljs-keyword">if</span> (!id) {
                                     dom.detach(childInstance);
                                 } <span class="hljs-keyword">else</span> {
                                     destroyComponent(childInstance);
                                 }
                             },
-                            close = (close = <span class="hljs-literal">true</span>) =&gt; {
+                            close = <span class="hljs-function">(<span class="hljs-params">close = <span class="hljs-literal">true</span></span>) =&gt;</span> {
                                 <span class="hljs-keyword">if</span> (close) {
                                     items--;
                                 } <span class="hljs-keyword">else</span> {
@@ -227,7 +229,7 @@ define([
                     });
                 });
 
-                matches.query((params) =&gt; {
+                matches.query(<span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {
                     applyToGroup(child, (childInstance) =&gt; {
                         applyToChildren(childInstance.children, (instance) =&gt; {
                             <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
