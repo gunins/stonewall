@@ -1245,12 +1245,14 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
         }, {
             key: 'setContext',
             value: function setContext(context) {
-                this.context = context;
+                if (!this.context) {
+                    this.context = context;
 
-                if (!this.async) {
-                    this.render();
+                    if (!this.async) {
+                        this.render();
+                    }
+                    this.init.apply(this, _toConsumableArray(this._arguments));
                 }
-                this.init.apply(this, _toConsumableArray(this._arguments));
             }
         }, {
             key: 'render',

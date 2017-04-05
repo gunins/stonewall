@@ -243,12 +243,14 @@ Basic Usage example</p>
         }
 
         setContext(context) {
-            <span class="hljs-keyword">this</span>.context = context;
+            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.context) {
+                <span class="hljs-keyword">this</span>.context = context;
 
-            <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.async) {
-                <span class="hljs-keyword">this</span>.render();
+                <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.async) {
+                    <span class="hljs-keyword">this</span>.render();
+                }
+                <span class="hljs-keyword">this</span>.init(...this._arguments);
             }
-            <span class="hljs-keyword">this</span>.init(...this._arguments);
         };
 
         set context(context) {

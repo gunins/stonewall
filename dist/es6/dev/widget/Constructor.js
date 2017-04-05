@@ -1231,12 +1231,14 @@ define('widget/Constructor',[
         }
 
         setContext(context) {
-            this.context = context;
+            if (!this.context) {
+                this.context = context;
 
-            if (!this.async) {
-                this.render();
+                if (!this.async) {
+                    this.render();
+                }
+                this.init(...this._arguments);
             }
-            this.init(...this._arguments);
         };
 
         set context(context) {
