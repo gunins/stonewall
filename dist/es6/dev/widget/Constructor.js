@@ -1233,7 +1233,6 @@ define('widget/Constructor',[
         setContext(context) {
             if (!this.context) {
                 this.context = context;
-
                 if (!this.async) {
                     this.render();
                 }

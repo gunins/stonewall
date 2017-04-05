@@ -1247,7 +1247,6 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
             value: function setContext(context) {
                 if (!this.context) {
                     this.context = context;
-
                     if (!this.async) {
                         this.render();
                     }
