@@ -173,8 +173,10 @@ define([
                         <span class="hljs-keyword">let</span> childInstance = child.run(<span class="hljs-literal">true</span>);
                         applyToChildren(childInstance.children, instance =&gt; {
                             <span class="hljs-keyword">if</span> (instance) {
-                                match(route, match =&gt; matchRoute(instance, {match, active}));
-                            }
+                                match(route, match =&gt; matchRoute(instance, <span class="hljs-built_in">Object</span>.assign({}, context, {
+                                    match,
+                                    active
+                                })));                            }
                         });
                     }
                     applyToGroup(child, (childInstance) =&gt; {

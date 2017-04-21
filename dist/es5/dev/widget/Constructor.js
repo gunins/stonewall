@@ -1013,7 +1013,10 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                         applyToChildren(childInstance.children, function (instance) {
                             if (instance) {
                                 match(route, function (match) {
-                                    return matchRoute(instance, { match: match, active: active });
+                                    return matchRoute(instance, Object.assign({}, context, {
+                                        match: match,
+                                        active: active
+                                    }));
                                 });
                             }
                         });

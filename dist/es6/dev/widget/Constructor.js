@@ -1006,8 +1006,10 @@ define('widget/parsers/setRoutes',[
                         let childInstance = child.run(true);
                         applyToChildren(childInstance.children, instance => {
                             if (instance) {
-                                match(route, match => matchRoute(instance, {match, active}));
-                            }
+                                match(route, match => matchRoute(instance, Object.assign({}, context, {
+                                    match,
+                                    active
+                                })));                            }
                         });
                     }
                     applyToGroup(child, (childInstance) => {
