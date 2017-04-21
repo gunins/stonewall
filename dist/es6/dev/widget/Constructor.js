@@ -1006,10 +1006,12 @@ define('widget/parsers/setRoutes',[
                         let childInstance = child.run(true);
                         applyToChildren(childInstance.children, instance => {
                             if (instance) {
+                                //TODO: maybe not need Object.assign
                                 match(route, match => matchRoute(instance, Object.assign({}, context, {
                                     match,
                                     active
-                                })));                            }
+                                })));
+                            }
                         });
                     }
                     applyToGroup(child, (childInstance) => {
@@ -1021,7 +1023,7 @@ define('widget/parsers/setRoutes',[
                     });
                 });
 
-                matches.leave(done=> {
+                matches.leave(done => {
                     let items = 0,
                         stopped = false;
                     applyToGroup(child, (childInstance) => {

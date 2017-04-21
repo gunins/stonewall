@@ -1012,6 +1012,7 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                         var childInstance = child.run(true);
                         applyToChildren(childInstance.children, function (instance) {
                             if (instance) {
+                                //TODO: maybe not need Object.assign
                                 match(route, function (match) {
                                     return matchRoute(instance, Object.assign({}, context, {
                                         match: match,

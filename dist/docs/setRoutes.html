@@ -172,11 +172,26 @@ define([
                     <span class="hljs-keyword">if</span> (!applyToGroup(child, instance =&gt; dom.attach(instance))) {
                         <span class="hljs-keyword">let</span> childInstance = child.run(<span class="hljs-literal">true</span>);
                         applyToChildren(childInstance.children, instance =&gt; {
-                            <span class="hljs-keyword">if</span> (instance) {
-                                match(route, match =&gt; matchRoute(instance, <span class="hljs-built_in">Object</span>.assign({}, context, {
+                            <span class="hljs-keyword">if</span> (instance) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO: maybe not need Object.assign</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                                match(route, match =&gt; matchRoute(instance, <span class="hljs-built_in">Object</span>.assign({}, context, {
                                     match,
                                     active
-                                })));                            }
+                                })));
+                            }
                         });
                     }
                     applyToGroup(child, (childInstance) =&gt; {
@@ -188,7 +203,7 @@ define([
                     });
                 });
 
-                matches.leave(<span class="hljs-function"><span class="hljs-params">done</span>=&gt;</span> {
+                matches.leave(<span class="hljs-function"><span class="hljs-params">done</span> =&gt;</span> {
                     <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
                         stopped = <span class="hljs-literal">false</span>;
                     applyToGroup(child, (childInstance) =&gt; {
