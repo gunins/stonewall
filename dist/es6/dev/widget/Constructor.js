@@ -1312,6 +1312,14 @@ define('widget/Constructor',[
                     addChildren(this, this.root);
                     this.rendered(...this._arguments);
                     this._rendered = true;
+                } else {
+                    this.root = new dom.Element('<div></div>', {
+                        name: 'root',
+                        data: {}
+                    });
+                    addChildren(this, this.root);
+                    this.rendered(...this._arguments);
+                    this._rendered = true;
                 }
             }
         };
