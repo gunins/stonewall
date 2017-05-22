@@ -1310,7 +1310,8 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                             name: 'root',
                             data: {}
                         });
-                        addChildren(this, this.root);
+                        this.el = this.root.el;
+
                         this.rendered.apply(this, _toConsumableArray(this._arguments));
                         this._rendered = true;
                     }

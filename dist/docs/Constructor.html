@@ -336,7 +336,8 @@ Basic Usage example</p>
                         <span class="hljs-attr">name</span>: <span class="hljs-string">'root'</span>,
                         <span class="hljs-attr">data</span>: {}
                     });
-                    addChildren(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.root);
+                    <span class="hljs-keyword">this</span>.el = <span class="hljs-keyword">this</span>.root.el;
+
                     <span class="hljs-keyword">this</span>.rendered(...this._arguments);
                     <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">true</span>;
                 }

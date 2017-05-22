@@ -1317,7 +1317,8 @@ define('widget/Constructor',[
                         name: 'root',
                         data: {}
                     });
-                    addChildren(this, this.root);
+                    this.el = this.root.el;
+
                     this.rendered(...this._arguments);
                     this._rendered = true;
                 }
