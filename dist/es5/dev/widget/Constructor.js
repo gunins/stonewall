@@ -1306,11 +1306,20 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
                         this.rendered.apply(this, _toConsumableArray(this._arguments));
                         this._rendered = true;
                     } else {
-                        this.root = new dom.Element('<div></div>', {
+                        var HTMLelement = document.createElement('div');
+                        this.root = new dom.Element(HTMLelement, {
                             name: 'root',
                             data: {}
                         });
-                        this.el = this.root.el;
+                        if (this.el) {
+                            var _parent = this.el.parentNode;
+                            if (_parent) {
+                                _parent.replaceChild(HTMLelement, this.el);
+                            }
+                        }
+                        this.el = HTMLelement;
+                        this.children = {};
+                        addChildren(this, this.root);
 
                         this.rendered.apply(this, _toConsumableArray(this._arguments));
                         this._rendered = true;

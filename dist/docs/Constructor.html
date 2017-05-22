@@ -332,11 +332,20 @@ Basic Usage example</p>
                     <span class="hljs-keyword">this</span>.rendered(...this._arguments);
                     <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">true</span>;
                 } <span class="hljs-keyword">else</span> {
-                    <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(<span class="hljs-string">'&lt;div&gt;&lt;/div&gt;'</span>, {
+                    <span class="hljs-keyword">let</span> HTMLelement = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+                    <span class="hljs-keyword">this</span>.root = <span class="hljs-keyword">new</span> dom.Element(HTMLelement, {
                         <span class="hljs-attr">name</span>: <span class="hljs-string">'root'</span>,
                         <span class="hljs-attr">data</span>: {}
                     });
-                    <span class="hljs-keyword">this</span>.el = <span class="hljs-keyword">this</span>.root.el;
+                    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.el) {
+                        <span class="hljs-keyword">let</span> parent = <span class="hljs-keyword">this</span>.el.parentNode;
+                        <span class="hljs-keyword">if</span> (parent) {
+                            parent.replaceChild(HTMLelement, <span class="hljs-keyword">this</span>.el);
+                        }
+                    }
+                    <span class="hljs-keyword">this</span>.el = HTMLelement;
+                    <span class="hljs-keyword">this</span>.children = {};
+                    addChildren(<span class="hljs-keyword">this</span>, <span class="hljs-keyword">this</span>.root);
 
                     <span class="hljs-keyword">this</span>.rendered(...this._arguments);
                     <span class="hljs-keyword">this</span>._rendered = <span class="hljs-literal">true</span>;
