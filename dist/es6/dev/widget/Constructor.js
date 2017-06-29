@@ -1026,6 +1026,7 @@ define('widget/parsers/setRoutes',[
                 });
 
                 matches.leave(done => {
+                    routesQueried = [];
                     let items = 0,
                         stopped = false;
                     applyToGroup(child, (childInstance) => {

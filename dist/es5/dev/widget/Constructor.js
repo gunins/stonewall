@@ -1034,6 +1034,7 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                 });
 
                 matches.leave(function (done) {
+                    routesQueried = [];
                     var items = 0,
                         stopped = false;
                     applyToGroup(child, function (childInstance) {

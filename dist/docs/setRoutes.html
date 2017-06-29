@@ -206,6 +206,7 @@ define([
                 });
 
                 matches.leave(<span class="hljs-function"><span class="hljs-params">done</span> =&gt;</span> {
+                    routesQueried = [];
                     <span class="hljs-keyword">let</span> items = <span class="hljs-number">0</span>,
                         stopped = <span class="hljs-literal">false</span>;
                     applyToGroup(child, (childInstance) =&gt; {
