@@ -1077,8 +1077,9 @@ define('widget/parsers/setRoutes',[
                     }
                     applyToGroup(child, (childInstance) => {
                         applyToChildren(childInstance.children, (instance) => {
-                            if (instance && instance.query !== undefined) {
+                            if (instance && instance.query !== undefined && routesQueried.indexOf(instance) === -1) {
                                 instance.query(params);
+                                routesQueried.push(instance);
                             }
                         });
                     });

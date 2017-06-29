@@ -1086,8 +1086,9 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                     }
                     applyToGroup(child, function (childInstance) {
                         applyToChildren(childInstance.children, function (instance) {
-                            if (instance && instance.query !== undefined) {
+                            if (instance && instance.query !== undefined && routesQueried.indexOf(instance) === -1) {
                                 instance.query(params);
+                                routesQueried.push(instance);
                             }
                         });
                     });

@@ -270,8 +270,9 @@ define([
                     }
                     applyToGroup(child, (childInstance) =&gt; {
                         applyToChildren(childInstance.children, (instance) =&gt; {
-                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
+                            <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span> &amp;&amp; routesQueried.indexOf(instance) === <span class="hljs-number">-1</span>) {
                                 instance.query(params);
+                                routesQueried.push(instance);
                             }
                         });
                     });
