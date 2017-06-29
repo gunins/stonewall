@@ -996,7 +996,9 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                 var id = void 0,
                     match = context.match,
                     active = context.active,
-                    matches = match(route);
+                    matches = match(route),
+                    oldParams = context.oldParams = context.oldParams || false,
+                    routesQueried = context.routesQueried = context.routesQueried || [];
 
                 matches.to(function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -1076,6 +1078,12 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                 });
 
                 matches.query(function (params) {
+                    //TODO: currently is a hack, later need better solution;
+                    var query = JSON.stringify(params.getQuery());
+                    if (oldParams !== query) {
+                        oldParams = query;
+                        routesQueried = [];
+                    }
                     applyToGroup(child, function (childInstance) {
                         applyToChildren(childInstance.children, function (instance) {
                             if (instance && instance.query !== undefined) {

@@ -996,7 +996,9 @@ define('widget/parsers/setRoutes',[
                 let id,
                     match = context.match,
                     active = context.active,
-                    matches = match(route);
+                    matches = match(route),
+                    oldParams = context.oldParams = context.oldParams || false,
+                    routesQueried = context.routesQueried = context.routesQueried || [];
 
                 matches.to((...args) => {
                     let params = args.pop();
@@ -1066,7 +1068,13 @@ define('widget/parsers/setRoutes',[
                     });
                 });
 
-                matches.query((params) => {
+                matches.query(params => {
+                    //TODO: currently is a hack, later need better solution;
+                    let query = JSON.stringify(params.getQuery());
+                    if (oldParams !== query) {
+                        oldParams = query;
+                        routesQueried = [];
+                    }
                     applyToGroup(child, (childInstance) => {
                         applyToChildren(childInstance.children, (instance) => {
                             if (instance && instance.query !== undefined) {

@@ -163,7 +163,9 @@ define([
                 <span class="hljs-keyword">let</span> id,
                     match = context.match,
                     active = context.active,
-                    matches = match(route);
+                    matches = match(route),
+                    oldParams = context.oldParams = context.oldParams || <span class="hljs-literal">false</span>,
+                    routesQueried = context.routesQueried = context.routesQueried || [];
 
                 matches.to(<span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> {
                     <span class="hljs-keyword">let</span> params = args.pop();
@@ -246,7 +248,26 @@ define([
                     });
                 });
 
-                matches.query(<span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {
+                matches.query(<span class="hljs-function"><span class="hljs-params">params</span> =&gt;</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>TODO: currently is a hack, later need better solution;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">let</span> query = <span class="hljs-built_in">JSON</span>.stringify(params.getQuery());
+                    <span class="hljs-keyword">if</span> (oldParams !== query) {
+                        oldParams = query;
+                        routesQueried = [];
+                    }
                     applyToGroup(child, (childInstance) =&gt; {
                         applyToChildren(childInstance.children, (instance) =&gt; {
                             <span class="hljs-keyword">if</span> (instance &amp;&amp; instance.query !== <span class="hljs-literal">undefined</span>) {
