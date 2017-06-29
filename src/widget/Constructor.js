@@ -174,6 +174,24 @@ define([
                     addChildren(this, this.root);
                     this.rendered(...this._arguments);
                     this._rendered = true;
+                } else {
+                    let HTMLelement = document.createElement('div');
+                    this.root = new dom.Element(HTMLelement, {
+                        name: 'root',
+                        data: {}
+                    });
+                    if (this.el) {
+                        let parent = this.el.parentNode;
+                        if (parent) {
+                            parent.replaceChild(HTMLelement, this.el);
+                        }
+                    }
+                    this.el = HTMLelement;
+                    this.children = {};
+                    addChildren(this, this.root);
+
+                    this.rendered(...this._arguments);
+                    this._rendered = true;
                 }
             }
         };
