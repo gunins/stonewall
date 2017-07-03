@@ -165,7 +165,8 @@ define([
                     active = context.active,
                     matches = match(route),
                     oldParams = context.oldParams = context.oldParams || <span class="hljs-literal">false</span>,
-                    routesQueried = context.routesQueried = context.routesQueried || [];
+                    routesQueried = context.routesQueried = context.routesQueried || [],
+                    childMatch = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>();
 
                 matches.to(<span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> {
                     <span class="hljs-keyword">let</span> params = args.pop();
@@ -189,10 +190,10 @@ define([
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                                match(route, match =&gt; matchRoute(instance, <span class="hljs-built_in">Object</span>.assign({}, context, {
+            <div class="content"><div class='highlight'><pre>                                childMatch.set(instance, match(route, match =&gt; matchRoute(instance, <span class="hljs-built_in">Object</span>.assign({}, context, {
                                     match,
                                     active
-                                })));
+                                }))));
                             }
                         });
                     }
@@ -214,6 +215,13 @@ define([
                                 <span class="hljs-keyword">if</span> (!id) {
                                     dom.detach(childInstance);
                                 } <span class="hljs-keyword">else</span> {
+                                    applyToChildren(childInstance.children, instance =&gt; {
+                                        <span class="hljs-keyword">const</span> childRoute = childMatch.get(instance);
+                                        <span class="hljs-keyword">if</span> (childRoute) {
+                                            childRoute.remove();
+                                            childMatch.delete(instance);
+                                        }
+                                    });
                                     destroyComponent(childInstance);
                                 }
                             },

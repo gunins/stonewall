@@ -55,7 +55,8 @@ define([
                     active = context.active,
                     matches = match(route),
                     oldParams = context.oldParams = context.oldParams || false,
-                    routesQueried = context.routesQueried = context.routesQueried || [];
+                    routesQueried = context.routesQueried = context.routesQueried || [],
+                    childMatch = new Map();
 
                 matches.to((...args) => {
                     let params = args.pop();
@@ -66,10 +67,10 @@ define([
                         applyToChildren(childInstance.children, instance => {
                             if (instance) {
                                 //TODO: maybe not need Object.assign
-                                match(route, match => matchRoute(instance, Object.assign({}, context, {
+                                childMatch.set(instance, match(route, match => matchRoute(instance, Object.assign({}, context, {
                                     match,
                                     active
-                                })));
+                                }))));
                             }
                         });
                     }
@@ -91,6 +92,13 @@ define([
                                 if (!id) {
                                     dom.detach(childInstance);
                                 } else {
+                                    applyToChildren(childInstance.children, instance => {
+                                        const childRoute = childMatch.get(instance);
+                                        if (childRoute) {
+                                            childRoute.remove();
+                                            childMatch.delete(instance);
+                                        }
+                                    });
                                     destroyComponent(childInstance);
                                 }
                             },

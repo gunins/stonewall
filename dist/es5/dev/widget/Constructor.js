@@ -998,7 +998,8 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                     active = context.active,
                     matches = match(route),
                     oldParams = context.oldParams = context.oldParams || false,
-                    routesQueried = context.routesQueried = context.routesQueried || [];
+                    routesQueried = context.routesQueried = context.routesQueried || [],
+                    childMatch = new Map();
 
                 matches.to(function () {
                     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -1015,12 +1016,12 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                         applyToChildren(childInstance.children, function (instance) {
                             if (instance) {
                                 //TODO: maybe not need Object.assign
-                                match(route, function (match) {
+                                childMatch.set(instance, match(route, function (match) {
                                     return matchRoute(instance, Object.assign({}, context, {
                                         match: match,
                                         active: active
                                     }));
-                                });
+                                }));
                             }
                         });
                     }
@@ -1042,6 +1043,13 @@ define('widget/parsers/setRoutes', ['templating/dom'], function (dom) {
                             if (!id) {
                                 dom.detach(childInstance);
                             } else {
+                                applyToChildren(childInstance.children, function (instance) {
+                                    var childRoute = childMatch.get(instance);
+                                    if (childRoute) {
+                                        childRoute.remove();
+                                        childMatch.delete(instance);
+                                    }
+                                });
                                 destroyComponent(childInstance);
                             }
                         },
