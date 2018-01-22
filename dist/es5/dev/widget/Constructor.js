@@ -1186,7 +1186,7 @@ define('widget/Constructor', ['require', 'templating/Decoder', 'templating/dom',
     'use strict';
 
     function _destroy(instance) {
-        var keys = Object.keys(instance);
+        var keys = Object.keys(instance || {});
         if (keys.length > 0) {
             keys.forEach(function (key) {
                 if (key !== 'root') {

@@ -164,7 +164,7 @@ Basic Usage example</p>
 
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroy</span>(<span class="hljs-params">instance</span>) </span>{
-        <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(instance);
+        <span class="hljs-keyword">let</span> keys = <span class="hljs-built_in">Object</span>.keys(instance || {});
         <span class="hljs-keyword">if</span> (keys.length &gt; <span class="hljs-number">0</span>) {
             keys.forEach(<span class="hljs-function">(<span class="hljs-params">key</span>) =&gt;</span> {
                 <span class="hljs-keyword">if</span> (key !== <span class="hljs-string">'root'</span>) {
@@ -202,6 +202,7 @@ Basic Usage example</p>
         <span class="hljs-keyword">static</span> extend(options = {}) {
             <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Surrogate</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Constructor</span> </span>{
             }
+
             <span class="hljs-built_in">Object</span>.assign(Surrogate.prototype, options);
             <span class="hljs-keyword">return</span> Surrogate;
         };
@@ -680,6 +681,7 @@ TODO: need to write tests for async operations.</p>
             <span class="hljs-keyword">return</span> applyBinders(<span class="hljs-keyword">this</span>, ...args);
         }
     }
+
     <span class="hljs-built_in">Object</span>.assign(Constructor.prototype, {</pre></div></div>
             
         </li>

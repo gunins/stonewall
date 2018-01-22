@@ -6,6 +6,7 @@ define([
     return Constructor.extend({
         template: template,
         init: function () {
+            console.log(this.data);
         },
         match: function (match) {
             match('/:tab').to(function (tab, param) {
@@ -25,7 +26,8 @@ define([
         },
         elReady: {
             resultsholder: function (container) {
-                    this.addComponent(Results, {
+                console.log(container.el);
+                this.addComponent(Results, {
                         name: 'results',
                         bind: 'results',
                         data: this.data,

@@ -42,7 +42,7 @@ define([
 
 
     function destroy(instance) {
-        let keys = Object.keys(instance);
+        let keys = Object.keys(instance || {});
         if (keys.length > 0) {
             keys.forEach((key) => {
                 if (key !== 'root') {
@@ -69,6 +69,7 @@ define([
         static extend(options = {}) {
             class Surrogate extends Constructor {
             }
+
             Object.assign(Surrogate.prototype, options);
             return Surrogate;
         };
@@ -402,6 +403,7 @@ define([
             return applyBinders(this, ...args);
         }
     }
+
     Object.assign(Constructor.prototype, {
         // `nodes` Object override default methods to Elements.
         // Usage Example
