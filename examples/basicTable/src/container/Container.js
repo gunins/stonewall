@@ -4,16 +4,16 @@
 define([
     'widget/Constructor',
     'templating/parser!./_container.html'
-], function (Constructor, template) {
+], function(Constructor, template) {
     'use strict';
 
     return Constructor.extend({
         template: template,
-        init(){
+        init() {
 
         },
         nodes:    {
-            panel(el, data){
+            panel(el, data) {
                 this.setChildren(el, data);
             }
         }

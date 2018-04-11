@@ -6,15 +6,11 @@ define([
     'templating/parser!./_table.html'
 ], function(Constructor, template) {
     'use strict';
-    function getCoords(elem, body) {
-        let box = elem.el.getBoundingClientRect(),
-            scrollTop = body.scrollTop,
-            scrollLeft = body.scrollLeft,
-            clientTop = body.clientTop || 0,
-            clientLeft = body.clientLeft || 0,
-            top = box.top + scrollTop - clientTop,
-            left = box.left + scrollLeft - clientLeft;
 
+    function getCoords(elem) {
+        let box = elem.el.getBoundingClientRect(),
+            top = box.top,
+            left = box.left;
         return {top: Math.round(top), left: Math.round(left)};
     }
 
@@ -71,7 +67,7 @@ define([
             root:  [{
                 name:   'mousemove',
                 action: function(e, el) {
-                    var offset = getCoords(el, this.context.container);
+                    var offset = getCoords(el);
                     this.eventBus.publish('move', {
                         pageX: e.pageX - offset.left + 10,
                         pageY: e.pageY - offset.top - 10
